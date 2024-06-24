@@ -1,0 +1,609 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */; };
+		465878702C2997B2005D4788 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786F2C2997B2005D4788 /* ContentView.swift */; };
+		465878722C2997B2005D4788 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 465878712C2997B2005D4788 /* Assets.xcassets */; };
+		465878752C2997B2005D4788 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 465878742C2997B2005D4788 /* Preview Assets.xcassets */; };
+		4658787F2C2997B3005D4788 /* ScopaRoyaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658787E2C2997B3005D4788 /* ScopaRoyaleTests.swift */; };
+		465878892C2997B3005D4788 /* ScopaRoyaleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878882C2997B3005D4788 /* ScopaRoyaleUITests.swift */; };
+		4658788B2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */; };
+		465878982C2997FE005D4788 /* StartNewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878972C2997FE005D4788 /* StartNewGameView.swift */; };
+		465878B02C299F35005D4788 /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */; };
+		465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878B32C29B5D0005D4788 /* SelectModeView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4658787B2C2997B3005D4788 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 465878622C2997B2005D4788 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 465878692C2997B2005D4788;
+			remoteInfo = ScopaRoyale;
+		};
+		465878852C2997B3005D4788 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 465878622C2997B2005D4788 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 465878692C2997B2005D4788;
+			remoteInfo = ScopaRoyale;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4658786A2C2997B2005D4788 /* ScopaRoyale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScopaRoyale.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleApp.swift; sourceTree = "<group>"; };
+		4658786F2C2997B2005D4788 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		465878712C2997B2005D4788 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		465878742C2997B2005D4788 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		4658787A2C2997B3005D4788 /* ScopaRoyaleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScopaRoyaleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4658787E2C2997B3005D4788 /* ScopaRoyaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleTests.swift; sourceTree = "<group>"; };
+		465878842C2997B3005D4788 /* ScopaRoyaleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScopaRoyaleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		465878882C2997B3005D4788 /* ScopaRoyaleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleUITests.swift; sourceTree = "<group>"; };
+		4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		465878972C2997FE005D4788 /* StartNewGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartNewGameView.swift; sourceTree = "<group>"; };
+		465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
+		465878B32C29B5D0005D4788 /* SelectModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModeView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		465878672C2997B2005D4788 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				465878B02C299F35005D4788 /* MultipeerConnectivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		465878772C2997B3005D4788 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		465878812C2997B3005D4788 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		465878612C2997B2005D4788 = {
+			isa = PBXGroup;
+			children = (
+				4658786C2C2997B2005D4788 /* ScopaRoyale */,
+				4658787D2C2997B3005D4788 /* ScopaRoyaleTests */,
+				465878872C2997B3005D4788 /* ScopaRoyaleUITests */,
+				4658786B2C2997B2005D4788 /* Products */,
+				465878992C299873005D4788 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		4658786B2C2997B2005D4788 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4658786A2C2997B2005D4788 /* ScopaRoyale.app */,
+				4658787A2C2997B3005D4788 /* ScopaRoyaleTests.xctest */,
+				465878842C2997B3005D4788 /* ScopaRoyaleUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4658786C2C2997B2005D4788 /* ScopaRoyale */ = {
+			isa = PBXGroup;
+			children = (
+				4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */,
+				4658786F2C2997B2005D4788 /* ContentView.swift */,
+				465878712C2997B2005D4788 /* Assets.xcassets */,
+				465878732C2997B2005D4788 /* Preview Content */,
+				465878972C2997FE005D4788 /* StartNewGameView.swift */,
+				465878B32C29B5D0005D4788 /* SelectModeView.swift */,
+			);
+			path = ScopaRoyale;
+			sourceTree = "<group>";
+		};
+		465878732C2997B2005D4788 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				465878742C2997B2005D4788 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		4658787D2C2997B3005D4788 /* ScopaRoyaleTests */ = {
+			isa = PBXGroup;
+			children = (
+				4658787E2C2997B3005D4788 /* ScopaRoyaleTests.swift */,
+			);
+			path = ScopaRoyaleTests;
+			sourceTree = "<group>";
+		};
+		465878872C2997B3005D4788 /* ScopaRoyaleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				465878882C2997B3005D4788 /* ScopaRoyaleUITests.swift */,
+				4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */,
+			);
+			path = ScopaRoyaleUITests;
+			sourceTree = "<group>";
+		};
+		465878992C299873005D4788 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		465878692C2997B2005D4788 /* ScopaRoyale */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4658788E2C2997B3005D4788 /* Build configuration list for PBXNativeTarget "ScopaRoyale" */;
+			buildPhases = (
+				465878662C2997B2005D4788 /* Sources */,
+				465878672C2997B2005D4788 /* Frameworks */,
+				465878682C2997B2005D4788 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScopaRoyale;
+			productName = ScopaRoyale;
+			productReference = 4658786A2C2997B2005D4788 /* ScopaRoyale.app */;
+			productType = "com.apple.product-type.application";
+		};
+		465878792C2997B3005D4788 /* ScopaRoyaleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 465878912C2997B3005D4788 /* Build configuration list for PBXNativeTarget "ScopaRoyaleTests" */;
+			buildPhases = (
+				465878762C2997B3005D4788 /* Sources */,
+				465878772C2997B3005D4788 /* Frameworks */,
+				465878782C2997B3005D4788 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4658787C2C2997B3005D4788 /* PBXTargetDependency */,
+			);
+			name = ScopaRoyaleTests;
+			productName = ScopaRoyaleTests;
+			productReference = 4658787A2C2997B3005D4788 /* ScopaRoyaleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		465878832C2997B3005D4788 /* ScopaRoyaleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 465878942C2997B3005D4788 /* Build configuration list for PBXNativeTarget "ScopaRoyaleUITests" */;
+			buildPhases = (
+				465878802C2997B3005D4788 /* Sources */,
+				465878812C2997B3005D4788 /* Frameworks */,
+				465878822C2997B3005D4788 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				465878862C2997B3005D4788 /* PBXTargetDependency */,
+			);
+			name = ScopaRoyaleUITests;
+			productName = ScopaRoyaleUITests;
+			productReference = 465878842C2997B3005D4788 /* ScopaRoyaleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		465878622C2997B2005D4788 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					465878692C2997B2005D4788 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					465878792C2997B3005D4788 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 465878692C2997B2005D4788;
+					};
+					465878832C2997B3005D4788 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 465878692C2997B2005D4788;
+					};
+				};
+			};
+			buildConfigurationList = 465878652C2997B2005D4788 /* Build configuration list for PBXProject "ScopaRoyale" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 465878612C2997B2005D4788;
+			productRefGroup = 4658786B2C2997B2005D4788 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				465878692C2997B2005D4788 /* ScopaRoyale */,
+				465878792C2997B3005D4788 /* ScopaRoyaleTests */,
+				465878832C2997B3005D4788 /* ScopaRoyaleUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		465878682C2997B2005D4788 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				465878752C2997B2005D4788 /* Preview Assets.xcassets in Resources */,
+				465878722C2997B2005D4788 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		465878782C2997B3005D4788 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		465878822C2997B3005D4788 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		465878662C2997B2005D4788 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
+				465878982C2997FE005D4788 /* StartNewGameView.swift in Sources */,
+				4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */,
+				465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		465878762C2997B3005D4788 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4658787F2C2997B3005D4788 /* ScopaRoyaleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		465878802C2997B3005D4788 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				465878892C2997B3005D4788 /* ScopaRoyaleUITests.swift in Sources */,
+				4658788B2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4658787C2C2997B3005D4788 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 465878692C2997B2005D4788 /* ScopaRoyale */;
+			targetProxy = 4658787B2C2997B3005D4788 /* PBXContainerItemProxy */;
+		};
+		465878862C2997B3005D4788 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 465878692C2997B2005D4788 /* ScopaRoyale */;
+			targetProxy = 465878852C2997B3005D4788 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4658788C2C2997B3005D4788 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4658788D2C2997B3005D4788 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4658788F2C2997B3005D4788 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
+				DEVELOPMENT_TEAM = U6H2CNTS33;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyale;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		465878902C2997B3005D4788 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
+				DEVELOPMENT_TEAM = U6H2CNTS33;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyale;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		465878922C2997B3005D4788 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U6H2CNTS33;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyaleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ScopaRoyale.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ScopaRoyale";
+			};
+			name = Debug;
+		};
+		465878932C2997B3005D4788 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U6H2CNTS33;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyaleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ScopaRoyale.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ScopaRoyale";
+			};
+			name = Release;
+		};
+		465878952C2997B3005D4788 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U6H2CNTS33;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyaleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ScopaRoyale;
+			};
+			name = Debug;
+		};
+		465878962C2997B3005D4788 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U6H2CNTS33;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyaleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ScopaRoyale;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		465878652C2997B2005D4788 /* Build configuration list for PBXProject "ScopaRoyale" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4658788C2C2997B3005D4788 /* Debug */,
+				4658788D2C2997B3005D4788 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4658788E2C2997B3005D4788 /* Build configuration list for PBXNativeTarget "ScopaRoyale" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4658788F2C2997B3005D4788 /* Debug */,
+				465878902C2997B3005D4788 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		465878912C2997B3005D4788 /* Build configuration list for PBXNativeTarget "ScopaRoyaleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				465878922C2997B3005D4788 /* Debug */,
+				465878932C2997B3005D4788 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		465878942C2997B3005D4788 /* Build configuration list for PBXNativeTarget "ScopaRoyaleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				465878952C2997B3005D4788 /* Debug */,
+				465878962C2997B3005D4788 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 465878622C2997B2005D4788 /* Project object */;
+}
