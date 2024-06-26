@@ -4,6 +4,7 @@ struct TwoVsTwoView: View {
     let username: String
     let numberOfPlayer: Int
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
+    let lobbyName: String
     
     var body: some View {
         VStack {
@@ -12,6 +13,10 @@ struct TwoVsTwoView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 120)
+            
+            Text("Lobby's name: \(lobbyName)")
+                .font(.title)
+                .padding()
             
             if peerManager.isConnected {
                 ProgressView("Searching for opponents...")
@@ -81,16 +86,15 @@ struct TwoVsTwoView: View {
             
             // Bottone per avviare la partita
             Button(action: {
-                // Messaggio di debug quando il bottone "Start" viene premuto
-                print("Start button tapped in TwoVsTwoView")
+
             }) {
                 Text("Start")
                     .font(.system(size: 20, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .cornerRadius(100)
+                    .background(.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 35)
                     .padding(.bottom, 20)
             }
@@ -104,10 +108,10 @@ struct TwoVsTwoView: View {
 
 struct TwoVsTwoView_Previews: PreviewProvider {
     static var previews: some View {
-        TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3)
+        TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3, lobbyName: "Lobby")
     }
 }
 
 #Preview {
-    TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3)
+    TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3, lobbyName: "Lobby")
 }

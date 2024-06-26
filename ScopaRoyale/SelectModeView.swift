@@ -5,6 +5,7 @@ struct SelectModeView: View {
     @State private var navigateToOneVsOne = false
     @State private var navigateToTwoVsTwo = false
     @State private var numberOfPlayers: Int = 0
+    let lobbyName: String
     
     var body: some View {
         VStack {
@@ -15,15 +16,14 @@ struct SelectModeView: View {
                 .padding(.bottom, 40)
                 .padding(.top, 70)
 
-            
             // NavigationLink per passare alla modalità OneVsOneView
             .navigationDestination(isPresented: $navigateToOneVsOne) {
-                OneVsOneView(username: username, numberOfPlayer: numberOfPlayers)
+                OneVsOneView(username: username, numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
             // NavigationLink per passare alla modalità TwoVsTwoView
             .navigationDestination(isPresented: $navigateToTwoVsTwo) {
-                TwoVsTwoView(username: username, numberOfPlayer: numberOfPlayers)
+                TwoVsTwoView(username: username, numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
             // Bottone per selezionare la modalità 1 vs 1
@@ -39,15 +39,15 @@ struct SelectModeView: View {
                     
                     Text("1 vs 1")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(width: 250, height: 35)
-                        .background(Color.black)
-                        .cornerRadius(100)
+                        .background(.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 100))
                     
                     Text("Play with one person nearby in a one vs one mode.")
                         .font(.system(size: 14, design: .default))
-                        .foregroundColor(.gray)
+                        .foregroundStyle(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.top, 5)
                         .padding(.horizontal, 70)
@@ -70,15 +70,15 @@ struct SelectModeView: View {
                     
                     Text("2 vs 2")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(width: 250, height: 35)
-                        .background(Color.black)
-                        .cornerRadius(100)
+                        .background(.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 100))
                     
                     Text("Play with multiple people nearby in a two vs two mode where all the players will play with ten cards, also known, as 'Scopone'.")
                         .font(.system(size: 14, design: .default))
-                        .foregroundColor(.gray)
+                        .foregroundStyle(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.top, 5)
                         .padding(.horizontal, 70)
@@ -93,10 +93,10 @@ struct SelectModeView: View {
 
 struct SelectModeView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectModeView(username: "HostPlayer")
+        SelectModeView(username: "HostPlayer", lobbyName: "Lobby")
     }
 }
 
 #Preview {
-    SelectModeView(username: "HostPlayer")
+    SelectModeView(username: "HostPlayer", lobbyName: "Lobby")
 }

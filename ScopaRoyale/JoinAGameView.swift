@@ -1,10 +1,3 @@
-//
-//  JoinAGameView.swift
-//  ScopaRoyale
-//
-//  Created by Nicolò Colella on 26/06/24.
-//
-
 import SwiftUI
 
 struct JoinAGameView: View {
@@ -12,6 +5,7 @@ struct JoinAGameView: View {
     @State private var matches: [String] = [] // Array provvisorio per mantenere i nomi delle partite trovate
     @State private var selectedMatch: String? = nil // Match selezionato
     @State private var showAlert = false // Stato per la visualizzazione dell'alert
+    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
 
     var body: some View {
         VStack {
@@ -37,8 +31,8 @@ struct JoinAGameView: View {
                             Text(match)
                                 .font(.title3)
                                 .padding()
-                                .background(selectedMatch == match ? Color.gray.opacity(0.5) : Color.clear)
-                                .cornerRadius(10)
+                                .background(selectedMatch == match ? .gray.opacity(0.5) : .clear)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                     }
                 }
@@ -61,11 +55,11 @@ struct JoinAGameView: View {
             }) {
                 Text("Join")
                     .font(.system(size: 20, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .cornerRadius(100)
+                    .background(.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 35)
                     .padding(.bottom, 20)
             }
@@ -78,11 +72,10 @@ struct JoinAGameView: View {
             }
         }
         .onAppear {
-            // Simulazione di partite trovate nelle vicinanze (andrà sostituita con la logica reale)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.matches = ["Example 1", "Example 2", "Example 3"]
-            }
+            peerManager.sendUsername(username: username)
+            peerManager.joinSession()
         }
+       
         .preferredColorScheme(.light) // Forza la light mode
     }
 }

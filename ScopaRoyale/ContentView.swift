@@ -1,21 +1,16 @@
-//
-//  ContentView.swift
-//  ScopaRoyale
-//
-//  Created by Nicolò Colella on 24/06/24.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var showSelectMode = false
-    @State private var showJoinGame = false
-    @State private var showUsernameEntry = false
-    @State private var showSettings = false
+    @State private var showSelectMode: Bool = false
+    @State private var showJoinGame: Bool = false
+    @State private var showUsernameEntry: Bool = false
+    @State private var showSettings: Bool = false
+    @State private var lobbyName: String = ""
+    @State private var showLobbyName: Bool = false
 
     init() {
-        // Controlla se è presente uno username nell'app
+        // Controlla se è presente un username nell'app
         if username.isEmpty {
             _showUsernameEntry = State(initialValue: true)
         }
@@ -38,7 +33,7 @@ struct ContentView: View {
                     
                     // Navigazione verso la schermata di selezione della modalità di gioco
                     .navigationDestination(isPresented: $showSelectMode) {
-                        SelectModeView(username: username)
+                        SelectModeView(username: username, lobbyName: lobbyName)
                     }
                     
                     // Navigazione verso la schermata di ricerca della partita
@@ -48,30 +43,46 @@ struct ContentView: View {
                     
                     // Bottone per avviare una nuova partita
                     Button(action: {
-                        showSelectMode = true
+                        showLobbyName = true
                     }) {
-                        Text("Start new game")
+                        Text("Create a new lobby")
                             .font(.system(size: 20, design: .default))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.black)
-                            .cornerRadius(100)
+                            .background(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
                             .padding(.horizontal, 35)
                             .padding(.top, 20)
+                    }
+                    .sheet(isPresented: $showLobbyName) {
+                        VStack {
+                            TextField("Lobby's name", text: $lobbyName)
+                                .padding() // contact's name's input
+                            Button(action: { // shows a button to confirm the insertion
+                                if !lobbyName.isEmpty {
+                                    showLobbyName = false
+                                    showSelectMode = true
+                                }
+                            }) {
+                                Text("Submit")
+                                    .padding()
+                                    .foregroundStyle(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                            }
+                        }
                     }
                     
                     // Bottone per unirsi a una partita esistente
                     Button(action: {
                         showJoinGame = true
                     }) {
-                        Text("Join a game")
+                        Text("Join a lobby")
                             .font(.system(size: 20, design: .default))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.black)
-                            .cornerRadius(100)
+                            .background(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
                             .padding(.horizontal, 35)
                     }
                     .padding(.bottom, 20)
@@ -85,7 +96,7 @@ struct ContentView: View {
             }) {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
-                    .foregroundColor(.black)
+                    .foregroundStyle(.black)
             })
             .onReceive(NotificationCenter.default.publisher(for: .usernameEntered)) { _ in
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
