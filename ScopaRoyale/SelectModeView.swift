@@ -14,12 +14,13 @@ struct SelectModeView: View {
     
     var body: some View {
         VStack {
-            Spacer()
-            
-            // Titolo della schermata
-            Text("Select game mode")
-                .font(.title)
-                .padding()
+            Image("gameMode")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 40)
+                .padding(.bottom, 40)
+                .padding(.top, 70)
+
             
             // NavigationLink per passare alla modalità OneVsOneView
             .navigationDestination(isPresented: $navigateToOneVsOne) {
@@ -39,25 +40,27 @@ struct SelectModeView: View {
                     Image("2users")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 100)
-                        .padding(.bottom, 10)
+                        .frame(height: 55)
                     
                     Text("1 vs 1")
                         .font(.system(size: 20, design: .default))
                         .foregroundColor(.white)
                         .padding()
-                        .frame(maxWidth: .infinity)
+                        .frame(width: 250, height: 35)
                         .background(Color.black)
                         .cornerRadius(100)
-                        .padding(.horizontal, 35)
                     
-                    Text("Play with one person nearby in a one-on-one mode.")
+                    Text("Play with one person nearby in a one vs one mode.")
                         .font(.system(size: 14, design: .default))
-                        .foregroundColor(.black)
+                        .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.top, 5)
+                        .padding(.horizontal, 70)
+
                 }
             }
+            .padding(.bottom, 40)
+            .padding(.top, 40)
             
             // Bottone per selezionare la modalità 2 vs 2
             Button(action: {
@@ -67,26 +70,25 @@ struct SelectModeView: View {
                     Image("4users")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 100)
-                        .padding(.bottom, 10)
+                        .frame(height: 70)
                     
                     Text("2 vs 2")
                         .font(.system(size: 20, design: .default))
                         .foregroundColor(.white)
                         .padding()
-                        .frame(maxWidth: .infinity)
+                        .frame(width: 250, height: 35)
                         .background(Color.black)
                         .cornerRadius(100)
-                        .padding(.horizontal, 35)
                     
-                    Text("Play with multiple people nearby in a two-on-two mode, also known as 'Scopone'.")
+                    Text("Play with multiple people nearby in a two vs two mode where all the players will play with ten cards, also known, as 'Scopone'.")
                         .font(.system(size: 14, design: .default))
-                        .foregroundColor(.black)
+                        .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
                         .padding(.top, 5)
+                        .padding(.horizontal, 70)
                 }
             }
-            
+            .padding(.top, 40)
             Spacer()
         }
         .preferredColorScheme(.light) // Forza la light mode

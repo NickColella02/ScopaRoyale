@@ -27,7 +27,7 @@ struct ContentView: View {
                     .padding(.bottom, 20)
                 
                 // Titolo e campo di inserimento per l'username
-                Text("Username")
+                Text("USERNAME")
                     .font(.system(size: 20, design: .default))
                     .padding(.top, 20)
                 TextField("Enter your username", text: $username)
@@ -100,6 +100,7 @@ struct ContentView: View {
             }
             .navigationBarHidden(true) // Nasconde la barra di navigazione
         }
+        .accentColor(.black)
         .preferredColorScheme(.light) // Forza la light mode
     }
 }
