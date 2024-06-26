@@ -19,6 +19,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
             case .connected:
                 self.connectedPeers.append(peerID)
                 print("Peer \(peerID) connesso")
+                self.sendUsername(username: self.peerID.displayName)
                 if self.connectedPeers.count == self.neededPlayers {
                     print("Interruzione connessione")
                     self.isConnected = false
@@ -92,15 +93,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
     
     func sendUsername(username: String) {
         guard let data = username.data(using: .utf8) else { return }
-        if session.connectedPeers.count > 0 {
-            do {
-                try session.send(data, toPeers: session.connectedPeers, with: .reliable)
-            } catch {
-                print("Errore invio username")
-            }
+        do {
+            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio username: \(error.localizedDescription)")
         }
     }
-    
-    
 }
 
