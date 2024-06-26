@@ -20,6 +20,8 @@
 		465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878972C2997FE005D4788 /* OneVsOneView.swift */; };
 		465878B02C299F35005D4788 /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */; };
 		465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878B32C29B5D0005D4788 /* SelectModeView.swift */; };
+		4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4690AD502C2C67CE009D3DD1 /* SettingsView.swift */; };
+		4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,8 @@
 		465878972C2997FE005D4788 /* OneVsOneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneView.swift; sourceTree = "<group>"; };
 		465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
 		465878B32C29B5D0005D4788 /* SelectModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModeView.swift; sourceTree = "<group>"; };
+		4690AD502C2C67CE009D3DD1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameEntryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +123,8 @@
 				465878B32C29B5D0005D4788 /* SelectModeView.swift */,
 				462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */,
 				462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */,
+				4690AD502C2C67CE009D3DD1 /* SettingsView.swift */,
+				4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */,
 			);
 			path = ScopaRoyale;
 			sourceTree = "<group>";
@@ -287,6 +293,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
+				4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */,
+				4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */,
 				167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */,
 				462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */,
 				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,

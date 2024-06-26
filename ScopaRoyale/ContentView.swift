@@ -8,99 +8,93 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var username: String = ""
-    @State private var showAlert = false
-    @State private var alertMessage = ""
-    
-    // Stati per la navigazione verso le altre schermate
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     @State private var showSelectMode = false
     @State private var showJoinGame = false
+    @State private var showUsernameEntry = false
+    @State private var showSettings = false
+
+    init() {
+        // Controlla se è presente uno username nell'app
+        if username.isEmpty {
+            _showUsernameEntry = State(initialValue: true)
+        }
+    }
 
     var body: some View {
         NavigationStack {
             VStack {
-                // Logo dell'applicazione
-                Image("AppLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 180)
-                    .padding(.bottom, 20)
-                
-                // Titolo e campo di inserimento per l'username
-                Text("USERNAME")
-                    .font(.system(size: 20, design: .default))
-                    .padding(.top, 20)
-                TextField("Enter your username", text: $username)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(100)
-                    .padding(.horizontal, 35)
-                    .padding(.bottom, 20)
-                
-                // Navigazione verso la schermata di selezione della modalità di gioco
-                .navigationDestination(isPresented: $showSelectMode) {
-                    SelectModeView(username: username)
-                }
-                
-                // Navigazione verso la schermata di ricerca della partita
-                .navigationDestination(isPresented: $showJoinGame) {
-                    JoinAGameView(username: username)
-                }
-                
-                // Bottone per avviare una nuova partita
-                Button(action: {
-                    if username.isEmpty {
-                        alertMessage = "Please enter your username to start a new game."
-                        showAlert = true
-                    } else {
+                Spacer()
+                if showUsernameEntry {
+                    // Mostra la schermata di inserimento dello username se necessario
+                    UsernameEntryView()
+                } else {
+                    // Logo dell'applicazione
+                    Image("AppLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 180)
+                        .padding(.bottom, 20)
+                    
+                    // Navigazione verso la schermata di selezione della modalità di gioco
+                    .navigationDestination(isPresented: $showSelectMode) {
+                        SelectModeView(username: username)
+                    }
+                    
+                    // Navigazione verso la schermata di ricerca della partita
+                    .navigationDestination(isPresented: $showJoinGame) {
+                        JoinAGameView(username: username)
+                    }
+                    
+                    // Bottone per avviare una nuova partita
+                    Button(action: {
                         showSelectMode = true
+                    }) {
+                        Text("Start new game")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black)
+                            .cornerRadius(100)
+                            .padding(.horizontal, 35)
+                            .padding(.top, 20)
                     }
-                }) {
-                    Text("Start new game")
-                        .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.black)
-                        .cornerRadius(100)
-                        .padding(.horizontal, 35)
-                        .padding(.top, 20)
-                }
-                
-                // Bottone per unirsi a una partita esistente
-                Button(action: {
-                    if username.isEmpty {
-                        alertMessage = "Please enter your username to join a game."
-                        showAlert = true
-                    } else {
+                    
+                    // Bottone per unirsi a una partita esistente
+                    Button(action: {
                         showJoinGame = true
+                    }) {
+                        Text("Join a game")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black)
+                            .cornerRadius(100)
+                            .padding(.horizontal, 35)
                     }
-                }) {
-                    Text("Join a game")
-                        .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.black)
-                        .cornerRadius(100)
-                        .padding(.horizontal, 35)
+                    .padding(.bottom, 20)
                 }
-                .padding(.bottom, 20)
-                
                 Spacer()
             }
-            .padding(.top, 100)
-            .padding(.bottom, 100)
-            .alert(isPresented: $showAlert) {
-                Alert(
-                    title: Text("Username Required"),
-                    message: Text(alertMessage),
-                    dismissButton: .default(Text("OK"))
-                )
+            .navigationBarHidden(false) // Mostra la barra di navigazione
+            .navigationTitle("")
+            .navigationBarItems(trailing: Button(action: {
+                showSettings = true
+            }) {
+                Image(systemName: "ellipsis.circle")
+                    .imageScale(.large)
+                    .foregroundColor(.black)
+            })
+            .onReceive(NotificationCenter.default.publisher(for: .usernameEntered)) { _ in
+                self.username = UserDefaults.standard.string(forKey: "username") ?? ""
+                self.showUsernameEntry = false
             }
-            .navigationBarHidden(true) // Nasconde la barra di navigazione
+            .sheet(isPresented: $showSettings) {
+                SettingsView(username: $username)
+            }
         }
-        .accentColor(.black)
         .preferredColorScheme(.light) // Forza la light mode
     }
 }
@@ -113,4 +107,8 @@ struct ContentView_Previews: PreviewProvider {
 
 #Preview {
     ContentView()
+}
+
+extension Notification.Name {
+    static let usernameEntered = Notification.Name("usernameEntered")
 }
