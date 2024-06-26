@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */; };
+		462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */; };
 		4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */; };
 		465878702C2997B2005D4788 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786F2C2997B2005D4788 /* ContentView.swift */; };
 		465878722C2997B2005D4788 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 465878712C2997B2005D4788 /* Assets.xcassets */; };
@@ -14,7 +16,7 @@
 		4658787F2C2997B3005D4788 /* ScopaRoyaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658787E2C2997B3005D4788 /* ScopaRoyaleTests.swift */; };
 		465878892C2997B3005D4788 /* ScopaRoyaleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878882C2997B3005D4788 /* ScopaRoyaleUITests.swift */; };
 		4658788B2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */; };
-		465878982C2997FE005D4788 /* StartNewGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878972C2997FE005D4788 /* StartNewGameView.swift */; };
+		465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878972C2997FE005D4788 /* OneVsOneView.swift */; };
 		465878B02C299F35005D4788 /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */; };
 		465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878B32C29B5D0005D4788 /* SelectModeView.swift */; };
 /* End PBXBuildFile section */
@@ -37,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinAGameView.swift; sourceTree = "<group>"; };
+		462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoVsTwoView.swift; sourceTree = "<group>"; };
 		4658786A2C2997B2005D4788 /* ScopaRoyale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScopaRoyale.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleApp.swift; sourceTree = "<group>"; };
 		4658786F2C2997B2005D4788 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -47,7 +51,7 @@
 		465878842C2997B3005D4788 /* ScopaRoyaleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScopaRoyaleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		465878882C2997B3005D4788 /* ScopaRoyaleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleUITests.swift; sourceTree = "<group>"; };
 		4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		465878972C2997FE005D4788 /* StartNewGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartNewGameView.swift; sourceTree = "<group>"; };
+		465878972C2997FE005D4788 /* OneVsOneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneView.swift; sourceTree = "<group>"; };
 		465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
 		465878B32C29B5D0005D4788 /* SelectModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -106,8 +110,10 @@
 				4658786F2C2997B2005D4788 /* ContentView.swift */,
 				465878712C2997B2005D4788 /* Assets.xcassets */,
 				465878732C2997B2005D4788 /* Preview Content */,
-				465878972C2997FE005D4788 /* StartNewGameView.swift */,
+				465878972C2997FE005D4788 /* OneVsOneView.swift */,
 				465878B32C29B5D0005D4788 /* SelectModeView.swift */,
+				462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */,
+				462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */,
 			);
 			path = ScopaRoyale;
 			sourceTree = "<group>";
@@ -276,9 +282,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
-				465878982C2997FE005D4788 /* StartNewGameView.swift in Sources */,
+				462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */,
+				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,
 				4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */,
 				465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */,
+				462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

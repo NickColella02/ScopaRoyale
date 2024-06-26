@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  ScopaRoyale
 //
-//  Created on 24/06/24.
+//  Created by Nicolò Colella on 24/06/24.
 //
 
 import SwiftUI
@@ -11,21 +11,25 @@ struct ContentView: View {
     @State private var username: String = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
+    
+    // Stati per la navigazione verso le altre schermate
     @State private var showSelectMode = false
+    @State private var showJoinGame = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
+                // Logo dell'applicazione
                 Image("AppLogo")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 180)
                     .padding(.bottom, 20)
                 
+                // Titolo e campo di inserimento per l'username
                 Text("Username")
                     .font(.system(size: 20, design: .default))
                     .padding(.top, 20)
-                
                 TextField("Enter your username", text: $username)
                     .padding()
                     .background(Color(.systemGray6))
@@ -33,10 +37,17 @@ struct ContentView: View {
                     .padding(.horizontal, 35)
                     .padding(.bottom, 20)
                 
-                NavigationLink(destination: SelectModeView(username: username), isActive: $showSelectMode) {
-                    EmptyView()
+                // Navigazione verso la schermata di selezione della modalità di gioco
+                .navigationDestination(isPresented: $showSelectMode) {
+                    SelectModeView(username: username)
                 }
                 
+                // Navigazione verso la schermata di ricerca della partita
+                .navigationDestination(isPresented: $showJoinGame) {
+                    JoinAGameView(username: username)
+                }
+                
+                // Bottone per avviare una nuova partita
                 Button(action: {
                     if username.isEmpty {
                         alertMessage = "Please enter your username to start a new game."
@@ -56,12 +67,13 @@ struct ContentView: View {
                         .padding(.top, 20)
                 }
                 
+                // Bottone per unirsi a una partita esistente
                 Button(action: {
                     if username.isEmpty {
                         alertMessage = "Please enter your username to join a game."
                         showAlert = true
                     } else {
-                        // Azione per unirsi a un gioco esistente
+                        showJoinGame = true
                     }
                 }) {
                     Text("Join a game")
@@ -88,6 +100,7 @@ struct ContentView: View {
             }
             .navigationBarHidden(true) // Nasconde la barra di navigazione
         }
+        .preferredColorScheme(.light) // Forza la light mode
     }
 }
 
