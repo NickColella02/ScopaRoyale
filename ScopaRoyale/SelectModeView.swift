@@ -1,16 +1,10 @@
-//
-//  SelectModeView.swift
-//  ScopaRoyale
-//
-//  Created by Nicolò Colella on 24/06/24.
-//
-
 import SwiftUI
 
 struct SelectModeView: View {
     let username: String
     @State private var navigateToOneVsOne = false
     @State private var navigateToTwoVsTwo = false
+    @State private var numberOfPlayers: Int = 0
     
     var body: some View {
         VStack {
@@ -24,17 +18,18 @@ struct SelectModeView: View {
             
             // NavigationLink per passare alla modalità OneVsOneView
             .navigationDestination(isPresented: $navigateToOneVsOne) {
-                OneVsOneView(username: username)
+                OneVsOneView(username: username, numberOfPlayer: numberOfPlayers)
             }
             
             // NavigationLink per passare alla modalità TwoVsTwoView
             .navigationDestination(isPresented: $navigateToTwoVsTwo) {
-                TwoVsTwoView(username: username)
+                TwoVsTwoView(username: username, numberOfPlayer: numberOfPlayers)
             }
             
             // Bottone per selezionare la modalità 1 vs 1
             Button(action: {
                 navigateToOneVsOne = true
+                numberOfPlayers = 1
             }) {
                 VStack {
                     Image("2users")
@@ -65,6 +60,7 @@ struct SelectModeView: View {
             // Bottone per selezionare la modalità 2 vs 2
             Button(action: {
                 navigateToTwoVsTwo = true
+                numberOfPlayers = 3
             }) {
                 VStack {
                     Image("4users")

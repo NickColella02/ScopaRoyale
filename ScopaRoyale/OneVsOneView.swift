@@ -1,14 +1,9 @@
-//
-//  StartNewGameView.swift
-//  ScopaRoyale
-//
-//  Created by Nicolò Colella on 24/06/24.
-//
-
 import SwiftUI
 
 struct OneVsOneView: View {
     let username: String
+    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // riferimento al peer manager
+    let numberOfPlayer: Int
     
     var body: some View {
         VStack {
@@ -18,11 +13,18 @@ struct OneVsOneView: View {
                 .scaledToFit()
                 .frame(height: 120)
             
-            // Titolo della schermata
-            Text("Waiting for an opponent...")
-                .font(.title)
-                .padding()
+            if peerManager.isConnected {
+                ProgressView("Searching for opponents...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding()
+            }
             
+            if !peerManager.opponentName.isEmpty {
+                Text("Nome avversario: \(peerManager.opponentName)")
+                    .font(.title2)
+                    .padding(.top, 10)
+            }
+    
             // Nome utente del giocatore
             Text(username)
                 .font(.title2)
@@ -47,15 +49,18 @@ struct OneVsOneView: View {
             }
         }
         .preferredColorScheme(.light) // Forza la light mode
+        .onAppear() {
+            peerManager.startHosting(numberOfPlayers: numberOfPlayer)
+        }
     }
 }
 
 struct OneVsOneView_Previews: PreviewProvider {
     static var previews: some View {
-        OneVsOneView(username: "HostPlayer")
+        OneVsOneView(username: "HostPlayer", numberOfPlayer: 1)
     }
 }
 
 #Preview {
-    OneVsOneView(username: "HostPlayer")
+    OneVsOneView(username: "HostPlayer", numberOfPlayer: 1)
 }

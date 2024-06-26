@@ -1,14 +1,9 @@
-//
-//  TwoVsTwoView.swift
-//  ScopaRoyale
-//
-//  Created by Nicolò Colella on 26/06/24.
-//
-
 import SwiftUI
 
 struct TwoVsTwoView: View {
     let username: String
+    let numberOfPlayer: Int
+    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
     
     var body: some View {
         VStack {
@@ -18,10 +13,11 @@ struct TwoVsTwoView: View {
                 .scaledToFit()
                 .frame(height: 120)
             
-            // Titolo della schermata
-            Text("Waiting for opponents...")
-                .font(.title)
-                .padding()
+            if peerManager.isConnected {
+                ProgressView("Searching for opponents...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding()
+            }
             
             // Visualizzazione dei team
             VStack(alignment: .leading, spacing: 20) {
@@ -100,15 +96,18 @@ struct TwoVsTwoView: View {
             }
         }
         .preferredColorScheme(.light) // Forza la light mode
+        .onAppear() {
+            peerManager.startHosting(numberOfPlayers: numberOfPlayer)
+        }
     }
 }
 
 struct TwoVsTwoView_Previews: PreviewProvider {
     static var previews: some View {
-        TwoVsTwoView(username: "HostPlayer")
+        TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3)
     }
 }
 
 #Preview {
-    TwoVsTwoView(username: "HostPlayer")
+    TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3)
 }

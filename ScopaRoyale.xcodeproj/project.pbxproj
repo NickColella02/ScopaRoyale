@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */; };
 		462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */; };
 		462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */; };
 		4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */; };
@@ -39,6 +40,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPeerManager.swift; sourceTree = "<group>"; };
+		167C0B032C2C63A70054F0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinAGameView.swift; sourceTree = "<group>"; };
 		462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoVsTwoView.swift; sourceTree = "<group>"; };
 		4658786A2C2997B2005D4788 /* ScopaRoyale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScopaRoyale.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,7 +109,9 @@
 		4658786C2C2997B2005D4788 /* ScopaRoyale */ = {
 			isa = PBXGroup;
 			children = (
+				167C0B032C2C63A70054F0DD /* Info.plist */,
 				4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */,
+				167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */,
 				4658786F2C2997B2005D4788 /* ContentView.swift */,
 				465878712C2997B2005D4788 /* Assets.xcassets */,
 				465878732C2997B2005D4788 /* Preview Content */,
@@ -282,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
+				167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */,
 				462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */,
 				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,
 				4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */,
@@ -450,9 +456,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
-				DEVELOPMENT_TEAM = U6H2CNTS33;
+				DEVELOPMENT_TEAM = 9AFL4Y4K2L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScopaRoyale/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -463,7 +470,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyale;
+				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -479,9 +486,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
-				DEVELOPMENT_TEAM = U6H2CNTS33;
+				DEVELOPMENT_TEAM = 9AFL4Y4K2L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScopaRoyale/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -492,7 +500,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = nickcole02.ScopaRoyale;
+				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
