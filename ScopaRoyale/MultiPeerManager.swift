@@ -13,7 +13,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
     private var connectedPeers: [MCPeerID] = []
     private var neededPlayers: Int = 0
     private var myUsername: String = ""
-    private var lobbyName: String = ""
+    @Published var lobbyName: String = ""
 
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         DispatchQueue.main.async {
@@ -22,7 +22,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
                 self.connectedPeers.append(peerID)
                 print("Peer \(peerID) connesso")
                 self.sendUsername(username: self.myUsername)
-                self.sendLobbyName(lobbyName: self.lobbyName)
                 if self.connectedPeers.count == self.neededPlayers {
                     print("Interruzione connessione")
                     self.isConnected = false
@@ -84,7 +83,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
         self.neededPlayers = numberOfPlayers
         self.lobbyName = lobbyName
         self.isConnected = true
-        
         advertiser = MCNearbyServiceAdvertiser(peer: peerID, discoveryInfo: nil, serviceType: serviceType)
         advertiser?.delegate = self
         advertiser?.startAdvertisingPeer()
@@ -103,16 +101,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
             try session.send(data, toPeers: session.connectedPeers, with: .reliable)
         } catch {
             print("Errore invio username: \(error.localizedDescription)")
-        }
-    }
-    
-    func sendLobbyName(lobbyName: String) {
-        self.lobbyName = lobbyName
-        guard let data = lobbyName.data(using: .utf8) else { return }
-        do {
-            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio nome lobby: \(error.localizedDescription)")
         }
     }
 }

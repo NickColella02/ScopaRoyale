@@ -17,7 +17,9 @@ struct JoinAGameView: View {
             
             // Elenco delle partite trovate
             HStack {
-                
+                Text("Lobby's name: \(peerManager.lobbyName)")
+                    .font(.title)
+                    .padding()
             }
             
             Spacer()
