@@ -13,7 +13,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
     private var connectedPeers: [MCPeerID] = []
     private var neededPlayers: Int = 0
     private var myUsername: String = ""
-    @Published var availableLobbies: [LobbyInfo] = [] // Elenco delle lobby disponibili
+    private var lobbyName: String = ""
 
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         DispatchQueue.main.async {
@@ -22,6 +22,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
                 self.connectedPeers.append(peerID)
                 print("Peer \(peerID) connesso")
                 self.sendUsername(username: self.myUsername)
+                self.sendLobbyName(lobbyName: self.lobbyName)
                 if self.connectedPeers.count == self.neededPlayers {
                     print("Interruzione connessione")
                     self.isConnected = false
@@ -35,7 +36,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
                     self.advertiser?.startAdvertisingPeer()
                     self.opponentName = "" // Rimuovi il nome dell'avversario
                     self.isConnected = false
-                    self.startHosting(numberOfPlayers: self.neededPlayers) // Ricomincia la ricerca
+                    self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.neededPlayers) // Ricomincia la ricerca
                 }
             default:
                 break
@@ -44,25 +45,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        do {
-            let lobbyInfo = try JSONDecoder().decode(LobbyInfo.self, from: data)
-            DispatchQueue.main.async {
-                // Aggiungi l'informazione sulla lobby alla lista delle lobby disponibili
-                if !self.availableLobbies.contains(lobbyInfo) {
-                    self.availableLobbies.append(lobbyInfo)
-                }
-            }
-        } catch {
-            print("Errore decoding lobby info: \(error.localizedDescription)")
-        }
-    }
-    
-    func sendLobbyInfo(lobbyInfo: LobbyInfo) {
-        do {
-            let data = try JSONEncoder().encode(lobbyInfo)
-            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio lobby info: \(error.localizedDescription)")
+        if let name = String(data: data, encoding: .utf8) {
+            self.opponentName = name
         }
     }
 
@@ -96,9 +80,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
         self.session.delegate = self
     }
 
-    func startHosting(numberOfPlayers: Int) {
+    func startHosting(lobbyName: String, numberOfPlayers: Int) {
         self.neededPlayers = numberOfPlayers
+        self.lobbyName = lobbyName
         self.isConnected = true
+        
         advertiser = MCNearbyServiceAdvertiser(peer: peerID, discoveryInfo: nil, serviceType: serviceType)
         advertiser?.delegate = self
         advertiser?.startAdvertisingPeer()
@@ -117,6 +103,16 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
             try session.send(data, toPeers: session.connectedPeers, with: .reliable)
         } catch {
             print("Errore invio username: \(error.localizedDescription)")
+        }
+    }
+    
+    func sendLobbyName(lobbyName: String) {
+        self.lobbyName = lobbyName
+        guard let data = lobbyName.data(using: .utf8) else { return }
+        do {
+            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio nome lobby: \(error.localizedDescription)")
         }
     }
 }

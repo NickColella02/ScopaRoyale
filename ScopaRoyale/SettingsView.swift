@@ -1,10 +1,3 @@
-//
-//  SettingsView.swift
-//  ScopaRoyale
-//
-// 
-//
-
 import SwiftUI
 
 struct SettingsView: View {

@@ -21,7 +21,7 @@ struct LobbyNameEntryView: View {
                     showSelectMode = true
                 }
             }) {
-                Text("Submit")
+                Text("Done")
                     .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding()

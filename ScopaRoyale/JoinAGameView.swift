@@ -17,27 +17,7 @@ struct JoinAGameView: View {
             
             // Elenco delle partite trovate
             HStack {
-                VStack(alignment: .leading) {
-                    Text("Games found:")
-                        .font(.title2)
-                        .padding(.bottom, 5)
-                    
-                    // Ciclo attraverso le partite trovate
-                    ForEach(peerManager.availableLobbies, id: \.self) { lobbyInfo in
-                        Button(action: {
-                            // Azioni quando viene selezionata una lobby
-                        }) {
-                            Text("\(lobbyInfo.lobbyName) (\(lobbyInfo.currentPlayers) players)")
-                                .font(.title3)
-                                .padding()
-                                .background(Color.gray.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                    }
-                }
-                .padding(.leading, 20)
                 
-                Spacer()
             }
             
             Spacer()

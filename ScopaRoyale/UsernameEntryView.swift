@@ -1,10 +1,3 @@
-//
-//  UsernameEntryView.swift
-//  ScopaRoyale
-//
-//  
-//
-
 import SwiftUI
 
 struct UsernameEntryView: View {
@@ -37,7 +30,7 @@ struct UsernameEntryView: View {
                     NotificationCenter.default.post(name: .usernameEntered, object: nil)
                 }
             }) {
-                Text("Submit")
+                Text("Done")
                     .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding()
