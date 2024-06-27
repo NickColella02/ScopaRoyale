@@ -63,12 +63,12 @@ struct JoinAGameView: View {
                     .padding(.horizontal, 35)
                     .padding(.bottom, 20)
             }
-            .alert(isPresented: $showAlert) {
-                Alert(
-                    title: Text("No game selected"),
-                    message: Text("Please select a game before joining."),
-                    dismissButton: .default(Text("OK"))
-                )
+            .alert("No game selected", isPresented: $showAlert) {
+                VStack {
+                    Button("OK", role: .cancel) {
+                        showAlert = false
+                    }
+                }
             }
         }
         .onAppear {

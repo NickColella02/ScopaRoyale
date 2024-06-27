@@ -70,12 +70,15 @@ struct ContentView: View {
                 }
                 Spacer()
             }
-            .navigationBarHidden(false) // Mostra la barra di navigazione
             .navigationTitle("")
-            .navigationBarItems(trailing: NavigationLink(destination: SettingsView(username: $username)) {
-                    Image(systemName: "gearshape.fill")
-                    .foregroundStyle(.black)
-                })
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: SettingsView(username: $username)) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundStyle(.black)
+                    }
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .usernameEntered)) { _ in
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
                 self.showUsernameEntry = false

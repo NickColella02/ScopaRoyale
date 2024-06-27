@@ -50,7 +50,6 @@ struct SelectModeView: View {
                         .multilineTextAlignment(.center)
                         .padding(.top, 5)
                         .padding(.horizontal, 70)
-
                 }
             }
             .padding(.bottom, 40)

@@ -13,7 +13,7 @@ struct LobbyNameEntryView: View {
             TextField("Lobby's name", text: $lobbyName)
                 .padding()
                 .background(Color(.systemGray6))
-                .cornerRadius(10)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.horizontal, 35)
             
             Button(action: { // shows a button to confirm the insertion
@@ -23,7 +23,7 @@ struct LobbyNameEntryView: View {
             }) {
                 Text("Submit")
                     .font(.system(size: 20, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color(red: 0.83, green: 0.69, blue: 0.22)) // Oro
@@ -36,8 +36,7 @@ struct LobbyNameEntryView: View {
                 SelectModeView(lobbyName: lobbyName)
             }
         }
-        .background(Color(.systemBackground))
-        .cornerRadius(20)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal, 20)
     }
 }

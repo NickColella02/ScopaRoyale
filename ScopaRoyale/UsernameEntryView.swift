@@ -2,7 +2,7 @@
 //  UsernameEntryView.swift
 //  ScopaRoyale
 //
-//  Created by Nicolò Colella on 26/06/24.
+//  
 //
 
 import SwiftUI
@@ -23,7 +23,7 @@ struct UsernameEntryView: View {
             TextField("Username", text: $username)
                 .padding()
                 .background(Color(.systemGray6))
-                .cornerRadius(100)
+                .clipShape(RoundedRectangle(cornerRadius: 100))
                 .padding(.horizontal, 35)
             
             Button(action: {
@@ -39,22 +39,21 @@ struct UsernameEntryView: View {
             }) {
                 Text("Submit")
                     .font(.system(size: 20, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color.black)
-                    .cornerRadius(100)
+                    .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 35)
                     .padding(.top, 20)
             }
-            .alert(isPresented: $showAlert) {
-                Alert(
-                    title: Text("Username Required"),
-                    message: Text(alertMessage),
-                    dismissButton: .default(Text("OK"))
-                )
+            .alert("Username required", isPresented: $showAlert) {
+                VStack {
+                    Button("OK", role: .cancel) {
+                        showAlert = false
+                    }
+                }
             }
-            
             Spacer()
         }
         .preferredColorScheme(.light) // Forza la light mode

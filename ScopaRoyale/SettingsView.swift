@@ -2,7 +2,7 @@
 //  SettingsView.swift
 //  ScopaRoyale
 //
-//  Created by Nicolò Colella on 26/06/24.
+// 
 //
 
 import SwiftUI
@@ -22,7 +22,7 @@ struct SettingsView: View {
                 TextField("Enter new username", text: $newUsername)
                     .padding()
                     .background(Color(.systemGray6))
-                    .cornerRadius(100)
+                    .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 35)
                     .padding(.top, 20)
 
@@ -38,11 +38,11 @@ struct SettingsView: View {
                 }) {
                     Text("Done")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.black)
-                        .cornerRadius(100)
+                        .clipShape(RoundedRectangle(cornerRadius: 100))
                         .padding(.horizontal, 35)
                         .padding(.top, 20)
                 }
