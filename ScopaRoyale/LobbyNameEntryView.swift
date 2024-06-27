@@ -36,6 +36,7 @@ struct LobbyNameEntryView: View {
                 SelectModeView(lobbyName: lobbyName)
             }
         }
+        .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal, 20)
     }

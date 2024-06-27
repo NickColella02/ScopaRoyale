@@ -88,13 +88,3 @@ struct SelectModeView: View {
         .preferredColorScheme(.light) // Forza la light mode
     }
 }
-
-struct SelectModeView_Previews: PreviewProvider {
-    static var previews: some View {
-        SelectModeView(lobbyName: "Lobby")
-    }
-}
-
-#Preview {
-    SelectModeView(lobbyName: "Lobby")
-}

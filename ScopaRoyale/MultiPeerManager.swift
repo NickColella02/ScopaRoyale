@@ -13,6 +13,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
     private var connectedPeers: [MCPeerID] = []
     private var neededPlayers: Int = 0
     private var myUsername: String = ""
+    @Published var availableLobbies: [LobbyInfo] = [] // Elenco delle lobby disponibili
 
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         DispatchQueue.main.async {
@@ -43,10 +44,25 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCBrowser
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        DispatchQueue.main.async {
-            if let name = String(data: data, encoding: .utf8) {
-                self.opponentName = name
+        do {
+            let lobbyInfo = try JSONDecoder().decode(LobbyInfo.self, from: data)
+            DispatchQueue.main.async {
+                // Aggiungi l'informazione sulla lobby alla lista delle lobby disponibili
+                if !self.availableLobbies.contains(lobbyInfo) {
+                    self.availableLobbies.append(lobbyInfo)
+                }
             }
+        } catch {
+            print("Errore decoding lobby info: \(error.localizedDescription)")
+        }
+    }
+    
+    func sendLobbyInfo(lobbyInfo: LobbyInfo) {
+        do {
+            let data = try JSONEncoder().encode(lobbyInfo)
+            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio lobby info: \(error.localizedDescription)")
         }
     }
 

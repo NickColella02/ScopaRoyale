@@ -52,15 +52,3 @@ struct SettingsView: View {
         }
     }
 }
-
-struct SettingsView_Previews: PreviewProvider {
-    @State static var username = "Example"
-    
-    static var previews: some View {
-        SettingsView(username: $username)
-    }
-}
-
-#Preview {
-    SettingsView(username: .constant("Example"))
-}

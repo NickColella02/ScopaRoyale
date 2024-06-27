@@ -105,13 +105,3 @@ struct TwoVsTwoView: View {
         }
     }
 }
-
-struct TwoVsTwoView_Previews: PreviewProvider {
-    static var previews: some View {
-        TwoVsTwoView(numberOfPlayer: 3, lobbyName: "Lobby")
-    }
-}
-
-#Preview {
-    TwoVsTwoView(numberOfPlayer: 3, lobbyName: "Lobby")
-}
