@@ -72,13 +72,3 @@ struct OneVsOneView: View {
        
     }
 }
-
-struct OneVsOneView_Previews: PreviewProvider {
-    static var previews: some View {
-        OneVsOneView(numberOfPlayer: 1, lobbyName: "Lobby")
-    }
-}
-
-#Preview {
-    OneVsOneView(numberOfPlayer: 1, lobbyName: "Lobby")
-}

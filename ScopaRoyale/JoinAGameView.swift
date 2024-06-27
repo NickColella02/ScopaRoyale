@@ -2,7 +2,6 @@ import SwiftUI
 
 struct JoinAGameView: View {
     let username: String
-    @State private var matches: [String] = [] // Array provvisorio per mantenere i nomi delle partite trovate
     @State private var selectedMatch: String? = nil // Match selezionato
     @State private var showAlert = false // Stato per la visualizzazione dell'alert
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
@@ -24,14 +23,14 @@ struct JoinAGameView: View {
                         .padding(.bottom, 5)
                     
                     // Ciclo attraverso le partite trovate
-                    ForEach(matches, id: \.self) { match in
+                    ForEach(peerManager.availableLobbies, id: \.self) { lobbyInfo in
                         Button(action: {
-                            selectedMatch = match
+                            // Azioni quando viene selezionata una lobby
                         }) {
-                            Text(match)
+                            Text("\(lobbyInfo.lobbyName) (\(lobbyInfo.currentPlayers) players)")
                                 .font(.title3)
                                 .padding()
-                                .background(selectedMatch == match ? .gray.opacity(0.5) : .clear)
+                                .background(Color.gray.opacity(0.5))
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                     }
@@ -78,14 +77,4 @@ struct JoinAGameView: View {
        
         .preferredColorScheme(.light) // Forza la light mode
     }
-}
-
-struct JoinAGameView_Previews: PreviewProvider {
-    static var previews: some View {
-        JoinAGameView(username: "Player1")
-    }
-}
-
-#Preview {
-    JoinAGameView(username: "Player1")
 }
