@@ -36,7 +36,7 @@ struct SettingsView: View {
                         presentationMode.wrappedValue.dismiss()
                     }
                 }) {
-                    Text("Save")
+                    Text("Done")
                         .font(.system(size: 20, design: .default))
                         .foregroundColor(.white)
                         .padding()
@@ -49,13 +49,6 @@ struct SettingsView: View {
                 Spacer()
             }
             .navigationTitle("Settings")
-            .navigationBarItems(leading: Button(action: {
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .imageScale(.large)
-                    .foregroundColor(.black)
-            })
         }
     }
 }

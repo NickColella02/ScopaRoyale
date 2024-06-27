@@ -2,10 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var showSelectMode: Bool = false
     @State private var showJoinGame: Bool = false
     @State private var showUsernameEntry: Bool = false
-    @State private var showSettings: Bool = false
     @State private var lobbyName: String = ""
     @State private var showLobbyName: Bool = false
 
@@ -30,47 +28,24 @@ struct ContentView: View {
                         .scaledToFit()
                         .frame(height: 180)
                         .padding(.bottom, 20)
-                    
-                    // Navigazione verso la schermata di selezione della modalità di gioco
-                    .navigationDestination(isPresented: $showSelectMode) {
-                        SelectModeView(username: username, lobbyName: lobbyName)
-                    }
-                    
+                                        
                     // Navigazione verso la schermata di ricerca della partita
                     .navigationDestination(isPresented: $showJoinGame) {
                         JoinAGameView(username: username)
                     }
                     
                     // Bottone per avviare una nuova partita
-                    Button(action: {
-                        showLobbyName = true
-                    }) {
-                        Text("Create a new lobby")
-                            .font(.system(size: 20, design: .default))
-                            .foregroundStyle(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(.black)
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .padding(.horizontal, 35)
-                            .padding(.top, 20)
-                    }
-                    .sheet(isPresented: $showLobbyName) {
-                        VStack {
-                            TextField("Lobby's name", text: $lobbyName)
-                                .padding() // contact's name's input
-                            Button(action: { // shows a button to confirm the insertion
-                                if !lobbyName.isEmpty {
-                                    showLobbyName = false
-                                    showSelectMode = true
-                                }
-                            }) {
-                                Text("Submit")
-                                    .padding()
-                                    .foregroundStyle(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                            }
+                    NavigationLink(destination: LobbyNameEntryView(lobbyName: $lobbyName)) {
+                            Text("Create a new lobby")
+                                .font(.system(size: 20, design: .default))
+                                .foregroundStyle(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(red: 0.83, green: 0.69, blue: 0.22)) // Oro
+                                .clipShape(RoundedRectangle(cornerRadius: 100))
+                                .padding(.horizontal, 35)
+                                .padding(.top, 20)
                         }
-                    }
                     
                     // Bottone per unirsi a una partita esistente
                     Button(action: {
@@ -81,7 +56,13 @@ struct ContentView: View {
                             .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(.black)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color(red: 0.0, green: 0.5, blue: 0.0), Color(red: 0.2, green: 0.8, blue: 0.2)]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
                             .clipShape(RoundedRectangle(cornerRadius: 100))
                             .padding(.horizontal, 35)
                     }
@@ -91,19 +72,13 @@ struct ContentView: View {
             }
             .navigationBarHidden(false) // Mostra la barra di navigazione
             .navigationTitle("")
-            .navigationBarItems(trailing: Button(action: {
-                showSettings = true
-            }) {
-                Image(systemName: "ellipsis.circle")
-                    .imageScale(.large)
+            .navigationBarItems(trailing: NavigationLink(destination: SettingsView(username: $username)) {
+                    Image(systemName: "gearshape.fill")
                     .foregroundStyle(.black)
-            })
+                })
             .onReceive(NotificationCenter.default.publisher(for: .usernameEntered)) { _ in
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
                 self.showUsernameEntry = false
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView(username: $username)
             }
         }
         .preferredColorScheme(.light) // Forza la light mode

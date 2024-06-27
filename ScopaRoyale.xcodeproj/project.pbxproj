@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */; };
+		16D9849A2C2D92C4003B1E8E /* LobbyNameEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D984992C2D92C4003B1E8E /* LobbyNameEntryView.swift */; };
 		462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */; };
 		462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */; };
 		4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */; };
@@ -44,6 +45,7 @@
 /* Begin PBXFileReference section */
 		167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPeerManager.swift; sourceTree = "<group>"; };
 		167C0B032C2C63A70054F0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		16D984992C2D92C4003B1E8E /* LobbyNameEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyNameEntryView.swift; sourceTree = "<group>"; };
 		462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinAGameView.swift; sourceTree = "<group>"; };
 		462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoVsTwoView.swift; sourceTree = "<group>"; };
 		4658786A2C2997B2005D4788 /* ScopaRoyale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScopaRoyale.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -115,6 +117,7 @@
 			children = (
 				167C0B032C2C63A70054F0DD /* Info.plist */,
 				4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */,
+				16D984992C2D92C4003B1E8E /* LobbyNameEntryView.swift */,
 				167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */,
 				4658786F2C2997B2005D4788 /* ContentView.swift */,
 				465878712C2997B2005D4788 /* Assets.xcassets */,
@@ -295,6 +298,7 @@
 				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
 				4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */,
 				4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */,
+				16D9849A2C2D92C4003B1E8E /* LobbyNameEntryView.swift in Sources */,
 				167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */,
 				462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */,
 				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TwoVsTwoView: View {
-    let username: String
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     let numberOfPlayer: Int
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
     let lobbyName: String
@@ -108,10 +108,10 @@ struct TwoVsTwoView: View {
 
 struct TwoVsTwoView_Previews: PreviewProvider {
     static var previews: some View {
-        TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3, lobbyName: "Lobby")
+        TwoVsTwoView(numberOfPlayer: 3, lobbyName: "Lobby")
     }
 }
 
 #Preview {
-    TwoVsTwoView(username: "HostPlayer", numberOfPlayer: 3, lobbyName: "Lobby")
+    TwoVsTwoView(numberOfPlayer: 3, lobbyName: "Lobby")
 }

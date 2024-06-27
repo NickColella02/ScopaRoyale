@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct OneVsOneView: View {
-    let username: String
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // riferimento al peer manager
     let numberOfPlayer: Int
     let lobbyName: String
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     
     var body: some View {
         VStack {
@@ -75,10 +75,10 @@ struct OneVsOneView: View {
 
 struct OneVsOneView_Previews: PreviewProvider {
     static var previews: some View {
-        OneVsOneView(username: "HostPlayer", numberOfPlayer: 1, lobbyName: "Lobby")
+        OneVsOneView(numberOfPlayer: 1, lobbyName: "Lobby")
     }
 }
 
 #Preview {
-    OneVsOneView(username: "HostPlayer", numberOfPlayer: 1, lobbyName: "Lobby")
+    OneVsOneView(numberOfPlayer: 1, lobbyName: "Lobby")
 }

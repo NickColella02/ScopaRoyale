@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct SelectModeView: View {
-    let username: String
     @State private var navigateToOneVsOne = false
     @State private var navigateToTwoVsTwo = false
     @State private var numberOfPlayers: Int = 0
@@ -18,12 +17,12 @@ struct SelectModeView: View {
 
             // NavigationLink per passare alla modalità OneVsOneView
             .navigationDestination(isPresented: $navigateToOneVsOne) {
-                OneVsOneView(username: username, numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
+                OneVsOneView(numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
             // NavigationLink per passare alla modalità TwoVsTwoView
             .navigationDestination(isPresented: $navigateToTwoVsTwo) {
-                TwoVsTwoView(username: username, numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
+                TwoVsTwoView(numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
             // Bottone per selezionare la modalità 1 vs 1
@@ -93,10 +92,10 @@ struct SelectModeView: View {
 
 struct SelectModeView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectModeView(username: "HostPlayer", lobbyName: "Lobby")
+        SelectModeView(lobbyName: "Lobby")
     }
 }
 
 #Preview {
-    SelectModeView(username: "HostPlayer", lobbyName: "Lobby")
+    SelectModeView(lobbyName: "Lobby")
 }
