@@ -14,10 +14,6 @@ struct OneVsOneView: View {
                 .scaledToFit()
                 .frame(height: 120)
             
-            Text("Lobby's name: \(lobbyName)")
-                .font(.title)
-                .padding()
-            
             if peerManager.isConnected {
                 ProgressView("Searching for opponents...")
                     .progressViewStyle(CircularProgressViewStyle())
@@ -25,6 +21,10 @@ struct OneVsOneView: View {
             }
             
             HStack {
+                Text("Lobby's name: \(lobbyName)")
+                    .font(.title)
+                    .padding()
+                
                 // Nome avversario a destra
                 if !peerManager.opponentName.isEmpty {
                     Spacer()
