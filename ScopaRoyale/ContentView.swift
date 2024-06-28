@@ -37,39 +37,64 @@ struct ContentView: View {
                         SelectModeView(lobbyName: lobbyName)
                     }
                     
-                    Button(action: { // bottone per creare una lobby
+                    Button(action: {
                         showLobbyForm = true
                     }) {
-                        Text("Create a new lobby")
-                            .font(.system(size: 20, design: .default))
-                            .foregroundStyle(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(red: 0.83, green: 0.69, blue: 0.22)) // Oro
-                            .clipShape(RoundedRectangle(cornerRadius: 50))
-                            .padding(.horizontal, 35)
-                            .padding(.top, 20)
+                        HStack {
+                            Text("Create a new lobby")
+                                .font(.system(size: 20, design: .default))
+                                .foregroundColor(.white)
+                                .padding(.horizontal)
+                            Image("createANewLobby")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 30, height: 60)
+                                .padding(.horizontal)
+                        }
+                        .frame(width: 330, height: 60)
+                        .background(Color.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
+                        .padding(.horizontal, 35)
+                        .padding(.top, 20)
                     }
                     
-                    Button(action: { // bottone per unirsi ad una lobby esistente
+                    Button(action: {
                         showJoinGame = true
-                    }) {
-                        Text("Join a lobby")
-                            .font(.system(size: 20, design: .default))
-                            .foregroundStyle(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color(red: 0.0, green: 0.5, blue: 0.0), Color(red: 0.2, green: 0.8, blue: 0.2)]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                        }) {
+                            HStack {
+                                Text("Join existent lobby")
+                                    .font(.system(size: 20, design: .default))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal)
+                                Image("joinAGame")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 60, height: 60)
+                                    .padding(.horizontal)
+                            }
+                            .frame(width: 330, height: 60)
+                            .background(Color.black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
-                            .padding(.horizontal, 35)
+                        }
+                    Button(action: {
+                        //showJoinGame = true
+                    }) {
+                        HStack {
+                            Text("How to play")
+                                .font(.system(size: 20, design: .default))
+                                .foregroundColor(.white)
+                                .padding(.horizontal)
+                            Image("howToPlay")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 60, height: 60)
+                                .padding(.horizontal)
+                        }
+                        .frame(width: 330, height: 60)
+                        .background(Color.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
                     }
-                    .padding(.bottom, 20)
+                .padding(.bottom, 70)
                 }
                 Spacer()
             }
@@ -77,8 +102,10 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(destination: SettingsView(username: $username)) {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundStyle(.black)
+                        Image(systemName: "gear.circle")
+                            .foregroundStyle(.gray)
+                            .font(.system(size: 25))
+                            .padding(.horizontal)
                     }
                 }
             }
@@ -92,46 +119,50 @@ struct ContentView: View {
                         ZStack {
                             Color.black.opacity(0.4)
                                 .edgesIgnoringSafeArea(.all)
-                            VStack(spacing: 20) {
+                                .onTapGesture {
+                                    showLobbyForm = false
+                                }
+                            VStack() {
                                 HStack {
-                                    Text("Enter Lobby Name")
-                                        .font(.headline)
-                                        .padding()
+                                    Image("lobbyName")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 40, height: 40)
+                                        .padding(.bottom, 10)
+                                    /*Spacer()
                                     Button(action: {
                                         showLobbyForm = false
                                     }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.gray)
-                                            .font(.system(size: 24))
-                                    }
-                                    .padding(.top, 10)
-                                    .padding(.trailing, 10)
+                                        Image(systemName: "xmark")
+                                            .foregroundColor(.gray)
+                                            .font(.system(size: 20))
+                                            .padding(.horizontal, 35)
+                                    }*/
                                 }
-                                TextField("Lobby Name", text: $lobbyName)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .padding(.horizontal)
+                                TextField("Enter lobby name", text: $lobbyName)
+                                    .padding()
+                                    .background(Color(.systemGray6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 100))
+                                    .padding(.horizontal, 25)
                                 Button(action: {
-                                    if !lobbyName.isEmpty { // se l'utente ha assegnato un nome alla lobby
+                                    if !lobbyName.isEmpty {
                                         showSelectMode = true
                                         showLobbyForm = false
-                                    } else { // se l'utente non ha assegnato un nome alla lobby
-                                        showLobbyNameAlert = true
                                     }
                                 }) {
-                                    Text("Done")
+                                    Text("Create lobby")
                                         .font(.system(size: 20, design: .default))
                                         .foregroundStyle(.white)
                                         .padding()
                                         .frame(maxWidth: .infinity)
-                                        .background(Color(red: 0.83, green: 0.69, blue: 0.22))
+                                        .background(.black)
                                         .clipShape(RoundedRectangle(cornerRadius: 50))
-                                        .padding(.horizontal, 35)
-                                        .padding(.top, 20)
+                                        .padding(.horizontal, 25)
                                 }
                             }
-                            .frame(width: 300, height: 400)
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .frame(width: 370, height: 250)
+                            .background(Color.white)
+                            .cornerRadius(20)
                             .shadow(radius: 20)
                         }
                     }

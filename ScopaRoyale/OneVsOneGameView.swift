@@ -3,9 +3,7 @@ import SpriteKit
 
 struct OneVsOneGameView: View {
     var scene: SKScene {
-        guard let scene = SKScene(fileNamed: "OneVsOneGameScene") else {
-            fatalError("Scene not found")
-        }
+        let scene = OneVsOneGameScene(size: UIScreen.main.bounds.size)
         scene.scaleMode = .aspectFill
         return scene
     }

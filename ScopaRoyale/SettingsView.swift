@@ -1,9 +1,12 @@
 import SwiftUI
+import AVFoundation
+
 
 struct SettingsView: View {
     @Binding var username: String
     @State private var newUsername: String = ""
     @Environment(\.presentationMode) var presentationMode
+    @State private var isMuted = false
 
     var body: some View {
         NavigationStack {
@@ -11,6 +14,15 @@ struct SettingsView: View {
                 Text("Welcome back \(username)")
                     .font(.title)
                     .padding()
+                VStack {
+                    Button(action: {
+                        toggleMute()
+                    }) {
+                        Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                            .foregroundColor(.black)
+                            .font(.system(size: 40))
+                    }
+                }
 
                 TextField("Enter new username", text: $newUsername)
                     .padding()
@@ -38,7 +50,23 @@ struct SettingsView: View {
                         .padding(.horizontal, 35)
                 }
             }
-            .navigationTitle("Settings")
+        }
+    }
+    private func toggleMute() {
+        isMuted.toggle()
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            if isMuted {
+                try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+                try audioSession.setCategory(.playback, options: .mixWithOthers)
+                try audioSession.overrideOutputAudioPort(.none)
+            } else {
+                try audioSession.setCategory(.playback, options: [])
+                try audioSession.overrideOutputAudioPort(.speaker)
+            }
+        } catch {
+            print("Failed to set audio session category: \(error.localizedDescription)")
         }
     }
 }

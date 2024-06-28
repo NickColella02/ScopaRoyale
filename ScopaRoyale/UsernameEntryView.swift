@@ -7,15 +7,17 @@ struct UsernameEntryView: View {
     
     var body: some View {
         VStack {            
-            Text("Enter your username")
-                .font(.title)
-                .padding(.bottom, 20)
+            Image("username")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 40, height: 40)
+                .padding(.bottom, 10)
             
-            TextField("Username", text: $username)
+            TextField("Enter username", text: $username)
                 .padding()
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 100))
-                .padding(.horizontal, 35)
+                .padding(.horizontal, 25)
             
             Button(action: {
                 if username.isEmpty {
@@ -30,11 +32,16 @@ struct UsernameEntryView: View {
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    .background(.black)
                     .clipShape(RoundedRectangle(cornerRadius: 50))
-                    .padding(.horizontal, 35)
-                    .padding(.top, 20)
+                    .padding(.horizontal, 25)
             }
+            Text("You can change your username whenever you want in settings.")
+                .font(.system(size: 14, design: .default))
+                .foregroundStyle(.gray)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 35)
+                .padding(.top, 10)
             .alert("Username required", isPresented: $showAlert) {
                 VStack {
                     Button("OK", role: .cancel) {

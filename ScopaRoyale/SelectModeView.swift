@@ -11,7 +11,7 @@ struct SelectModeView: View {
             Image("gameMode")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 40)
+                .frame(height: 60)
 
             .navigationDestination(isPresented: $navigateToOneVsOne) { // navigazione alla modalità 1 vs 1
                 OneVsOneView(numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
@@ -21,7 +21,7 @@ struct SelectModeView: View {
                 TwoVsTwoView(numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
-            VStack (spacing: 5) {
+            VStack () {
                 Image("2users")
                     .resizable()
                     .scaledToFit()
@@ -33,25 +33,25 @@ struct SelectModeView: View {
                 }) {
                     Text("1 vs 1")
                         .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(red: 0.83, green: 0.69, blue: 0.22)) // Oro
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 35)
+                        .foregroundColor(.white)
+                        .padding(.horizontal)
                 }
-                .padding()
+                .frame(width: 330, height: 60)
+                .background(Color.black)
+                .clipShape(RoundedRectangle(cornerRadius: 50))
+                .padding(.horizontal, 35)
+                .padding(.top, 20)
                 
                 Text("Play with one person nearby in a one vs one mode.")
                     .font(.system(size: 14, design: .default))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.gray)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 70)
-                    .bold()
-                    .padding()
+                    .padding(.horizontal, 35)
+                    .padding(.top, 10)
             }
+            .padding(.bottom, 20)
             
-            VStack (spacing: 5) {
+            VStack () {
                 Image("4users")
                     .resizable()
                     .scaledToFit()
@@ -63,29 +63,22 @@ struct SelectModeView: View {
                 }) {
                     Text("2 vs 2")
                         .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            LinearGradient(
-                                gradient: Gradient(colors: [Color(red: 0.0, green: 0.5, blue: 0.0), Color(red: 0.2, green: 0.8, blue: 0.2)]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 35)
+                        .foregroundColor(.white)
+                        .padding(.horizontal)
                 }
-                .padding()
+                .frame(width: 330, height: 60)
+                .background(Color.black)
+                .clipShape(RoundedRectangle(cornerRadius: 50))
+                .padding(.horizontal, 35)
                 
                 Text("Play with multiple people nearby in a two vs two mode where all the players will play with ten cards, also known, as 'Scopone'.")
                     .font(.system(size: 14, design: .default))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.gray)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 70)
-                    .bold()
-                    .padding()
+                    .padding(.horizontal, 35)
+                    .padding(.top, 10)
             }
+            .padding(.top, 20)
         }
         .preferredColorScheme(.light) // forza la light mode
         .navigationTitle("")
