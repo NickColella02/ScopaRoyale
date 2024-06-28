@@ -8,16 +8,15 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Change Username")
+                Text("Welcome back \(username)")
                     .font(.title)
-                    .padding(.top, 20)
+                    .padding()
 
                 TextField("Enter new username", text: $newUsername)
                     .padding()
                     .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
+                    .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 35)
-                    .padding(.top, 20)
 
                 Button(action: {
                     if !newUsername.isEmpty {
@@ -34,12 +33,10 @@ struct SettingsView: View {
                         .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
+                        .background(Color(red: 0.83, green: 0.69, blue: 0.22))
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
                         .padding(.horizontal, 35)
-                        .padding(.top, 20)
                 }
-                Spacer()
             }
             .navigationTitle("Settings")
         }
