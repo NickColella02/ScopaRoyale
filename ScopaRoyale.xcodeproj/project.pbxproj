@@ -21,6 +21,9 @@
 		465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878972C2997FE005D4788 /* OneVsOneView.swift */; };
 		465878B02C299F35005D4788 /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */; };
 		465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878B32C29B5D0005D4788 /* SelectModeView.swift */; };
+		4662659F2C2EDE21004B963E /* OneVsOneGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4662659E2C2EDE21004B963E /* OneVsOneGameScene.swift */; };
+		466265A12C2EDE44004B963E /* OneVsOneGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466265A02C2EDE44004B963E /* OneVsOneGameView.swift */; };
+		466265A32C2EDE72004B963E /* OneVsOneGameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 466265A22C2EDE72004B963E /* OneVsOneGameScene.sks */; };
 		4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4690AD502C2C67CE009D3DD1 /* SettingsView.swift */; };
 		4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */; };
 /* End PBXBuildFile section */
@@ -61,6 +64,9 @@
 		465878972C2997FE005D4788 /* OneVsOneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneView.swift; sourceTree = "<group>"; };
 		465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
 		465878B32C29B5D0005D4788 /* SelectModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModeView.swift; sourceTree = "<group>"; };
+		4662659E2C2EDE21004B963E /* OneVsOneGameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneGameScene.swift; sourceTree = "<group>"; };
+		466265A02C2EDE44004B963E /* OneVsOneGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneGameView.swift; sourceTree = "<group>"; };
+		466265A22C2EDE72004B963E /* OneVsOneGameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = OneVsOneGameScene.sks; sourceTree = "<group>"; };
 		4690AD502C2C67CE009D3DD1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameEntryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -128,6 +134,9 @@
 				462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */,
 				4690AD502C2C67CE009D3DD1 /* SettingsView.swift */,
 				4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */,
+				4662659E2C2EDE21004B963E /* OneVsOneGameScene.swift */,
+				466265A02C2EDE44004B963E /* OneVsOneGameView.swift */,
+				466265A22C2EDE72004B963E /* OneVsOneGameScene.sks */,
 			);
 			path = ScopaRoyale;
 			sourceTree = "<group>";
@@ -269,6 +278,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				466265A32C2EDE72004B963E /* OneVsOneGameScene.sks in Resources */,
 				465878752C2997B2005D4788 /* Preview Assets.xcassets in Resources */,
 				465878722C2997B2005D4788 /* Assets.xcassets in Resources */,
 			);
@@ -299,8 +309,10 @@
 				4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */,
 				16D9849C2C2DA306003B1E8E /* LobbyInfo.swift in Sources */,
 				4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */,
+				4662659F2C2EDE21004B963E /* OneVsOneGameScene.swift in Sources */,
 				167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */,
 				462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */,
+				466265A12C2EDE44004B963E /* OneVsOneGameView.swift in Sources */,
 				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,
 				4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */,
 				465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */,
@@ -468,7 +480,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
-				DEVELOPMENT_TEAM = 63DT8X2XA3;
+				DEVELOPMENT_TEAM = U6H2CNTS33;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScopaRoyale/Info.plist;
@@ -482,7 +494,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale24;
+				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale02;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -498,7 +510,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
-				DEVELOPMENT_TEAM = 63DT8X2XA3;
+				DEVELOPMENT_TEAM = U6H2CNTS33;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScopaRoyale/Info.plist;
@@ -512,7 +524,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale24;
+				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale02;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
