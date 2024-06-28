@@ -8,20 +8,18 @@ struct JoinAGameView: View {
     
     var body: some View {
         VStack {
-            Spacer()
+            if !peerManager.isConnected { // se l'utente deve ancora connettersi alla lobby
+                Text("Searching a lobby...")
+                    .font(.title)
+                    .padding()
+            }
             
-            // Titolo della schermata
-            Text(peerManager.isConnected2 ? "Lobby Found!" : "Searching...")
-                .font(.title)
-                .padding()
-            
-            // Visualizza il nome della lobby trovata
-            if peerManager.isConnected2 {
-                Text("Lobby's name: \(peerManager.lobbyName)")
+            if peerManager.isConnected2 { // quando l'utente si connette alla lobby
+                Text("Lobby's name: \(peerManager.lobbyName)") // nome della lobby trovata
                     .font(.title)
                     .padding()
                 
-                Text("Opponent: \(peerManager.opponentName)")
+                Text("Opponent: \(peerManager.opponentName)") // nome dell'avversario
                     .font(.title)
                     .padding()
             }
