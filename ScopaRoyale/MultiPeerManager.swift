@@ -9,6 +9,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     private var browser: MCNearbyServiceBrowser?
     @Published var receivedData: Data?
     @Published var isConnected: Bool = false
+    @Published var isConnected2: Bool = false
     @Published var opponentName: String = ""
     @Published var lobbyName: String = "" // Nome della lobby
     @Published var showAlert: Bool = false
@@ -31,6 +32,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 self.connectedPeers.append(peerID)
                 print("Peer \(peerID) connesso")
                 self.sendUsername(username: self.myUsername)
+                self.sendLobbyName(lobbyName: self.lobbyName)
                 if self.connectedPeers.count == self.neededPlayers {
                     print("Interruzione connessione")
                     self.isConnected = false
@@ -44,7 +46,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.advertiser?.startAdvertisingPeer()
                     self.opponentName = "" // Rimuovi il nome dell'avversario
                     self.isConnected = false
-                    self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.neededPlayers) // Ricomincia la ricerca
+                    self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.neededPlayers, username: self.myUsername) // Ricomincia la ricerca
                 }
             default:
                 break
@@ -57,8 +59,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             if let receivedString = String(data: data, encoding: .utf8) {
                 if receivedString.starts(with: "Lobby:") {
                     self.lobbyName = String(receivedString.dropFirst(6))
+                    self.isConnected2 = true
                 } else {
                     self.opponentName = receivedString
+                    self.isConnected2 = true
                 }
             }
         }
@@ -86,10 +90,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
 
     // MARK: - Custom Methods
 
-    func startHosting(lobbyName: String, numberOfPlayers: Int) {
+    func startHosting(lobbyName: String, numberOfPlayers: Int, username : String) {
         self.neededPlayers = numberOfPlayers
         self.isConnected = true
         self.lobbyName = lobbyName
+        self.myUsername = username
         advertiser = MCNearbyServiceAdvertiser(peer: peerID, discoveryInfo: nil, serviceType: serviceType)
         advertiser?.delegate = self
         advertiser?.startAdvertisingPeer()
@@ -120,3 +125,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
 }
+
+
+

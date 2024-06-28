@@ -100,6 +100,7 @@ struct ContentView: View {
                                 HStack {
                                     Text("Enter Lobby Name")
                                         .font(.headline)
+                                        
                                         .padding()
                                     Spacer()
                                     Button(action: {

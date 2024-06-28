@@ -67,7 +67,7 @@ struct OneVsOneView: View {
         }
         .preferredColorScheme(.light) // Forza la light mode
         .onAppear() {
-            peerManager.startHosting(lobbyName: lobbyName, numberOfPlayers: numberOfPlayer)
+            peerManager.startHosting(lobbyName: lobbyName, numberOfPlayers: numberOfPlayer, username: username)
         }
        
     }

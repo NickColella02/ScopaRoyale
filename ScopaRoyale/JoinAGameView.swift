@@ -2,6 +2,7 @@ import SwiftUI
 
 struct JoinAGameView: View {
     let username: String
+    @State private var showAlert = false // Stato per la visualizzazione dell'alert
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
 
     var body: some View {
@@ -9,32 +10,30 @@ struct JoinAGameView: View {
             Spacer()
             
             // Titolo della schermata
-            if peerManager.lobbyName.isEmpty {
-                Text("Searching for a lobby...")
-                    .font(.title)
-                    .padding()
-            } else {
-                Text("Lobby found!")
-                    .font(.title)
-                    .padding()
+            Text(peerManager.isConnected2 ? "Lobby Found!" : "Searching...")
+                .font(.title)
+                .padding()
+            
+            // Visualizza il nome della lobby trovata
+            if peerManager.isConnected2 {
                 Text("Lobby's name: \(peerManager.lobbyName)")
-                    .font(.headline)
+                    .font(.title)
                     .padding()
+                
                 Text("Opponent: \(peerManager.opponentName)")
-                    .font(.subheadline)
+                    .font(.title)
                     .padding()
             }
             
             Spacer()
             
-            // Bottone per unirsi a una partita trovata
+            // Bottone per unirsi alla partita
             Button(action: {
-                if !peerManager.lobbyName.isEmpty {
-                    // Messaggio di debug
-                    print("Joining match: \(peerManager.lobbyName) with username: \(username)")
+                if peerManager.isConnected2 {
                     // Navigazione alla partita da implementare
+                    print("Joining lobby: \(peerManager.lobbyName) with username: \(username)")
                 } else {
-                    peerManager.showAlert = true // Mostra l'alert se nessuna lobby è stata trovata
+                    showAlert = true // Mostra l'alert se nessuna lobby è stata trovata
                 }
             }) {
                 Text("Join")
@@ -47,9 +46,9 @@ struct JoinAGameView: View {
                     .padding(.horizontal, 35)
                     .padding(.bottom, 20)
             }
-            .alert("No lobby found", isPresented: $peerManager.showAlert) {
+            .alert("No game found", isPresented: $showAlert) {
                 Button("OK", role: .cancel) {
-                    peerManager.showAlert = false
+                    showAlert = false
                 }
             }
         }
