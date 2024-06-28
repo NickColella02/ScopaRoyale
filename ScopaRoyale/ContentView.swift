@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var lobbyName: String = ""
     @State private var showLobbyForm: Bool = false
     @State private var showSelectMode: Bool = false
+    @State private var showLobbyNameAlert: Bool  = false
 
     init() {
         // Controlla se è presente un username nell'app
@@ -19,33 +20,29 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 Spacer()
-                if showUsernameEntry {
-                    // Mostra la schermata di inserimento dello username se necessario
+                if showUsernameEntry { // mostra la schermata di inserimento dell'username se non ancora inserito
                     UsernameEntryView()
                 } else {
-                    // Logo dell'applicazione
-                    Image("AppLogo")
+                    Image("AppLogo") // logo dell'app
                         .resizable()
                         .scaledToFit()
                         .frame(height: 180)
                         .padding(.bottom, 20)
                                         
-                    // Navigazione verso la schermata di ricerca della partita
-                    .navigationDestination(isPresented: $showJoinGame) {
+                    .navigationDestination(isPresented: $showJoinGame) { // navigazione verso la pagina di accesso ad una lobby
                         JoinAGameView(username: username)
                     }
                     
-                    .navigationDestination(isPresented: $showSelectMode) {
+                    .navigationDestination(isPresented: $showSelectMode) { // navigazione verso la pagina di selezione della modalità di partita
                         SelectModeView(lobbyName: lobbyName)
                     }
                     
-                    // Bottone per avviare una nuova partita
-                    Button(action: {
+                    Button(action: { // bottone per creare una lobby
                         showLobbyForm = true
                     }) {
                         Text("Create a new lobby")
                             .font(.system(size: 20, design: .default))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(Color(red: 0.83, green: 0.69, blue: 0.22)) // Oro
@@ -54,13 +51,12 @@ struct ContentView: View {
                             .padding(.top, 20)
                     }
                     
-                    // Bottone per unirsi a una partita esistente
-                    Button(action: {
+                    Button(action: { // bottone per unirsi ad una lobby esistente
                         showJoinGame = true
                     }) {
                         Text("Join a lobby")
                             .font(.system(size: 20, design: .default))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
@@ -90,7 +86,7 @@ struct ContentView: View {
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
                 self.showUsernameEntry = false
             }
-            .overlay(
+            .overlay( // visualizzato quando si clicca su create a lobby
                 Group {
                     if showLobbyForm {
                         ZStack {
@@ -100,14 +96,12 @@ struct ContentView: View {
                                 HStack {
                                     Text("Enter Lobby Name")
                                         .font(.headline)
-                                        
                                         .padding()
-                                    Spacer()
                                     Button(action: {
                                         showLobbyForm = false
                                     }) {
                                         Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.gray)
+                                            .foregroundStyle(.gray)
                                             .font(.system(size: 24))
                                     }
                                     .padding(.top, 10)
@@ -117,31 +111,43 @@ struct ContentView: View {
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .padding(.horizontal)
                                 Button(action: {
-                                    if !lobbyName.isEmpty {
+                                    if !lobbyName.isEmpty { // se l'utente ha assegnato un nome alla lobby
                                         showSelectMode = true
                                         showLobbyForm = false
+                                    } else { // se l'utente non ha assegnato un nome alla lobby
+                                        showLobbyNameAlert = true
                                     }
                                 }) {
                                     Text("Done")
                                         .font(.system(size: 20, design: .default))
-                                        .foregroundColor(.white)
+                                        .foregroundStyle(.white)
                                         .padding()
                                         .frame(maxWidth: .infinity)
-                                        .background(Color.blue)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                                        .padding(.horizontal, 20)
+                                        .background(Color(red: 0.83, green: 0.69, blue: 0.22))
+                                        .clipShape(RoundedRectangle(cornerRadius: 50))
+                                        .padding(.horizontal, 35)
+                                        .padding(.top, 20)
                                 }
                             }
-                            .frame(width: 300, height: 200)
-                            .background(Color.white)
-                            .cornerRadius(20)
+                            .frame(width: 300, height: 400)
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
                             .shadow(radius: 20)
                         }
                     }
                 }
             )
         }
-        .preferredColorScheme(.light) // Forza la light mode
+        .preferredColorScheme(.light) // forza la light mode
+        .alert("Lobby's name required", isPresented: $showLobbyNameAlert) { // messaggio di errore se non si assegna un nome alla lobby
+            VStack {
+                Button("OK", role: .cancel) {
+                    showLobbyNameAlert = false
+                }
+            }
+        } message: {
+            Text("You need to assign a name to the lobby.")
+        }
     }
 }
 

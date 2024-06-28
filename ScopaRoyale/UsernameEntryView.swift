@@ -2,13 +2,11 @@ import SwiftUI
 
 struct UsernameEntryView: View {
     @State private var username: String = ""
-    @State private var showAlert = false
-    @State private var alertMessage = ""
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
     
     var body: some View {
-        VStack {
-            Spacer()
-            
+        VStack {            
             Text("Enter your username")
                 .font(.title)
                 .padding(.bottom, 20)
@@ -21,12 +19,9 @@ struct UsernameEntryView: View {
             
             Button(action: {
                 if username.isEmpty {
-                    alertMessage = "Please enter a username."
                     showAlert = true
                 } else {
-                    // Salva lo username in UserDefaults
                     UserDefaults.standard.set(username, forKey: "username")
-                    // Procede alla schermata principale
                     NotificationCenter.default.post(name: .usernameEntered, object: nil)
                 }
             }) {
@@ -35,8 +30,8 @@ struct UsernameEntryView: View {
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
+                    .background(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 35)
                     .padding(.top, 20)
             }
@@ -46,8 +41,9 @@ struct UsernameEntryView: View {
                         showAlert = false
                     }
                 }
+            } message: {
+                Text("You need to enter a username.")
             }
-            Spacer()
         }
         .preferredColorScheme(.light) // Forza la light mode
     }

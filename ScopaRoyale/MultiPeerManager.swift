@@ -11,9 +11,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var isConnected: Bool = false
     @Published var isConnected2: Bool = false
     @Published var opponentName: String = ""
-    @Published var lobbyName: String = "" // Nome della lobby
+    @Published var lobbyName: String = ""
     @Published var showAlert: Bool = false
-    private var connectedPeers: [MCPeerID] = []
+    @Published var startGame: Bool = false
+    @Published var peerDisconnected: Bool = false
+
+    @Published var connectedPeers: [MCPeerID] = []
     private var neededPlayers: Int = 0
     private var myUsername: String = ""
 
@@ -34,7 +37,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 self.sendUsername(username: self.myUsername)
                 self.sendLobbyName(lobbyName: self.lobbyName)
                 if self.connectedPeers.count == self.neededPlayers {
-                    print("Interruzione connessione")
                     self.isConnected = false
                     self.advertiser?.stopAdvertisingPeer()
                 }
@@ -44,9 +46,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 }
                 if self.connectedPeers.count < self.neededPlayers {
                     self.advertiser?.startAdvertisingPeer()
-                    self.opponentName = "" // Rimuovi il nome dell'avversario
+                    self.opponentName = ""
                     self.isConnected = false
-                    self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.neededPlayers, username: self.myUsername) // Ricomincia la ricerca
+                    self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: 1, username: self.myUsername)
+                } else {
+                    self.peerDisconnected = true
                 }
             default:
                 break
@@ -57,7 +61,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
             if let receivedString = String(data: data, encoding: .utf8) {
-                if receivedString.starts(with: "Lobby:") {
+                if receivedString == "START_GAME" {
+                    self.startGame = true
+                } else if receivedString.starts(with: "Lobby:") {
                     self.lobbyName = String(receivedString.dropFirst(6))
                     self.isConnected2 = true
                 } else {
@@ -68,9 +74,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
 
-    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) { }
+    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
 
-    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) { }
+    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {}
 
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {}
 
@@ -90,7 +96,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
 
     // MARK: - Custom Methods
 
-    func startHosting(lobbyName: String, numberOfPlayers: Int, username : String) {
+    func startHosting(lobbyName: String, numberOfPlayers: Int, username: String) {
         self.neededPlayers = numberOfPlayers
         self.isConnected = true
         self.lobbyName = lobbyName
@@ -124,7 +130,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio nome lobby: \(error.localizedDescription)")
         }
     }
+
+    func sendStartGameSignal() {
+        guard let data = "START_GAME".data(using: .utf8) else { return }
+        do {
+            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio segnale inizio partita: \(error.localizedDescription)")
+        }
+    }
 }
-
-
-

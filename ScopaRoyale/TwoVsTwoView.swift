@@ -3,6 +3,7 @@ import SwiftUI
 struct TwoVsTwoView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     let numberOfPlayer: Int
+    @State private var showStartGameAlert: Bool = false
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
     let lobbyName: String
     
@@ -86,7 +87,11 @@ struct TwoVsTwoView: View {
             
             // Bottone per avviare la partita
             Button(action: {
-
+                if peerManager.connectedPeers.count != 4 { // se non ci sono abbastanza peer connessi
+                    showStartGameAlert = true
+                } else {
+                    
+                }
             }) {
                 Text("Start")
                     .font(.system(size: 20, design: .default))
@@ -99,9 +104,19 @@ struct TwoVsTwoView: View {
                     .padding(.bottom, 20)
             }
         }
-        .preferredColorScheme(.light) // Forza la light mode
-        .onAppear() {
+        .preferredColorScheme(.light) // forza la light mode
+        .onAppear() { // quando la pagina è caricata, avvia la connessione
             peerManager.startHosting(lobbyName: lobbyName, numberOfPlayers: numberOfPlayer, username: username)
+        }
+        .navigationTitle("")
+        .alert("Unable to Start the Game", isPresented: $showStartGameAlert) { // messaggio di errore se si tenta di avviare una partita senza abbastanza giocatori
+            VStack {
+                Button("OK", role: .cancel) {
+                    showStartGameAlert = false
+                }
+            }
+        } message: {
+            Text("You need 4 players to start a 2 vs 2 game.")
         }
     }
 }
