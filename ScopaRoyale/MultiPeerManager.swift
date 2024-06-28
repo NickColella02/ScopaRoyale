@@ -13,7 +13,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var opponentName: String = ""
     @Published var lobbyName: String = "" // Nome della lobby
     @Published var showAlert: Bool = false
-    private var connectedPeers: [MCPeerID] = []
+    @Published var connectedPeers: [MCPeerID] = []
     private var neededPlayers: Int = 0
     private var myUsername: String = ""
 

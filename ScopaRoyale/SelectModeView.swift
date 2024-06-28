@@ -7,84 +7,87 @@ struct SelectModeView: View {
     let lobbyName: String
     
     var body: some View {
-        VStack {
+        VStack (spacing: 20) {
             Image("gameMode")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 40)
-                .padding(.bottom, 40)
-                .padding(.top, 70)
 
-            // NavigationLink per passare alla modalità OneVsOneView
-            .navigationDestination(isPresented: $navigateToOneVsOne) {
+            .navigationDestination(isPresented: $navigateToOneVsOne) { // navigazione alla modalità 1 vs 1
                 OneVsOneView(numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
-            // NavigationLink per passare alla modalità TwoVsTwoView
-            .navigationDestination(isPresented: $navigateToTwoVsTwo) {
+            .navigationDestination(isPresented: $navigateToTwoVsTwo) { // navigazione alla modalità 2 vs 2
                 TwoVsTwoView(numberOfPlayer: numberOfPlayers, lobbyName: lobbyName)
             }
             
-            // Bottone per selezionare la modalità 1 vs 1
-            Button(action: {
-                navigateToOneVsOne = true
-                numberOfPlayers = 1
-            }) {
-                VStack {
-                    Image("2users")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 55)
-                    
+            VStack (spacing: 5) {
+                Image("2users")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 55)
+                
+                Button(action: { // bottone per selezionare la modalità 1 vs 1
+                    navigateToOneVsOne = true
+                    numberOfPlayers = 1
+                }) {
                     Text("1 vs 1")
                         .font(.system(size: 20, design: .default))
                         .foregroundStyle(.white)
                         .padding()
-                        .frame(width: 250, height: 35)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                    
-                    Text("Play with one person nearby in a one vs one mode.")
-                        .font(.system(size: 14, design: .default))
-                        .foregroundStyle(.gray)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 5)
-                        .padding(.horizontal, 70)
+                        .frame(maxWidth: .infinity)
+                        .background(Color(red: 0.83, green: 0.69, blue: 0.22)) // Oro
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
+                        .padding(.horizontal, 35)
                 }
+                .padding()
+                
+                Text("Play with one person nearby in a one vs one mode.")
+                    .font(.system(size: 14, design: .default))
+                    .foregroundStyle(.black)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 70)
+                    .bold()
+                    .padding()
             }
-            .padding(.bottom, 40)
-            .padding(.top, 40)
             
-            // Bottone per selezionare la modalità 2 vs 2
-            Button(action: {
-                navigateToTwoVsTwo = true
-                numberOfPlayers = 3
-            }) {
-                VStack {
-                    Image("4users")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 70)
-                    
+            VStack (spacing: 5) {
+                Image("4users")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 70)
+                
+                Button(action: { // bottone per selezionare la modalità 2 vs 2
+                    navigateToTwoVsTwo = true
+                    numberOfPlayers = 3
+                }) {
                     Text("2 vs 2")
                         .font(.system(size: 20, design: .default))
                         .foregroundStyle(.white)
                         .padding()
-                        .frame(width: 250, height: 35)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                    
-                    Text("Play with multiple people nearby in a two vs two mode where all the players will play with ten cards, also known, as 'Scopone'.")
-                        .font(.system(size: 14, design: .default))
-                        .foregroundStyle(.gray)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 5)
-                        .padding(.horizontal, 70)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color(red: 0.0, green: 0.5, blue: 0.0), Color(red: 0.2, green: 0.8, blue: 0.2)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
+                        .padding(.horizontal, 35)
                 }
+                .padding()
+                
+                Text("Play with multiple people nearby in a two vs two mode where all the players will play with ten cards, also known, as 'Scopone'.")
+                    .font(.system(size: 14, design: .default))
+                    .foregroundStyle(.black)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 70)
+                    .bold()
+                    .padding()
             }
-            .padding(.top, 40)
-            Spacer()
         }
-        .preferredColorScheme(.light) // Forza la light mode
+        .preferredColorScheme(.light) // forza la light mode
+        .navigationTitle("")
     }
 }

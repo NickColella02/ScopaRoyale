@@ -2,13 +2,13 @@ import SwiftUI
 
 struct OneVsOneView: View {
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // riferimento al peer manager
-    let numberOfPlayer: Int
-    let lobbyName: String
-    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
+    let numberOfPlayer: Int // numero di giocatori
+    let lobbyName: String // nome della lobby
+    @State private var showStartGameAlert: Bool = false // true se si tenta di avviare una partita senza sufficienti giocatori
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
     
     var body: some View {
         VStack {
-            // Immagine rappresentativa della modalità di gioco (1 vs 1)
             Image("2users")
                 .resizable()
                 .scaledToFit()
@@ -20,39 +20,32 @@ struct OneVsOneView: View {
                     .padding()
             }
             
+            Text("Lobby's name: \(lobbyName)")
+                .font(.title)
+                .padding()
+            
             HStack {
-                Text("Lobby's name: \(lobbyName)")
-                    .font(.title)
-                    .padding()
-                
-                // Nome avversario a destra
                 if !peerManager.opponentName.isEmpty {
-                    Spacer()
                     Text(peerManager.opponentName)
                         .font(.title2)
                         .padding(.top, 10)
-                        .padding(.trailing, 20)
-                }
-                
-                // VS al centro
-                Text("VS")
-                    .font(.title2)
-                    .padding(.top, 10)
-                
-                // Nome utente dell'host a sinistra
-                Text(username)
-                    .font(.title2)
-                    .padding(.top, 10)
-                    .padding(.leading, 20)
-                
-                Spacer()
-            }
-            
-            Spacer()
-            
-            // Bottone per avviare la partita
-            Button(action: {
 
+                    Text("VS")
+                        .font(.title2)
+                        .padding(.top, 10)
+        
+                    Text(username)
+                        .font(.title2)
+                        .padding(.top, 10)
+                }
+            }
+                        
+            Button(action: { // bottone per avviare la partita
+                if peerManager.connectedPeers.isEmpty { // se non ci sono peer connessi
+                    showStartGameAlert = true
+                } else {
+                    
+                }
             }) {
                 Text("Start")
                     .font(.system(size: 20, design: .default))
@@ -65,10 +58,19 @@ struct OneVsOneView: View {
                     .padding(.bottom, 20)
             }
         }
-        .preferredColorScheme(.light) // Forza la light mode
-        .onAppear() {
+        .preferredColorScheme(.light) // forza la light mode
+        .onAppear() { // quando la pagina è caricata, da avvio alla connessione
             peerManager.startHosting(lobbyName: lobbyName, numberOfPlayers: numberOfPlayer, username: username)
         }
-       
+        .navigationTitle("")
+        .alert("Unable to Start the Game", isPresented: $showStartGameAlert) { // messaggio di errore se si tenta di avviare la partita senza avversario
+            VStack {
+                Button("OK", role: .cancel) {
+                    showStartGameAlert = false
+                }
+            }
+        } message: {
+            Text("You need another player to start a 1 vs 1 game.")
+        }
     }
 }

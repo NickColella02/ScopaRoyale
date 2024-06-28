@@ -1,61 +1,32 @@
 import SwiftUI
 
 struct JoinAGameView: View {
-    let username: String
-    @State private var showAlert = false // Stato per la visualizzazione dell'alert
-    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
+    let username: String // username dell'utente
+    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // riferimento al peer manager
 
     var body: some View {
         VStack {
-            Spacer()
+            if !peerManager.isConnected { // se l'utente deve ancora connettersi alla lobby
+                Text("Searching a lobby...")
+                    .font(.title)
+                    .padding()
+            }
             
-            // Titolo della schermata
-            Text(peerManager.isConnected2 ? "Lobby Found!" : "Searching...")
-                .font(.title)
-                .padding()
-            
-            // Visualizza il nome della lobby trovata
-            if peerManager.isConnected2 {
-                Text("Lobby's name: \(peerManager.lobbyName)")
+            if peerManager.isConnected2 { // quando l'utente si connette alla lobby
+                Text("Lobby's name: \(peerManager.lobbyName)") // nome della lobby trovata
                     .font(.title)
                     .padding()
                 
-                Text("Opponent: \(peerManager.opponentName)")
+                Text("Opponent: \(peerManager.opponentName)") // nome dell'avversario
                     .font(.title)
                     .padding()
             }
-            
-            Spacer()
-            
-            // Bottone per unirsi alla partita
-            Button(action: {
-                if peerManager.isConnected2 {
-                    // Navigazione alla partita da implementare
-                    print("Joining lobby: \(peerManager.lobbyName) with username: \(username)")
-                } else {
-                    showAlert = true // Mostra l'alert se nessuna lobby è stata trovata
-                }
-            }) {
-                Text("Join")
-                    .font(.system(size: 20, design: .default))
-                    .foregroundStyle(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
-                    .padding(.horizontal, 35)
-                    .padding(.bottom, 20)
-            }
-            .alert("No game found", isPresented: $showAlert) {
-                Button("OK", role: .cancel) {
-                    showAlert = false
-                }
-            }
         }
-        .onAppear {
+        .onAppear { // quando la pagina è caricata, cerca di connettersi alla lobby e invia il proprio username
             peerManager.sendUsername(username: username)
             peerManager.joinSession()
         }
-        .preferredColorScheme(.light) // Forza la light mode
+        .preferredColorScheme(.light) // forza la light mode
+        .navigationTitle("")
     }
 }
