@@ -49,6 +49,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.opponentName = ""
                     self.isConnected = false
                     self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: 1, username: self.myUsername)
+                    self.peerDisconnected = true
                 } else {
                     self.peerDisconnected = true
                 }
@@ -59,20 +60,22 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        DispatchQueue.main.async {
-            if let receivedString = String(data: data, encoding: .utf8) {
-                if receivedString == "START_GAME" {
-                    self.startGame = true
-                } else if receivedString.starts(with: "Lobby:") {
-                    self.lobbyName = String(receivedString.dropFirst(6))
-                    self.isConnected2 = true
-                } else {
-                    self.opponentName = receivedString
-                    self.isConnected2 = true
+            DispatchQueue.main.async {
+                if let receivedString = String(data: data, encoding: .utf8) {
+                    print("Dati ricevuti: \(receivedString)")
+                    if receivedString == "START_GAME" {
+                        self.startGame = true
+                    } else if receivedString.starts(with: "Lobby:") {
+                        self.lobbyName = String(receivedString.dropFirst(6))
+                        self.isConnected2 = true
+                    } else {
+                        self.opponentName = receivedString
+                        self.isConnected2 = true
+                    }
                 }
             }
         }
-    }
+
 
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
 
@@ -123,6 +126,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func sendLobbyName(lobbyName: String) {
+        guard !lobbyName.isEmpty else { return }
+        self.lobbyName = lobbyName
         guard let data = "Lobby:\(lobbyName)".data(using: .utf8) else { return }
         do {
             try session.send(data, toPeers: session.connectedPeers, with: .reliable)
@@ -139,4 +144,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio segnale inizio partita: \(error.localizedDescription)")
         }
     }
+    
+    func reset() {
+            self.isConnected = false
+            self.isConnected2 = false
+            self.opponentName = ""
+            self.lobbyName = ""
+            self.startGame = false
+            self.peerDisconnected = true
+        }
 }

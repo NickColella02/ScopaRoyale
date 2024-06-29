@@ -19,6 +19,7 @@ struct JoinAGameView: View {
                     .font(.title)
                     .padding()
                 
+                
                 Text("Opponent: \(peerManager.opponentName)") // nome dell'avversario
                     .font(.title)
                     .padding()
@@ -40,5 +41,6 @@ struct JoinAGameView: View {
                             }
                 .preferredColorScheme(.light) // Forza la light mode
         }
+        
     }
 }

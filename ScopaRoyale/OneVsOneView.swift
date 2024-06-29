@@ -16,7 +16,7 @@ struct OneVsOneView: View {
                 .frame(height: 120)
             
             if peerManager.isConnected {
-                ProgressView("Searching for opponents...")
+                ProgressView("Searching for an opponent...")
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
             }
@@ -77,5 +77,6 @@ struct OneVsOneView: View {
         } message: {
             Text("You need another player to start a 1 vs 1 game.")
         }
+        
     }
 }

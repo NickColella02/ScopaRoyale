@@ -1,5 +1,6 @@
 import SwiftUI
 import SpriteKit
+import Combine
 
 struct OneVsOneGameView: View {
     var scene: SKScene {
@@ -11,6 +12,7 @@ struct OneVsOneGameView: View {
     @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
     @Environment(\.presentationMode) var presentationMode
     @State private var backModality = false
+    @State private var cancellables = Set<AnyCancellable>()
 
     var body: some View {
         ZStack {
@@ -20,7 +22,7 @@ struct OneVsOneGameView: View {
             
             Color.clear // Placeholder for any additional views
         }
-        .onChange(of: peerManager.peerDisconnected) { disconnected in
+        .onReceive(peerManager.$peerDisconnected) { disconnected in
             if disconnected {
                 print(disconnected)
                 self.presentationMode.wrappedValue.dismiss()
@@ -29,6 +31,18 @@ struct OneVsOneGameView: View {
         }
         .navigationDestination(isPresented: $backModality) {
             SelectModeView(lobbyName: peerManager.lobbyName)
+        }
+        .onAppear {
+            peerManager.$peerDisconnected
+                .receive(on: RunLoop.main)
+                .sink { disconnected in
+                    if disconnected {
+                        print("Peer disconnected: \(disconnected)")
+                        self.presentationMode.wrappedValue.dismiss()
+                        backModality = true
+                    }
+                }
+                .store(in: &cancellables)
         }
     }
 }
