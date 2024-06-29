@@ -49,7 +49,7 @@ struct ContentView: View {
                         HStack {
                             Text("Create a new lobby")
                                 .font(.system(size: 20, design: .default))
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                                 .padding(.horizontal)
                             Image("createANewLobby")
                                 .resizable()
@@ -70,7 +70,7 @@ struct ContentView: View {
                             HStack {
                                 Text("Join existent lobby")
                                     .font(.system(size: 20, design: .default))
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                                     .padding(.horizontal)
                                 Image("joinAGame")
                                     .resizable()
@@ -88,7 +88,7 @@ struct ContentView: View {
                         HStack {
                             Text("How to play")
                                 .font(.system(size: 20, design: .default))
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                                 .padding(.horizontal)
                             Image("howToPlay")
                                 .resizable()
@@ -109,9 +109,9 @@ struct ContentView: View {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink(destination: SettingsView(username: $username)) {
-                            Image(systemName: "gear.circle")
-                                .foregroundStyle(.gray)
-                                .font(.system(size: 25))
+                            Image(systemName: "gearshape.fill")
+                                .foregroundStyle(.black)
+                                .font(.system(size: 20))
                                 .padding(.horizontal)
                         }
                     }
@@ -147,6 +147,8 @@ struct ContentView: View {
                                     if !lobbyName.isEmpty {
                                         showSelectMode = true
                                         showLobbyForm = false
+                                    }else{
+                                        showLobbyNameAlert = true
                                     }
                                 }) {
                                     Text("Create lobby")

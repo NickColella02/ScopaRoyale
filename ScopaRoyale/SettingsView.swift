@@ -5,6 +5,7 @@ import AVFoundation
 struct SettingsView: View {
     @Binding var username: String
     @State private var newUsername: String = ""
+    @State private var showEmptyUsernameAlert = false
     @Environment(\.presentationMode) var presentationMode
     @State private var isMuted = false
 
@@ -19,7 +20,7 @@ struct SettingsView: View {
                         toggleMute()
                     }) {
                         Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                            .foregroundColor(.black)
+                            .foregroundStyle(.black)
                             .font(.system(size: 40))
                     }
                 }
@@ -38,23 +39,33 @@ struct SettingsView: View {
                         username = newUsername
                         // Chiude il popup
                         presentationMode.wrappedValue.dismiss()
+                    } else {
+                        showEmptyUsernameAlert = true
                     }
                 }) {
                     Text("Done")
                         .font(.system(size: 20, design: .default))
                         .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(red: 0.83, green: 0.69, blue: 0.22))
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 35)
+                        .padding(.horizontal)
+                }
+                .frame(width: 330, height: 60)
+                .background(Color.black)
+                .clipShape(RoundedRectangle(cornerRadius: 50))
+                .padding(.horizontal, 35)
+            }
+        }
+        .alert("Username required", isPresented: $showEmptyUsernameAlert) { // messaggio di errore se non si assegna un nome alla lobby
+            VStack {
+                Button("OK", role: .cancel) {
+                    showEmptyUsernameAlert = false
                 }
             }
+        } message: {
+            Text("You need to enter a username.")
         }
     }
     private func toggleMute() {
         isMuted.toggle()
-        
         let audioSession = AVAudioSession.sharedInstance()
         do {
             if isMuted {
