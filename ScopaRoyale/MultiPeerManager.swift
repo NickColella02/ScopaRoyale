@@ -139,4 +139,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio segnale inizio partita: \(error.localizedDescription)")
         }
     }
+    
+    func reset() {
+            self.isConnected = false
+            self.isConnected2 = false
+            self.opponentName = ""
+            self.startGame = false
+        }
 }

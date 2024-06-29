@@ -16,7 +16,7 @@ struct OneVsOneView: View {
                 .frame(height: 120)
             
             if peerManager.isConnected {
-                ProgressView("Searching for opponents...")
+                ProgressView("Searching for an opponent...")
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
             }

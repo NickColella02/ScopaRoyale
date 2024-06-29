@@ -8,6 +8,8 @@ struct ContentView: View {
     @State private var showLobbyForm: Bool = false
     @State private var showSelectMode: Bool = false
     @State private var showLobbyNameAlert: Bool  = false
+    
+    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // Osserviamo il MultiPeerManager per rilevare i cambiamenti
 
     init() {
         // Controlla se è presente un username nell'app
@@ -29,9 +31,12 @@ struct ContentView: View {
                         .frame(height: 180)
                         .padding(.bottom, 20)
                                         
-                    .navigationDestination(isPresented: $showJoinGame) { // navigazione verso la pagina di accesso ad una lobby
-                        JoinAGameView(username: username)
-                    }
+                        .navigationDestination(isPresented: $showJoinGame) {
+                                            JoinAGameView(username: username)
+                                                .onDisappear {
+                                                    peerManager.reset() // Chiamiamo il reset del MultiPeerManager quando si torna qui da JoinAGameView
+                                                }
+                                        }
                     
                     .navigationDestination(isPresented: $showSelectMode) { // navigazione verso la pagina di selezione della modalità di partita
                         SelectModeView(lobbyName: lobbyName)
@@ -100,12 +105,14 @@ struct ContentView: View {
             }
             .navigationTitle("")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(destination: SettingsView(username: $username)) {
-                        Image(systemName: "gear.circle")
-                            .foregroundStyle(.gray)
-                            .font(.system(size: 25))
-                            .padding(.horizontal)
+                if !showUsernameEntry {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink(destination: SettingsView(username: $username)) {
+                            Image(systemName: "gear.circle")
+                                .foregroundStyle(.gray)
+                                .font(.system(size: 25))
+                                .padding(.horizontal)
+                        }
                     }
                 }
             }
