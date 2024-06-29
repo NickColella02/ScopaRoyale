@@ -9,11 +9,12 @@ struct OneVsOneGameView: View {
         return scene
     }
     
-    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
+    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @Environment(\.presentationMode) var presentationMode
     @State private var backModality = false
-    @State private var cancellables = Set<AnyCancellable>()
-
+    @State private var playerHand: [Card] = [] // mano del giocatore (advertiser) inizialmente vuota
+    @State private var tableCards: [Card] = [] // carte presenti sul tavolo
+    
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
@@ -21,28 +22,94 @@ struct OneVsOneGameView: View {
                 .navigationBarBackButtonHidden(true)
             
             Color.clear // Placeholder for any additional views
-        }
-        .onReceive(peerManager.$peerDisconnected) { disconnected in
-            if disconnected {
-                print(disconnected)
-                self.presentationMode.wrappedValue.dismiss()
-                backModality = true
+            
+            VStack {
+                // Visualizzazione delle carte del giocatore (advertiser)
+                HStack {
+                    ForEach(playerHand, id: \.self) { card in
+                        Image(card.imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 60, height: 90)
+                            .padding(4)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .shadow(radius: 5)
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+                
+                // Visualizzazione delle carte dell'avversario (browser)
+                HStack {
+                    ForEach(peerManager.opponentHand, id: \.self) { card in
+                        Image(card.imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 60, height: 90)
+                            .padding(4)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .shadow(radius: 5)
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+                
+                // Visualizzazione delle carte sul tavolo
+                HStack {
+                    ForEach(tableCards, id: \.self) { card in
+                        Image(card.imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 60, height: 90)
+                            .padding(4)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .shadow(radius: 5)
+                    }
+                }
+                .padding(.horizontal)
             }
         }
         .navigationDestination(isPresented: $backModality) {
-            SelectModeView(lobbyName: peerManager.lobbyName)
+            SelectModeView(lobbyName: peerManager.lobbyName).environmentObject(peerManager)
         }
         .onAppear {
-            peerManager.$peerDisconnected
-                .receive(on: RunLoop.main)
-                .sink { disconnected in
-                    if disconnected {
-                        print("Peer disconnected: \(disconnected)")
-                        self.presentationMode.wrappedValue.dismiss()
-                        backModality = true
-                    }
-                }
-                .store(in: &cancellables)
+            peerManager.createDeck() // crea il mazzo iniziale e lo mescola
+            giveCardsToPlayer() // estrae 3 carte e le da al giocatore (advertiser)
+            peerManager.giveCardsToOpponent() // estrae 3 carte e le da all'avversario (browser)
+            placeTableCards() // posiziona 4 carte al centro
+        }
+    }
+    
+    // Estrae le carte per il giocatore (advertiser)
+    private func giveCardsToPlayer() {
+        for _ in 0..<3 {
+            if let card = peerManager.deck.first {
+                playerHand.append(card)
+                peerManager.deck.removeFirst()
+                print("Carta estratta per il giocatore: \(card.value) di \(card.seed)")
+            } else {
+                print("Il mazzo è vuoto, non ci sono altre carte da estrarre per il giocatore.")
+                break
+            }
+        }
+    }
+    
+    // Posiziona le carte sul tavolo
+    private func placeTableCards() {
+        for _ in 0..<4 {
+            if let card = peerManager.deck.first {
+                tableCards.append(card)
+                peerManager.deck.removeFirst()
+                print("Carta estratta per il tavolo: \(card.value) di \(card.seed)")
+            } else {
+                print("Il mazzo è vuoto, non ci sono altre carte da posizionare sul tavolo.")
+                break
+            }
         }
     }
 }
@@ -51,8 +118,4 @@ struct OneVsOneGameView_Previews: PreviewProvider {
     static var previews: some View {
         OneVsOneGameView()
     }
-}
-
-#Preview {
-    OneVsOneGameView()
 }

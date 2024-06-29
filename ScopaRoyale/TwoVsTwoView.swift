@@ -4,7 +4,7 @@ struct TwoVsTwoView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     let numberOfPlayer: Int
     @State private var showStartGameAlert: Bool = false
-    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
+    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     let lobbyName: String
     
     var body: some View {

@@ -3,7 +3,7 @@ import SwiftUI
 struct JoinAGameView: View {
     let username: String
     @State private var showAlert = false // Stato per la visualizzazione dell'alert
-    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager()
+    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @State private var navigateToGame = false
     
     var body: some View {
@@ -27,7 +27,7 @@ struct JoinAGameView: View {
             
             Spacer()
                 .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
-                    OneVsOneGameView()
+                    OneVsOneGameView().environmentObject(peerManager)
                 }
             
                 .onAppear {
@@ -35,12 +35,11 @@ struct JoinAGameView: View {
                     peerManager.joinSession()
                 }
                 .onReceive(peerManager.$startGame) { startGame in
-                                if startGame {
-                                    navigateToGame = true
-                                }
-                            }
+                    if startGame {
+                        navigateToGame = true
+                    }
+                }
                 .preferredColorScheme(.light) // Forza la light mode
         }
-        
     }
 }

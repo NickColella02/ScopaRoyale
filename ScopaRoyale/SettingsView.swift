@@ -1,7 +1,6 @@
 import SwiftUI
 import AVFoundation
 
-
 struct SettingsView: View {
     @Binding var username: String
     @State private var newUsername: String = ""

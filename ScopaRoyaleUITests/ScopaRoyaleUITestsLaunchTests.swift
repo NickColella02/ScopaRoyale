@@ -1,10 +1,3 @@
-//
-//  ScopaRoyaleUITestsLaunchTests.swift
-//  ScopaRoyaleUITests
-//
-//  Created by Nicolò Colella on 24/06/24.
-//
-
 import XCTest
 
 final class ScopaRoyaleUITestsLaunchTests: XCTestCase {

@@ -1,4 +1,5 @@
 import SpriteKit
+import SwiftUI
 
 class OneVsOneGameScene: SKScene {
     override func didMove(to view: SKView) {

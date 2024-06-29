@@ -15,10 +15,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var showAlert: Bool = false
     @Published var startGame: Bool = false
     @Published var peerDisconnected: Bool = false
-
     @Published var connectedPeers: [MCPeerID] = []
     private var neededPlayers: Int = 0
     private var myUsername: String = ""
+    @Published var deck: [Card] = []
+    @Published var opponentHand: [Card] = [] // mano dell'avversario (browser)
 
     override init() {
         super.init()
@@ -60,22 +61,21 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-            DispatchQueue.main.async {
-                if let receivedString = String(data: data, encoding: .utf8) {
-                    print("Dati ricevuti: \(receivedString)")
-                    if receivedString == "START_GAME" {
-                        self.startGame = true
-                    } else if receivedString.starts(with: "Lobby:") {
-                        self.lobbyName = String(receivedString.dropFirst(6))
-                        self.isConnected2 = true
-                    } else {
-                        self.opponentName = receivedString
-                        self.isConnected2 = true
-                    }
+        DispatchQueue.main.async {
+            if let receivedString = String(data: data, encoding: .utf8) {
+                print("Dati ricevuti: \(receivedString)")
+                if receivedString == "START_GAME" {
+                    self.startGame = true
+                } else if receivedString.starts(with: "Lobby:") {
+                    self.lobbyName = String(receivedString.dropFirst(6))
+                    self.isConnected2 = true
+                } else {
+                    self.opponentName = receivedString
+                    self.isConnected2 = true
                 }
             }
         }
-
+    }
 
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
 
@@ -146,11 +146,41 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func reset() {
-            self.isConnected = false
-            self.isConnected2 = false
-            self.opponentName = ""
-            self.lobbyName = ""
-            self.startGame = false
-            self.peerDisconnected = true
+        self.isConnected = false
+        self.isConnected2 = false
+        self.opponentName = ""
+        self.lobbyName = ""
+        self.startGame = false
+        self.peerDisconnected = true
+    }
+    
+    func createDeck() { // crea e mischia il mazzo di carte iniziale
+        let values: [String] = [ // possibili valori delle carte
+            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
+        ]
+
+        let seeds: [String] = [ // possibili semi delle carte
+            "denari", "coppe", "bastoni", "spade"
+        ]
+        for value in values { // scorre tutti i possibili valori
+            for seed in seeds { // scorre tutti i possibili semi
+                let card = Card(value: value, seed: seed) // crea una carta
+                deck.append(card) // inserisce la carta nel mazzo
+            }
         }
+        deck = deck.shuffled() // mescola le carte del mazzo
+    }
+    
+    func giveCardsToOpponent() {
+        for _ in 0..<3 {
+            if let card = deck.first {
+                opponentHand.append(card)
+                deck.removeFirst()
+                print("Carta estratta per l'avversario: \(card.value) di \(card.seed)")
+            } else {
+                print("Il mazzo è vuoto, non ci sono altre carte da dare all'avversario.")
+                break
+            }
+        }
+    }
 }

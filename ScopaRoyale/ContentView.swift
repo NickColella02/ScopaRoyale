@@ -9,8 +9,7 @@ struct ContentView: View {
     @State private var showSelectMode: Bool = false
     @State private var showLobbyNameAlert: Bool  = false
     @State private var showGameRules: Bool = false
-    
-    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // Osserviamo il MultiPeerManager per rilevare i cambiamenti
+    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
 
     init() {
         // Controlla se è presente un username nell'app
@@ -33,14 +32,14 @@ struct ContentView: View {
                         .padding(.bottom, 20)
                                         
                         .navigationDestination(isPresented: $showJoinGame) {
-                                            JoinAGameView(username: username)
-                                                .onDisappear {
-                                                    peerManager.reset() // Chiamiamo il reset del MultiPeerManager quando si torna qui da JoinAGameView
-                                                }
-                                        }
+                            JoinAGameView(username: username).environmentObject(peerManager)
+                                .onDisappear {
+                                    peerManager.reset() // Chiamiamo il reset del MultiPeerManager quando si torna qui da JoinAGameView
+                                }
+                        }
                     
                     .navigationDestination(isPresented: $showSelectMode) { // navigazione verso la pagina di selezione della modalità di partita
-                        SelectModeView(lobbyName: lobbyName)
+                        SelectModeView(lobbyName: lobbyName).environmentObject(peerManager)
                     }
                     
                     Button(action: {

@@ -1,10 +1,3 @@
-//
-//  ScopaRoyaleTests.swift
-//  ScopaRoyaleTests
-//
-//  Created by Nicolò Colella on 24/06/24.
-//
-
 import XCTest
 @testable import ScopaRoyale
 

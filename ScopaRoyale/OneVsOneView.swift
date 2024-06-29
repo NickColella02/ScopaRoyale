@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OneVsOneView: View {
-    @ObservedObject private var peerManager: MultiPeerManager = MultiPeerManager() // riferimento al peer manager
+    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     let numberOfPlayer: Int // numero di giocatori
     let lobbyName: String // nome della lobby
     @State private var showStartGameAlert: Bool = false // true se si tenta di avviare una partita senza sufficienti giocatori
@@ -61,7 +61,7 @@ struct OneVsOneView: View {
             }
         }
         .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
-            OneVsOneGameView()
+            OneVsOneGameView().environmentObject(peerManager)
         }
         .preferredColorScheme(.light) // forza la light mode
         .onAppear() { // quando la pagina è caricata, da avvio alla connessione
@@ -77,6 +77,5 @@ struct OneVsOneView: View {
         } message: {
             Text("You need another player to start a 1 vs 1 game.")
         }
-        
     }
 }

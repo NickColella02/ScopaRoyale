@@ -1,17 +1,11 @@
-//
-//  ScopaRoyaleApp.swift
-//  ScopaRoyale
-//
-//  Created by Nicolò Colella on 24/06/24.
-//
-
 import SwiftUI
 
 @main
 struct ScopaRoyaleApp: App {
+    @StateObject private var peerManager = MultiPeerManager()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(peerManager)
         }
     }
 }
