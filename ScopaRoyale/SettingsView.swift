@@ -112,7 +112,7 @@ struct SettingsView: View {
                         }
                         .frame(width: 370, height: 250)
                         .background(Color.white)
-                        .cornerRadius(20)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
                         .shadow(radius: 20)
                     }
                 }

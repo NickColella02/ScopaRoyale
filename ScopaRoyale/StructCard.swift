@@ -9,12 +9,12 @@ public let seeds: [String] = [ // possibili semi delle carte
 struct Card: CustomStringConvertible, Equatable, Hashable { // definizione di una carta
     let value: String // valore
     let seed: String // seme
-    var imageName: String { "\(value.lowercased())\(seed.lowercased())" }
-    init(value: String, seed: String) {
+    var imageName: String { "\(value.lowercased())\(seed.lowercased())" } // immagine della carta
+    init(value: String, seed: String) { // costruttore
         self.value = value
         self.seed = seed
     }
-    var description: String {
+    var description: String { // restituisce la carta sottoforma di stringa
         return "\(value) di \(seed)"
     }
 }

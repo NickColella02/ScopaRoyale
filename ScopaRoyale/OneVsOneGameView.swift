@@ -33,7 +33,7 @@ struct OneVsOneGameView: View {
                             .frame(width: 60, height: 90)
                             .padding(4)
                             .background(Color.white)
-                            .cornerRadius(8)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .shadow(radius: 5)
                     }
                 }
@@ -50,7 +50,7 @@ struct OneVsOneGameView: View {
                             .frame(width: 60, height: 90)
                             .padding(4)
                             .background(Color.white)
-                            .cornerRadius(8)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .shadow(radius: 5)
                     }
                 }
@@ -67,7 +67,7 @@ struct OneVsOneGameView: View {
                             .frame(width: 60, height: 90)
                             .padding(4)
                             .background(Color.white)
-                            .cornerRadius(8)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                             .shadow(radius: 5)
                     }
                 }
