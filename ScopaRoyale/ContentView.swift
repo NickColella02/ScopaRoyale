@@ -245,11 +245,13 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(MultiPeerManager())
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(MultiPeerManager())
 }
 
 extension Notification.Name {
