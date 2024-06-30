@@ -19,27 +19,27 @@ struct JoinAGameView: View {
                     .font(.title)
                     .padding()
                 
-                
                 Text("Opponent: \(peerManager.opponentName)") // nome dell'avversario
                     .font(.title)
                     .padding()
             }
             
             Spacer()
-                .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
-                    OneVsOneGameView().environmentObject(peerManager)
-                }
             
-                .onAppear {
-                    peerManager.sendUsername(username: username)
-                    peerManager.joinSession()
+            .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
+                OneVsOneGameView().environmentObject(peerManager)
+            }
+        
+            .onAppear {
+                peerManager.sendUsername(username: username)
+                peerManager.joinSession()
+            }
+            .onReceive(peerManager.$startGame) { startGame in
+                if startGame {
+                    navigateToGame = true
                 }
-                .onReceive(peerManager.$startGame) { startGame in
-                    if startGame {
-                        navigateToGame = true
-                    }
-                }
-                .preferredColorScheme(.light) // Forza la light mode
+            }
+            .preferredColorScheme(.light) // Forza la light mode
         }
     }
 }

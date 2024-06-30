@@ -9,15 +9,21 @@ struct TwoVsTwoView: View {
     
     var body: some View {
         VStack {
-            // Immagine rappresentativa della modalità di gioco (2 vs 2)
+            VStack(spacing: 10) {
+                Text("Lobby's Name")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.horizontal)
+                
+                Text(lobbyName)
+                    .font(.largeTitle)
+                    .padding(.horizontal)
+            }
+            
             Image("4users")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 120)
-            
-            Text("Lobby's name: \(lobbyName)")
-                .font(.title)
-                .padding()
             
             if peerManager.isConnected {
                 ProgressView("Searching for opponents...")
