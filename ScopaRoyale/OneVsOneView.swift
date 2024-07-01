@@ -11,11 +11,11 @@ struct OneVsOneView: View {
     var body: some View {
         VStack(spacing: 30) {
             VStack(spacing: 10) {
-                Text("Lobby's Name")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.horizontal)
-                
+                Image("lobbysName")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 40, height: 40)
+                    .padding(.top, 20)
                 Text(lobbyName)
                     .font(.largeTitle)
                     .padding(.horizontal)
@@ -23,10 +23,10 @@ struct OneVsOneView: View {
             
             Spacer()
             
-            Image("2users")
+            /*Image("2users")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 120)
+                .frame(height: 120)*/
             
             if peerManager.isConnected {
                 VStack(spacing: 10) {

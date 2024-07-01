@@ -15,6 +15,8 @@ struct SettingsView: View {
         NavigationStack {
             VStack {
                 
+                Spacer()
+                
                 Button(action: {
                     showChangeUsernameForm = true
                 }) {
@@ -46,6 +48,8 @@ struct SettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 35)
                 }
+                
+                Spacer()
             }
         }
         .alert("Username required", isPresented: $showEmptyUsernameAlert) {
@@ -72,6 +76,7 @@ struct SettingsView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                                     .frame(width: 40, height: 40)
+                                    .padding(.top, 20)
                             }
                             TextField("Enter new username", text: $newUsername)
                                 .onAppear {
@@ -83,16 +88,10 @@ struct SettingsView: View {
                                 .padding(.horizontal, 25)
                             Button(action: {
                                 if !newUsername.isEmpty {
-                                    // salva il nuovo username in UserDefaults
                                     UserDefaults.standard.set(newUsername, forKey: "username")
-                                    // aggiorna la variabile username
                                     username = newUsername
-                                    // chiude il popup
-                                    // Save the new username in UserDefaults
                                     UserDefaults.standard.set(newUsername, forKey: "username")
-                                    // Update the username variable
                                     username = newUsername
-                                    // Close the popup
                                     showChangeUsernameForm = false
                                 } else {
                                     showEmptyUsernameAlert = true
@@ -107,8 +106,9 @@ struct SettingsView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 50))
                                     .padding(.horizontal, 25)
                             }
+                            .padding(.bottom, 20)
                         }
-                        .frame(width: 370, height: 200)
+                        .frame(width: 370)
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .shadow(radius: 20)

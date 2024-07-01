@@ -43,11 +43,11 @@ struct WelcomeView: View {
             }
             
             if showDescription {
-                Text("Immerse yourself in thrilling rounds of Scopa with nearby players.")
-                    .font(.title2)
+                Text("Immerse yourself in thrilling rounds of Scopa with nearby players!")
+                    .font(.system(size: 20, design: .default))
                     .multilineTextAlignment(.center)
-                    .padding(.top, 5)
                     .transition(.opacity)
+                    .padding(.horizontal, 35)
             }
             
             Spacer()
@@ -60,14 +60,13 @@ struct WelcomeView: View {
                             .foregroundStyle(.white)
                             .padding(.horizontal)
                         
-                        Image(systemName: "arrow.right")
+                        /*Image(systemName: "arrow.right")
                             .font(.system(size: 20))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.white)*/
                     }
                     .frame(width: 330, height: 60)
                     .background(Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 50))
-                    .padding(.horizontal, 25)
                     .padding(.bottom, 50)
                     .transition(.opacity)
                 }
@@ -77,12 +76,12 @@ struct WelcomeView: View {
             withAnimation(.easeInOut(duration: 1.0)) {
                 showTitle = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     showDescription = true
                 }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     showContinueButton = true
                 }
@@ -102,7 +101,6 @@ struct UsernameFormView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 40, height: 40) // Aumentato per coerenza con AppLogo
-                .padding(.bottom, 10)
             
             TextField("Enter username", text: $username)
                 .padding()
@@ -146,4 +144,8 @@ struct UsernameFormView: View {
             }
         }
     }
+}
+
+#Preview {
+    UsernameEntryView()
 }

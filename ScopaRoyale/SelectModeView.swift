@@ -29,13 +29,13 @@ struct SelectModeView: View {
                 }
                 .frame(width: 330, height: 60)
                 .padding(.horizontal, 35)
-                .padding(.top, 20)
                 
                 Text("Play with one person nearby in a one vs one mode.")
                     .font(.system(size: 14, design: .default))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 35)
-                    .padding(.top, 10)
+                    .foregroundStyle(.gray)
+                    .padding(.top, 5)
             }
             
             VStack () {
@@ -63,7 +63,8 @@ struct SelectModeView: View {
                     .font(.system(size: 14, design: .default))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 35)
-                    .padding(.top, 10)
+                    .foregroundStyle(.gray)
+                    .padding(.top, 5)
             }
             .padding(.top, 20)
         }
