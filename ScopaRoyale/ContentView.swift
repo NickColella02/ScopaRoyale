@@ -135,7 +135,8 @@ struct ContentView: View {
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 40, height: 40)
-                                        .padding(.bottom, 10)
+                                        .padding(.top, 20)
+                                        
                                 }
                                 TextField("Enter lobby name", text: $lobbyName)
                                     .padding()
@@ -159,10 +160,11 @@ struct ContentView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 50))
                                         .padding(.horizontal, 25)
                                 }
+                                .padding(.bottom, 20)
                             }
-                            .frame(width: 370, height: 250)
+                            .frame(width: 370, height: 215)
                             .background(Color.white)
-                            .cornerRadius(20)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
                             .shadow(radius: 20)
                         }
                     }
@@ -177,13 +179,14 @@ struct ContentView: View {
                                 .onTapGesture {
                                     showGameRules = false
                                 }
-                            VStack(spacing: 20) {
-                                Text("Scopa Rules")
-                                    .font(.title)
-                                    .fontWeight(.bold)
+                            VStack() {
+                                Image("rules")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 40, height: 40)
                                     .padding(.top, 20)
                                 ScrollView {
-                                    VStack(alignment: .leading, spacing: 10) {
+                                    VStack(alignment: .leading) {
                                         Text("Scopa is a traditional Italian card game. Here are the basic rules:")
                                             .font(.headline)
                                         Text("""
@@ -203,8 +206,9 @@ struct ContentView: View {
                                         4. **Winning**: The game continues until all cards are played. The player with the most points at the end wins.
                                         """)
                                         .font(.body)
+                                        
                                     }
-                                    .padding()
+                                    .padding(.horizontal, 20)
                                 }
                                 Button(action: {
                                     showGameRules = false
@@ -218,9 +222,10 @@ struct ContentView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 50))
                                         .padding(.horizontal, 25)
                                 }
+                                .frame(width: 330, height: 60)
                                 .padding(.bottom, 20)
                             }
-                            .frame(width: 370, height: 400)
+                            .frame(width: 370, height: 700)
                             .background(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .shadow(radius: 20)
