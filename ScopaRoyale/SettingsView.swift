@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var showChangeUsernameForm = false
     @Environment(\.presentationMode) var presentationMode
     @State private var volumeLevel: Float = AVAudioSession.sharedInstance().outputVolume * 100
+    @State private var audioPlayer: AVAudioPlayer?
 
     var body: some View {
         NavigationStack {
@@ -47,7 +48,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .alert("Username required", isPresented: $showEmptyUsernameAlert) { // messaggio di errore se non si assegna un nome alla lobby
+        .alert("Username required", isPresented: $showEmptyUsernameAlert) {
             VStack {
                 Button("OK", role: .cancel) {
                     showEmptyUsernameAlert = false
@@ -87,6 +88,11 @@ struct SettingsView: View {
                                     // aggiorna la variabile username
                                     username = newUsername
                                     // chiude il popup
+                                    // Save the new username in UserDefaults
+                                    UserDefaults.standard.set(newUsername, forKey: "username")
+                                    // Update the username variable
+                                    username = newUsername
+                                    // Close the popup
                                     showChangeUsernameForm = false
                                 } else {
                                     showEmptyUsernameAlert = true
@@ -110,10 +116,14 @@ struct SettingsView: View {
                 }
             }
         )
+        .onAppear {
+            playBackgroundMusic()
+        }
     }
 
     private func setVolume(level: Float) {
         let volume = level / 100
+        audioPlayer?.volume = volume
         do {
             try AVAudioSession.sharedInstance().setActive(true)
             let volumeView = MPVolumeView(frame: .zero)
@@ -122,6 +132,20 @@ struct SettingsView: View {
             }
         } catch {
             print("Failed to set volume: \(error.localizedDescription)")
+        }
+    }
+
+    private func playBackgroundMusic() {
+        if let path = Bundle.main.path(forResource: "sound", ofType: "mp3") {
+            let url = URL(fileURLWithPath: path)
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.numberOfLoops = -1 // loop indefinitely
+                audioPlayer?.play()
+                setVolume(level: volumeLevel) // set the initial volume
+            } catch {
+                print("Error loading background music: \(error.localizedDescription)")
+            }
         }
     }
 }
