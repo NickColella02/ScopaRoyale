@@ -13,21 +13,18 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                
                 Button(action: {
                     showChangeUsernameForm = true
                 }) {
                     HStack {
-                        Text("Change username")
-                            .font(.system(size: 20, design: .default))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal)
+                        Text("Welcome back \(username)")
+                            .font(.system(size: 30, design: .default))
+                            .foregroundStyle(.black)
                         Image(systemName: "pencil")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.white)
+                            .font(.system(size: 30))
+                            .foregroundStyle(.black)
                     }
-                    .frame(width: 330, height: 60)
-                    .background(Color.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 35)
                     .padding(.top, 20)
                 }
@@ -35,22 +32,18 @@ struct SettingsView: View {
                 VStack {
                     HStack {
                         Image(systemName: volumeLevel > 0 ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                            .foregroundStyle(.black)
-                            .font(.system(size: 40))
+                            .foregroundStyle(.white)
+                            .font(.system(size: 25))
+                            .padding(.horizontal, 20)
                         Slider(value: $volumeLevel, in: 0...100, step: 1, onEditingChanged: { _ in
                             setVolume(level: volumeLevel)
                         })
                         .padding(.horizontal, 20)
                     }
-                    .padding()
-                }
-            }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Settings")
-                        .font(.system(size: 24, weight: .bold))
+                    .frame(width: 330, height: 60)
+                    .background(Color.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 50))
+                    .padding(.horizontal, 35)
                 }
             }
         }
@@ -78,7 +71,6 @@ struct SettingsView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                                     .frame(width: 40, height: 40)
-                                    .padding(.bottom, 10)
                             }
                             TextField("Enter new username", text: $newUsername)
                                 .onAppear {
@@ -90,11 +82,11 @@ struct SettingsView: View {
                                 .padding(.horizontal, 25)
                             Button(action: {
                                 if !newUsername.isEmpty {
-                                    // Salva il nuovo username in UserDefaults
+                                    // salva il nuovo username in UserDefaults
                                     UserDefaults.standard.set(newUsername, forKey: "username")
-                                    // Aggiorna la variabile username
+                                    // aggiorna la variabile username
                                     username = newUsername
-                                    // Chiude il popup
+                                    // chiude il popup
                                     showChangeUsernameForm = false
                                 } else {
                                     showEmptyUsernameAlert = true
@@ -110,7 +102,7 @@ struct SettingsView: View {
                                     .padding(.horizontal, 25)
                             }
                         }
-                        .frame(width: 370, height: 250)
+                        .frame(width: 370, height: 200)
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .shadow(radius: 20)
