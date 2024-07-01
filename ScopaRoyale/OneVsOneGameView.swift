@@ -21,15 +21,10 @@ struct OneVsOneGameView: View {
             VStack {
                 if peerManager.isHost {
                     // Sezione per le carte dell'avversario, posizionate sopra il tavolo se sei l'host
-                    VStack {
-                        Text("Mano dell'Avversario")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .padding(.bottom, 10)
-                        
+                    VStack {                        
                         HStack {
                             ForEach(peerManager.opponentHand, id: \.self) { card in
-                                Image(card.imageName)
+                                Image("retro")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 60, height: 90)
@@ -45,14 +40,9 @@ struct OneVsOneGameView: View {
                 }
                 if peerManager.isClient {
                     VStack {
-                        Text("Mano dell'Avversario")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .padding(.bottom, 10)
-                        
                         HStack {
                             ForEach(peerManager.playerHand, id: \.self) { card in
-                                Image(card.imageName)
+                                Image("retro")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 60, height: 90)
@@ -70,12 +60,7 @@ struct OneVsOneGameView: View {
                 Spacer()
                 
                 // Sezione per le carte del tavolo, posizionate al centro
-                VStack {
-                    Text("Carte sul Tavolo")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .padding(.bottom, 10)
-                    
+                VStack {                    
                     HStack {
                         ForEach(peerManager.tableCards, id: \.self) { card in
                             Image(card.imageName)
@@ -97,11 +82,6 @@ struct OneVsOneGameView: View {
                 if peerManager.isHost {
                     // Sezione per le carte del giocatore (solo per il browser)
                     VStack {
-                        Text("La tua Mano")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .padding(.bottom, 10)
-                        
                         HStack {
                             ForEach(peerManager.playerHand, id: \.self) { card in
                                 Image(card.imageName)
@@ -121,11 +101,6 @@ struct OneVsOneGameView: View {
                 if peerManager.isClient {
                     // Sezione per le carte dell'avversario (solo per il browser)
                     VStack {
-                        Text("La tua mano")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .padding(.bottom, 10)
-                        
                         HStack {
                             ForEach(peerManager.opponentHand, id: \.self) { card in
                                 Image(card.imageName)

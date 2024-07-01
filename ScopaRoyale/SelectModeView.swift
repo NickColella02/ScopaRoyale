@@ -14,6 +14,11 @@ struct SelectModeView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: 55)
+                    .onAppear() {
+                        if peerManager.isHost {
+                            peerManager.reset()
+                        }
+                    }
                 
                 Button(action: { // bottone per selezionare la modalità 1 vs 1
                     navigateToOneVsOne = true

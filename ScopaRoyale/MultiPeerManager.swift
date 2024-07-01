@@ -79,26 +79,19 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     print("Nome lobby ricevuto: \(self.lobbyName)")
                 } else if receivedString.starts(with: "Deck:") {
                     let deckData = data.dropFirst(5)
-                    let receivedDeck = [Card].fromJSON(deckData)
-                    self.deck = receivedDeck!
+                    self.deck = [Card].fromJSON(deckData)!
                     print("Deck ricevuto")
                 } else if receivedString.starts(with: "OpponentHand:") {
                     let handData = data.dropFirst(13)
-                    print("Hand Data: \(String(data: handData, encoding: .utf8)!)")
-                    let opponentHand = [Card].fromJSON(handData)
-                    self.opponentHand = opponentHand!
+                    self.opponentHand = [Card].fromJSON(handData)!
                     print("Mano avversario ricevuta: \(self.opponentHand)")
                 } else if receivedString.starts(with: "PlayerHand:") {
                     let playerData = data.dropFirst(11)
-                    print("Player Data: \(String(data: playerData, encoding: .utf8)!)")
-                    let playerHand = [Card].fromJSON(playerData)
-                    self.playerHand = playerHand!
+                    self.playerHand = [Card].fromJSON(playerData)!
                     print("Mano giocatore ricevuta: \(self.playerHand)")
                 } else if receivedString.starts(with: "Table:") {
                     let tableData = data.dropFirst(6)
-                    print("Table:  \(String(data: tableData, encoding: .utf8)!)")
-                    let table = [Card].fromJSON(tableData)
-                    self.tableCards = table!
+                    self.tableCards = [Card].fromJSON(tableData)!
                     print("Tavolo ricevuto: \(self.tableCards)")
                 } else {
                     self.opponentName = receivedString
@@ -146,6 +139,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         browser = MCNearbyServiceBrowser(peer: peerID, serviceType: serviceType)
         browser?.delegate = self
         self.isClient = true
+        self.isConnected2 = true
         browser?.startBrowsingForPeers()
     }
 
@@ -216,8 +210,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func giveCardsToOpponent() {
         for _ in 0..<3 {
             if let card = deck.first {
-                opponentHand.append(card)
-                deck.removeFirst()
+                self.opponentHand.append(card)
+                self.deck.removeFirst()
             }
         }
     }
@@ -238,8 +232,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func giveCardsToPlayer() {
         for _ in 0..<3 {
             if let card = deck.first {
-                playerHand.append(card)
-                deck.removeFirst()
+                self.playerHand.append(card)
+                self.deck.removeFirst()
             }
         }
     }
@@ -260,8 +254,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func placeTableCards() {
         for _ in 0..<4 {
             if let card = deck.first {
-                tableCards.append(card)
-                deck.removeFirst()
+                self.tableCards.append(card)
+                self.deck.removeFirst()
                 print("Carta estratta per il tavolo: \(card.value) di \(card.seed)")
             }
         }
@@ -280,15 +274,18 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func reset() {
-        self.isConnected = false
-        self.isConnected2 = false
-        self.opponentName = ""
-        self.lobbyName = ""
-        self.peerDisconnected = false
-        self.deck = []
-        self.opponentHand = []
-        self.connectedPeers = []
+        DispatchQueue.main.async {
+            self.isConnected = false
+            self.isConnected2 = false
+            self.opponentName = ""
+            self.peerDisconnected = false
+            self.deck = []
+            self.opponentHand = []
+            self.playerHand = []
+            self.connectedPeers = []
+        }
         advertiser?.stopAdvertisingPeer()
         browser?.stopBrowsingForPeers()
+        session.disconnect()
     }
 }

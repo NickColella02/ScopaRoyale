@@ -35,12 +35,14 @@ struct ContentView: View {
                         .scaledToFit()
                         .frame(height: 180)
                         .padding(.bottom, 20)
+                        .onAppear() {
+                            if peerManager.isClient {
+                                peerManager.reset()
+                            }
+                        }
                                         
                         .navigationDestination(isPresented: $showJoinGame) {
                             JoinAGameView(username: username).environmentObject(peerManager)
-                                .onDisappear {
-                                    peerManager.reset()
-                                }
                         }
                     
                     .navigationDestination(isPresented: $showSelectMode) {

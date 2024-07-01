@@ -2,7 +2,6 @@ import SwiftUI
 
 struct JoinAGameView: View {
     let username: String
-    @State private var showAlert = false // Stato per la visualizzazione dell'alert
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @State private var navigateToGame = false
     
@@ -19,9 +18,7 @@ struct JoinAGameView: View {
                         .progressViewStyle(CircularProgressViewStyle())
                 }
                 .padding()
-            }
-            
-            if peerManager.isConnected2 { // quando l'utente si connette alla lobby
+            } else { // quando l'utente si connette alla lobby
                 VStack(spacing: 10) {
                     Text("Lobby's Name")
                         .font(.title)
@@ -38,7 +35,7 @@ struct JoinAGameView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 120)
-                            Text(peerManager.opponentName) // nome dell'avversario
+                            Text(username) // nome dell'utente
                                 .font(.title2)
                                 .padding(.top, 10)
                         }
@@ -52,7 +49,7 @@ struct JoinAGameView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 120)
-                            Text(username) // nome dell'utente
+                            Text(peerManager.opponentName) // nome dell'avversario
                                 .font(.title2)
                                 .padding(.top, 10)
                         }
