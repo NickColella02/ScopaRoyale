@@ -11,22 +11,17 @@ struct OneVsOneView: View {
     var body: some View {
         VStack(spacing: 30) {
             VStack(spacing: 10) {
-                Image("lobbysName")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 40, height: 40)
-                    .padding(.top, 20)
+                Text("Lobby's Name")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.horizontal)
+                
                 Text(lobbyName)
                     .font(.largeTitle)
                     .padding(.horizontal)
             }
             
             Spacer()
-            
-            /*Image("2users")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 120)*/
             
             if peerManager.isConnected {
                 VStack(spacing: 10) {
@@ -41,18 +36,30 @@ struct OneVsOneView: View {
             }
             
             HStack {
+                VStack {
+                    Image("1user")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 120)
+                    Text(username) // nome dell'avversario
+                        .font(.title2)
+                        .padding(.top, 10)
+                }
+                
+                Text("VS")
+                    .font(.title)
+                    .padding(.horizontal, 20)
+                
                 if !peerManager.opponentName.isEmpty {
-                    Text(peerManager.opponentName)
-                        .font(.title2)
-                        .padding(.top, 10)
-
-                    Text("VS")
-                        .font(.title2)
-                        .padding(.top, 10)
-
-                    Text(username)
-                        .font(.title2)
-                        .padding(.top, 10)
+                    VStack {
+                        Image("1user")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 120)
+                        Text(peerManager.opponentName) // nome dell'utente
+                            .font(.title2)
+                            .padding(.top, 10)
+                    }
                 }
             }
             .padding(.horizontal, 35)

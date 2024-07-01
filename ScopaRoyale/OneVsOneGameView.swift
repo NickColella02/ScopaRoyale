@@ -1,6 +1,5 @@
 import SwiftUI
 import SpriteKit
-import Combine
 
 struct OneVsOneGameView: View {
     var scene: SKScene {
@@ -12,8 +11,6 @@ struct OneVsOneGameView: View {
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @Environment(\.presentationMode) var presentationMode
     @State private var backModality = false
-    @State private var playerHand: [Card] = [] // mano del giocatore (advertiser) inizialmente vuota
-    @State private var tableCards: [Card] = [] // carte presenti sul tavolo
     
     var body: some View {
         ZStack {
@@ -21,101 +18,134 @@ struct OneVsOneGameView: View {
                 .edgesIgnoringSafeArea(.all)
                 .navigationBarBackButtonHidden(true)
             
-            Color.clear // Placeholder for any additional views
-            
             VStack {
-                // Visualizzazione delle carte del giocatore (advertiser)
-                HStack {
-                    ForEach(playerHand, id: \.self) { card in
-                        Image(card.imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 60, height: 90)
-                            .padding(4)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .shadow(radius: 5)
+                if peerManager.isHost {
+                    // Sezione per le carte dell'avversario, posizionate sopra il tavolo se sei l'host
+                    VStack {
+                        Text("Mano dell'Avversario")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.bottom, 10)
+                        
+                        HStack {
+                            ForEach(peerManager.opponentHand, id: \.self) { card in
+                                Image(card.imageName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 60, height: 90)
+                                    .padding(4)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
                     }
                 }
-                .padding(.horizontal)
+                if peerManager.isClient {
+                    VStack {
+                        Text("Mano dell'Avversario")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.bottom, 10)
+                        
+                        HStack {
+                            ForEach(peerManager.playerHand, id: \.self) { card in
+                                Image(card.imageName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 60, height: 90)
+                                    .padding(4)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
+                    }
+                }
                 
                 Spacer()
                 
-                // Visualizzazione delle carte dell'avversario (browser)
-                HStack {
-                    ForEach(peerManager.opponentHand, id: \.self) { card in
-                        Image(card.imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 60, height: 90)
-                            .padding(4)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .shadow(radius: 5)
+                // Sezione per le carte del tavolo, posizionate al centro
+                VStack {
+                    Text("Carte sul Tavolo")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(.bottom, 10)
+                    
+                    HStack {
+                        ForEach(peerManager.tableCards, id: \.self) { card in
+                            Image(card.imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 60, height: 90)
+                                .padding(4)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .shadow(radius: 5)
+                        }
                     }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .padding(.horizontal)
                 
                 Spacer()
                 
-                // Visualizzazione delle carte sul tavolo
-                HStack {
-                    ForEach(tableCards, id: \.self) { card in
-                        Image(card.imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 60, height: 90)
-                            .padding(4)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .shadow(radius: 5)
+                if peerManager.isHost {
+                    // Sezione per le carte del giocatore (solo per il browser)
+                    VStack {
+                        Text("La tua Mano")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.bottom, 10)
+                        
+                        HStack {
+                            ForEach(peerManager.playerHand, id: \.self) { card in
+                                Image(card.imageName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 60, height: 90)
+                                    .padding(4)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
                     }
                 }
-                .padding(.horizontal)
+                if peerManager.isClient {
+                    // Sezione per le carte dell'avversario (solo per il browser)
+                    VStack {
+                        Text("La tua mano")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.bottom, 10)
+                        
+                        HStack {
+                            ForEach(peerManager.opponentHand, id: \.self) { card in
+                                Image(card.imageName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 60, height: 90)
+                                    .padding(4)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 5)
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
+                    }
+                }
             }
         }
         .navigationDestination(isPresented: $backModality) {
             SelectModeView(lobbyName: peerManager.lobbyName).environmentObject(peerManager)
         }
-        .onAppear {
-            peerManager.createDeck() // crea il mazzo iniziale e lo mescola
-            giveCardsToPlayer() // estrae 3 carte e le da al giocatore (advertiser)
-            peerManager.giveCardsToOpponent() // estrae 3 carte e le da all'avversario (browser)
-            placeTableCards() // posiziona 4 carte al centro
-        }
-    }
-    
-    // Estrae le carte per il giocatore (advertiser)
-    private func giveCardsToPlayer() {
-        for _ in 0..<3 {
-            if let card = peerManager.deck.first {
-                playerHand.append(card)
-                peerManager.deck.removeFirst()
-                print("Carta estratta per il giocatore: \(card.value) di \(card.seed)")
-            } else {
-                print("Il mazzo è vuoto, non ci sono altre carte da estrarre per il giocatore.")
-                break
-            }
-        }
-    }
-    
-    // Posiziona le carte sul tavolo
-    private func placeTableCards() {
-        for _ in 0..<4 {
-            if let card = peerManager.deck.first {
-                tableCards.append(card)
-                peerManager.deck.removeFirst()
-                print("Carta estratta per il tavolo: \(card.value) di \(card.seed)")
-            } else {
-                print("Il mazzo è vuoto, non ci sono altre carte da posizionare sul tavolo.")
-                break
-            }
-        }
-    }
-}
-
-struct OneVsOneGameView_Previews: PreviewProvider {
-    static var previews: some View {
-        OneVsOneGameView()
     }
 }
