@@ -11,7 +11,8 @@ struct OneVsOneGameView: View {
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @Environment(\.presentationMode) var presentationMode
     @State private var backModality = false
-    
+    @State private var showPeerDisconnectedAlert = false // Variabile di stato per l'alert
+
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
@@ -21,7 +22,7 @@ struct OneVsOneGameView: View {
             VStack {
                 if peerManager.isHost {
                     // Sezione per le carte dell'avversario, posizionate sopra il tavolo se sei l'host
-                    VStack {                        
+                    VStack {
                         HStack {
                             ForEach(peerManager.opponentHand, id: \.self) { card in
                                 Image("retro")
@@ -60,7 +61,7 @@ struct OneVsOneGameView: View {
                 Spacer()
                 
                 // Sezione per le carte del tavolo, posizionate al centro
-                VStack {                    
+                VStack {
                     HStack {
                         ForEach(peerManager.tableCards, id: \.self) { card in
                             Image(card.imageName)
@@ -137,8 +138,19 @@ struct OneVsOneGameView: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $backModality) {
-            SelectModeView(lobbyName: peerManager.lobbyName).environmentObject(peerManager)
+        .alert(isPresented: $showPeerDisconnectedAlert) {
+            Alert(title: Text("Disconnessione"), message: Text("Il giocatore ha abbandonato la partita."), dismissButton: .default(Text("OK")) {
+                peerManager.reset() // chiude la connessione alla lobby quando uno dei due giocatori si disconnette
+                backModality = true
+            })
+        }
+        .fullScreenCover(isPresented: $backModality) {
+            ContentView()
+        }
+        .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
+            if newValue {
+                showPeerDisconnectedAlert = true
+            }
         }
     }
 }
