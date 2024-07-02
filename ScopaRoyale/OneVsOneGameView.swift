@@ -23,74 +23,86 @@ struct OneVsOneGameView: View {
                 if peerManager.isHost {
                     // Sezione per le carte dell'avversario, posizionate sopra il tavolo se sei l'host
                     VStack {
-                        HStack {
-                            ForEach(peerManager.opponentHand, id: \.self) { card in
-                                Image("retro")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 60, height: 90)
-                                    .padding(4)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .shadow(radius: 5)
+                        HStack(spacing: 4) {
+                            ZStack {
+                                ForEach(0..<peerManager.opponentHand.count, id: \.self) { index in
+                                    Image("retro")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(2)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 3)
+                                        .rotationEffect(index == 0 ? Angle(degrees: 10) : (index == 2 ? Angle(degrees: -10) : Angle(degrees: 0)))
+                                        .rotationEffect(.degrees(180))
+                                        .zIndex(index == 1 ? 1 : 0)
+                                        .offset(x: index == 0 ? -20 : (index == 2 ? 20 : 0))
+                                }
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
+                        .padding(.bottom, 10)
                     }
                 }
                 if peerManager.isClient {
                     VStack {
-                        HStack {
-                            ForEach(peerManager.playerHand, id: \.self) { card in
-                                Image("retro")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 60, height: 90)
-                                    .padding(4)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .shadow(radius: 5)
+                        HStack(spacing: 4) {
+                            ZStack {
+                                ForEach(0..<peerManager.playerHand.count, id: \.self) { index in
+                                    Image("retro")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(2)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 3)
+                                        .rotationEffect(index == 0 ? Angle(degrees: 20) : (index == 2 ? Angle(degrees: -20) : Angle(degrees: 0)))
+                                        .rotationEffect(.degrees(180))
+                                        .zIndex(index == 1 ? 1 : 0)
+                                        .offset(x: index == 0 ? -24 : (index == 2 ? 24 : 0))
+                                }
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
+                        .padding(.bottom, 10) // Reduced bottom padding
                     }
                 }
                 
                 Spacer()
                 
                 // Sezione per le carte del tavolo, posizionate al centro
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
                         Image(card.imageName)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 60, height: 90)
-                            .padding(4)
+                            .frame(width: 60)
+                            .padding(1)
                             .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .shadow(radius: 5)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .shadow(radius: 3)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
+                .padding(.horizontal, 40)
+                .padding(.bottom, 5)
                 
                 Spacer()
                 
                 if peerManager.isHost {
-                    // Sezione per le carte del giocatore (solo per il browser)
+                    // Sezione per le carte del giocatore (solo per l'host)
                     VStack {
-                        HStack {
+                        HStack(spacing: 4) {
                             ForEach(peerManager.playerHand, id: \.self) { card in
                                 Image(card.imageName)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 60, height: 90)
-                                    .padding(4)
+                                    .frame(width: 75)
+                                    .padding(2)
                                     .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .shadow(radius: 5)
+                                    .clipShape(RoundedRectangle(cornerRadius: 5))
+                                    .shadow(radius: 3)
                                     .gesture(
                                         DragGesture()
                                             .onEnded { gesture in
@@ -103,37 +115,43 @@ struct OneVsOneGameView: View {
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
+                        .padding(.bottom, 150)
                     }
                 }
                 if peerManager.isClient {
-                    // Sezione per le carte dell'avversario (solo per il browser)
+                    // Sezione per le carte dell'avversario (solo per il client)
                     VStack {
-                        HStack {
-                            ForEach(peerManager.opponentHand, id: \.self) { card in
-                                Image(card.imageName)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 60, height: 90)
-                                    .padding(4)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .shadow(radius: 5)
-                                    .gesture(
-                                        DragGesture()
-                                            .onEnded { gesture in
-                                                if gesture.translation.height < -50 && peerManager.currentPlayer == 1 {
-                                                    peerManager.playCard(card: card)
+                        HStack(spacing: 20) {
+                            ZStack {
+                                ForEach(0..<peerManager.opponentHand.count, id: \.self) { index in
+                                    Image(peerManager.opponentHand[index].imageName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 75)
+                                        .padding(2)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                                        .shadow(radius: 3)
+                                        .gesture(
+                                            DragGesture()
+                                                .onEnded { gesture in
+                                                    if gesture.translation.height < -50 && peerManager.currentPlayer == 1 {
+                                                        peerManager.playCard(card: peerManager.opponentHand[index])
+                                                    }
                                                 }
-                                            }
-                                    )
-                                    .disabled(peerManager.currentPlayer != 1)
+                                        )
+                                        .disabled(peerManager.currentPlayer != 1)
+                                        .rotationEffect(index == 0 ? Angle(degrees: -10) : (index == 2 ? Angle(degrees: 10) : Angle(degrees: 0)))
+                                        .zIndex(index == 1 ? 1 : 0)
+                                        .offset(x: index == 0 ? -60 : (index == 2 ? 60 : 0))
+                                }
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
+                        .padding(.bottom, 150)
                     }
                 }
+
             }
         }
         .alert(isPresented: $showPeerDisconnectedAlert) {
