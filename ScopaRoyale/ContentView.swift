@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var username:          String = UserDefaults.standard.string(forKey: "username") ?? ""
+    @State private var username:           String = UserDefaults.standard.string(forKey: "username") ?? ""
     @State private var showJoinGame:       Bool = false
     @State private var showUsernameEntry:  Bool = false
     @State private var lobbyName:          String = ""
