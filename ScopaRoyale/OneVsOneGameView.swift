@@ -12,6 +12,8 @@ struct OneVsOneGameView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var backModality = false
     @State private var showPeerDisconnectedAlert = false // Variabile di stato per l'alert
+    @State private var draggedCard: Card? = nil
+    @State private var cardOffset: CGSize = .zero
 
     var body: some View {
         ZStack {
@@ -91,16 +93,24 @@ struct OneVsOneGameView: View {
                                     .background(Color.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                                     .shadow(radius: 5)
+                                    .offset(card == draggedCard ? cardOffset : .zero)
                                     .gesture(
                                         DragGesture()
+                                            .onChanged { gesture in
+                                                draggedCard = card
+                                                cardOffset = gesture.translation
+                                            }
                                             .onEnded { gesture in
                                                 if gesture.translation.height < -50 && peerManager.currentPlayer == 0 {
                                                     peerManager.playCard(card: card)
                                                 }
+                                                // Resettare le variabili di stato dopo il rilascio del dito
+                                                draggedCard = nil
+                                                cardOffset = .zero
                                             }
                                     )
                                     .disabled(peerManager.currentPlayer != 0)
-                            }
+                                }
                         }
                         .padding(.horizontal)
                         .padding(.bottom, 20) // Aggiunta di padding inferiore per distanziare le carte dal bordo inferiore
@@ -119,12 +129,20 @@ struct OneVsOneGameView: View {
                                     .background(Color.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                                     .shadow(radius: 5)
+                                    .offset(card == draggedCard ? cardOffset : .zero)
                                     .gesture(
                                         DragGesture()
+                                            .onChanged { gesture in
+                                                draggedCard = card
+                                                cardOffset = gesture.translation
+                                            }
                                             .onEnded { gesture in
                                                 if gesture.translation.height < -50 && peerManager.currentPlayer == 1 {
                                                     peerManager.playCard(card: card)
                                                 }
+                                                // Resettare le variabili di stato dopo il rilascio del dito
+                                                draggedCard = nil
+                                                cardOffset = .zero
                                             }
                                     )
                                     .disabled(peerManager.currentPlayer != 1)
