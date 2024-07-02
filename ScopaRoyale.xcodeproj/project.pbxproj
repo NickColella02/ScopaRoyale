@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		165E20202C34251000B883D1 /* ShowWinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165E201F2C34251000B883D1 /* ShowWinnerView.swift */; };
 		167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */; };
 		169E707D2C3017DF007200FE /* StructCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169E707C2C3017DF007200FE /* StructCard.swift */; };
 		462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		165E201F2C34251000B883D1 /* ShowWinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowWinnerView.swift; sourceTree = "<group>"; };
 		167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPeerManager.swift; sourceTree = "<group>"; };
 		167C0B032C2C63A70054F0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		169E707C2C3017DF007200FE /* StructCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructCard.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 			children = (
 				167C0B032C2C63A70054F0DD /* Info.plist */,
 				4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */,
+				165E201F2C34251000B883D1 /* ShowWinnerView.swift */,
 				169E707C2C3017DF007200FE /* StructCard.swift */,
 				167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */,
 				465878712C2997B2005D4788 /* Assets.xcassets */,
@@ -313,6 +316,7 @@
 				465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */,
 				169E707D2C3017DF007200FE /* StructCard.swift in Sources */,
 				462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */,
+				165E20202C34251000B883D1 /* ShowWinnerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

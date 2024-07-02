@@ -9,7 +9,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
     private var neededPlayers: Int = 0
-    private var myUsername: String = ""
+    var myUsername: String = ""
     
     @Published var receivedData: Data?
     @Published var isConnected: Bool = false
@@ -34,6 +34,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var playerScore: Int = 0 // punteggio del giocatore
     @Published var opponentScore: Int = 0 // punteggio dell'avversario
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
+    @Published var gameOver: Bool = false // true quando la partita finisce
+    @Published var winner: String = "" // nome del giocatore che ha vinto
 
     override init() {
         super.init()
@@ -303,19 +305,21 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
 
         var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
         var shortestCombination: [Card]? = nil
-        for length in 1...tableCards.count {
-            for combination in tableCards.combinations(length: length) {
-                let combinationValues = combination.map { card in
-                    return numericValue(for: card.value) ?? 0
-                }
-                if combinationValues.reduce(0, +) == numericValue(for: card.value) ?? 0 {
-                    if shortestCombination == nil || combination.count < shortestCombination!.count {
-                        shortestCombination = combination
+        if !tableCards.isEmpty { // controllo che il tavolo non sia vuoto
+            for length in 1...tableCards.count {
+                for combination in tableCards.combinations(length: length) {
+                    let combinationValues = combination.map { card in
+                        return numericValue(for: card.value) ?? 0
+                    }
+                    if combinationValues.reduce(0, +) == numericValue(for: card.value) ?? 0 {
+                        if shortestCombination == nil || combination.count < shortestCombination!.count {
+                            shortestCombination = combination
+                        }
                     }
                 }
             }
         }
-
+        
         if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
             tableCards.append(card) // aggiungi la carta giocata al tavolo
         } else if let validCombination = shortestCombination { // se ha trovato una combinazione
@@ -347,13 +351,65 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         sendCardsToPlayer() // aggiorna le carte del giocatore
 
         currentPlayer = 1 - currentPlayer // passa il turno
-
-        if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano e pescano nuove carte
-            giveCardsToPlayer()
-            giveCardsToOpponent()
-        }
-
+        
         sendTurnChange() // aggiorna il turno
+
+        if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
+            if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
+                giveCardsToPlayer()
+                giveCardsToOpponent()
+            } else { // altrimenti si controllano i punteggi per decretare il vincitore
+                
+                // assegno un punto a chi ha preso più carte
+                let playerTakenCards = cardTakenByPlayer.count
+                let opponentTakenCards = cardTakenByOpponent.count
+                if playerTakenCards > opponentTakenCards {
+                    playerScore += 1
+                } else if playerTakenCards < opponentTakenCards {
+                    opponentScore += 1
+                }
+                
+                // assegno un punto per ogni scopa fatta dai giocatori
+                playerScore += playerPoints.count
+                opponentScore += opponentPoints.count
+                
+                // assegno un punto a chi ha il 7 denari
+                if cardTakenByPlayer.contains(where: { $0.value == "sette" && $0.seed == "denari" }) || playerPoints.contains(where: { $0.value == "sette" && $0.seed == "denari" }) {
+                    playerScore += 1
+                } else {
+                    opponentScore += 1
+                }
+                
+                // assegno un punto a chi ha più carte denari nel proprio mazzo
+                let playerDenariCount = cardTakenByPlayer.filter{$0.seed == "denari"}.count
+                let opponentDenariCount = cardTakenByOpponent.filter{$0.seed == "denari"}.count
+                if playerDenariCount > opponentDenariCount {
+                    playerScore += 1
+                } else if playerDenariCount < opponentDenariCount {
+                    opponentScore += 1
+                }
+                
+                // assegno un punto a chi ha completato la "primera" (più sette)
+                let playerSevenCount = cardTakenByPlayer.filter { $0.value == "sette" }.count
+                let opponentSevenCount = cardTakenByOpponent.filter { $0.value == "sette" }.count
+                if playerSevenCount > opponentSevenCount {
+                    playerScore += 1
+                } else if playerSevenCount < opponentSevenCount {
+                    opponentScore += 1
+                }
+                
+                // decreto il vincitore
+                if playerScore > opponentScore {
+                    winner = myUsername
+                } else if playerScore < opponentScore {
+                    winner = opponentName
+                } else {
+                    winner = "Pareggio"
+                }
+                
+                gameOver = true // termina la partita
+            }
+        }
     }
 
     func reset() {
@@ -368,26 +424,19 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.tableCards = []
             self.connectedPeers = []
 
-            // Stop advertising and browsing
             self.advertiser?.stopAdvertisingPeer()
             self.browser?.stopBrowsingForPeers()
 
-            // Disconnect the session
             self.session.disconnect()
 
-            // Reinitialize the session
             self.session = MCSession(peer: self.peerID, securityIdentity: nil, encryptionPreference: .none)
             self.session.delegate = self
 
-            // Clear advertiser and browser
             self.advertiser = nil
             self.browser = nil
 
-            // Clear the player points
             self.playerPoints = []
             self.opponentPoints = []
-
-            // Reset scores and current player
             self.playerScore = 0
             self.opponentScore = 0
             self.currentPlayer = 1

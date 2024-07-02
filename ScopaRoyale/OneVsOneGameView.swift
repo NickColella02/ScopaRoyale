@@ -61,22 +61,20 @@ struct OneVsOneGameView: View {
                 Spacer()
                 
                 // Sezione per le carte del tavolo, posizionate al centro
-                VStack {
-                    HStack {
-                        ForEach(peerManager.tableCards, id: \.self) { card in
-                            Image(card.imageName)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 60, height: 90)
-                                .padding(4)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .shadow(radius: 5)
-                        }
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                    ForEach(peerManager.tableCards, id: \.self) { card in
+                        Image(card.imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 60, height: 90)
+                            .padding(4)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .shadow(radius: 5)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
                 }
+                .padding(.horizontal)
+                .padding(.bottom, 20)
                 
                 Spacer()
                 
@@ -145,12 +143,20 @@ struct OneVsOneGameView: View {
             })
         }
         .fullScreenCover(isPresented: $backModality) {
-            ContentView()
+            ContentView().environmentObject(peerManager)
+        }
+        .fullScreenCover(isPresented: $peerManager.gameOver) {
+            ShowWinnerView().environmentObject(peerManager)
         }
         .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
             if newValue {
                 showPeerDisconnectedAlert = true
             }
+        }
+    }
+    private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {
+        return stride(from: 0, to: array.count, by: chunkSize).map {
+            Array(array[$0 ..< Swift.min($0 + chunkSize, array.count)])
         }
     }
 }

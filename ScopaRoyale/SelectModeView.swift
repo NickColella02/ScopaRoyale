@@ -4,12 +4,12 @@ struct SelectModeView: View {
     @State private var navigateToOneVsOne = false
     @State private var navigateToTwoVsTwo = false
     @State private var numberOfPlayers: Int = 0
-    @EnvironmentObject var peerManager: MultiPeerManager
+    @EnvironmentObject private var peerManager: MultiPeerManager
     let lobbyName: String
     
     var body: some View {
         VStack (spacing: 20) {
-            VStack () {
+            VStack {
                 Image("2users")
                     .resizable()
                     .scaledToFit()
