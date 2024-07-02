@@ -36,7 +36,7 @@ struct ContentView: View {
                         .frame(height: 180)
                         .padding(.bottom, 20)
                         .onAppear() {
-                            if peerManager.isClient {
+                            if peerManager.isClient { // se il client arriva a questa pagina, si disconnette ed esce dalla lobby
                                 peerManager.reset()
                             }
                         }

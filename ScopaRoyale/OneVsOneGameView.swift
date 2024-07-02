@@ -92,6 +92,15 @@ struct OneVsOneGameView: View {
                                     .background(Color.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                                     .shadow(radius: 5)
+                                    .gesture(
+                                        DragGesture()
+                                            .onEnded { gesture in
+                                                if gesture.translation.height < -50 && peerManager.currentPlayer == 0 {
+                                                    peerManager.playCard(card: card)
+                                                }
+                                            }
+                                    )
+                                    .disabled(peerManager.currentPlayer != 0)
                             }
                         }
                         .padding(.horizontal)
@@ -111,6 +120,15 @@ struct OneVsOneGameView: View {
                                     .background(Color.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                                     .shadow(radius: 5)
+                                    .gesture(
+                                        DragGesture()
+                                            .onEnded { gesture in
+                                                if gesture.translation.height < -50 && peerManager.currentPlayer == 1 {
+                                                    peerManager.playCard(card: card)
+                                                }
+                                            }
+                                    )
+                                    .disabled(peerManager.currentPlayer != 1)
                             }
                         }
                         .padding(.horizontal)

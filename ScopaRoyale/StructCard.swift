@@ -58,3 +58,46 @@ extension Card {
         }
     }
 }
+
+// Funzione di utilità per convertire il valore stringa della carta in un valore numerico
+func numericValue(for stringValue: String) -> Int? {
+    switch stringValue {
+    case "asso": return 1
+    case "due": return 2
+    case "tre": return 3
+    case "quattro": return 4
+    case "cinque": return 5
+    case "sei": return 6
+    case "sette": return 7
+    case "otto": return 8
+    case "nove": return 9
+    case "dieci": return 10
+    default: return nil
+    }
+}
+
+// Estensione per gestire le combinazioni di un array di carte
+extension Array where Element == Card {
+    func combinations(length: Int) -> [[Card]] {
+        guard length > 0 else { return [[]] }
+        guard length <= count else { return [] }
+        
+        if length == 1 {
+            return self.map { [$0] }
+        } else {
+            var combinations: [[Card]] = []
+            
+            for (index, element) in self.enumerated() {
+                var reduced = self
+                reduced.removeFirst(index + 1)
+                let subCombinations = reduced.combinations(length: length - 1)
+                for var subCombination in subCombinations {
+                    subCombination.insert(element, at: 0)
+                    combinations.append(subCombination)
+                }
+            }
+            
+            return combinations
+        }
+    }
+}
