@@ -10,15 +10,15 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     private var browser: MCNearbyServiceBrowser?
     var myUsername: String = ""
     
-    @Published var isConnected: Bool = false
-    @Published var isConnected2: Bool = false
-    @Published var opponentName: String = ""
-    @Published var lobbyName: String = ""
-    @Published var startGame: Bool = false
-    @Published var peerDisconnected: Bool = false
-    @Published var connectedPeers: [MCPeerID] = []
-    @Published var isHost: Bool = false
-    @Published var isClient: Bool = false
+    @Published var isConnected: Bool = false // true se l'advertiser è connesso
+    @Published var isConnected2: Bool = false // true se il browser è connesso
+    @Published var opponentName: String = "" // nome dell'avversario (browser)
+    @Published var lobbyName: String = "" // nome della lobby
+    @Published var startGame: Bool = false // true se la partita è iniziata
+    @Published var peerDisconnected: Bool = false // true se un peer si è disconnesso
+    @Published var connectedPeers: [MCPeerID] = [] // lista di peer connessi
+    @Published var isHost: Bool = false // true se è l'advertiser
+    @Published var isClient: Bool = false // true se è l'host
     
     @Published var deck: [Card] = [] // mazzo di carte iniziale
     @Published var tableCards: [Card] = [] // carte presenti sul tavolo
@@ -66,7 +66,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.browser?.startBrowsingForPeers()
                     self.advertiser?.startAdvertisingPeer()
                     self.opponentName = ""
-                    self.isConnected = false
+                    self.isConnected2 = false
                     self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: 1, username: self.myUsername)
                 }
             default:
@@ -159,7 +159,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.neededPlayers = numberOfPlayers
         self.lobbyName = lobbyName
         self.myUsername = username
-        self.isHost = true
+        self.isHost = true // sono l'advertiser
+        self.isClient = false // non sono il browser
         advertiser = MCNearbyServiceAdvertiser(peer: peerID, discoveryInfo: nil, serviceType: serviceType)
         advertiser?.delegate = self
         advertiser?.startAdvertisingPeer()
@@ -168,7 +169,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func joinSession() { // eseguito dal browser
         browser = MCNearbyServiceBrowser(peer: peerID, serviceType: serviceType)
         browser?.delegate = self
-        self.isClient = true
+        self.isClient = true // sono il browser
+        self.isHost = false // non sono l'advertiser
         browser?.startBrowsingForPeers()
     }
 
@@ -195,20 +197,20 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         let startData = "START_GAME".data(using: .utf8)
         do {
             try session.send(startData!, toPeers: session.connectedPeers, with: .reliable)
-            createDeck() // crea il mazzo iniziale
-            placeTableCards() // posiziona le carte sul tavolo
-            giveCardsToPlayer() // assegna le carte al giocatore
-            giveCardsToOpponent() // assegna le carte all'avversario
-            sendDeck()
-            sendPlayerPoints()
-            sendOpponentPoints()
-            sendCardTakenByPlayer()
-            sendCardTakenByOpponent()
-            sendPlayerScore()
-            sendOpponentScore()
         } catch {
             print("Errore invio segnale inizio partita: \(error.localizedDescription)")
         }
+        createDeck() // crea il mazzo iniziale
+        placeTableCards() // posiziona le carte sul tavolo
+        giveCardsToPlayer() // assegna le carte al giocatore
+        giveCardsToOpponent() // assegna le carte all'avversario
+        sendDeck()
+        sendPlayerPoints()
+        sendOpponentPoints()
+        sendCardTakenByPlayer()
+        sendCardTakenByOpponent()
+        sendPlayerScore()
+        sendOpponentScore()
     }
     
     func sendCardTakenByPlayer() {
@@ -265,7 +267,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             }
         }
         deck = deck.shuffled() // mescola il mazzo
-        sendDeck() // lo invia al browser
     }
     
     func sendDeck() { // invia il deck al browser
@@ -559,6 +560,5 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.session = MCSession(peer: self.peerID, securityIdentity: nil, encryptionPreference: .none)
             self.session.delegate = self
         }
-        
     }
 }

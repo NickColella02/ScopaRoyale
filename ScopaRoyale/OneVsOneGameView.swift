@@ -19,7 +19,7 @@ struct OneVsOneGameView: View {
     var body: some View {
         ZStack(alignment: .topLeading) { // Align contents to top left
             SpriteView(scene: scene)
-                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea(edges: .all)
                 .navigationBarBackButtonHidden(true)
             GeometryReader { geometry in
                 ZStack {
@@ -39,7 +39,7 @@ struct OneVsOneGameView: View {
                         
                         Text("\(peerManager.deck.count)")
                             .font(.system(size: 12, design: .default))
-                            .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                            .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
                             .padding(1)
                             .background(Color(red: 59 / 255, green: 125 / 255, blue: 35 / 255))
                             .clipShape(RoundedRectangle(cornerRadius: 5))
@@ -323,6 +323,7 @@ struct OneVsOneGameView: View {
         }
         .alert(isPresented: $showPeerDisconnectedAlert) {
             Alert(title: Text("Disconnessione"), message: Text("Il giocatore ha abbandonato la partita."), dismissButton: .default(Text("OK")) {
+                peerManager.closeConnection()
                 peerManager.reset()
                 backModality = true
             })

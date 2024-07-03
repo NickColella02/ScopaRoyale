@@ -23,7 +23,7 @@ struct OneVsOneView: View {
             
             Spacer()
             
-            if peerManager.isConnected {
+            if !peerManager.isConnected {
                 VStack(spacing: 10) {
                     Text("Searching for an opponent...")
                         .font(.headline)

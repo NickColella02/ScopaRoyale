@@ -12,7 +12,7 @@ struct ShowWinnerView: View {
             Image("background")
                 .resizable()
                 .scaledToFill()
-                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea(edges: .all)
                 .blur(radius: 10) // aggiunge un effetto blur
             
             VStack {
@@ -95,6 +95,7 @@ struct ShowWinnerView: View {
                 
                 Button(action: {
                     if peerManager.isHost {
+                        peerManager.sendEndGameSignal()
                         peerManager.closeConnection()
                     }
                     showHomeView = true
