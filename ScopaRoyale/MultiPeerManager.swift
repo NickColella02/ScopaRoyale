@@ -95,10 +95,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.playerHand = [Card].fromJSON(data)!
                 } else if receivedString.starts(with: "PlayerCards:") { // riceve il mazzo di carte prese del giocatore
                     let data = data.dropFirst(12)
-                    self.cardTakenByPlayer = [Card].fromJSON(data)!
+                    self.cardTakenByOpponent = [Card].fromJSON(data)!
                 } else if receivedString.starts(with: "OpponentCards:") { // riceve il mazzo di carte prese del giocatore
                     let data = data.dropFirst(14)
-                    self.cardTakenByOpponent = [Card].fromJSON(data)!
+                    self.cardTakenByPlayer = [Card].fromJSON(data)!
                 } else if receivedString.starts(with: "PlayerPoints:") { // riceve il mazzo di carte prese del giocatore
                     let data = data.dropFirst(13)
                     self.playerPoints = [Card].fromJSON(data)!
@@ -411,6 +411,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             }
         }
         
+        
         if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
             tableCards.append(card) // aggiungi la carta giocata al tavolo
         } else if let validCombination = shortestCombination { // se ha trovato una combinazione
@@ -429,18 +430,14 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             }
         }
 
-        if currentPlayer == 0 { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
-            if !cardTakenByPlayer.isEmpty {
+        if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
+            if currentPlayer == 0 {
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
-                lastPlayer = 0
-            }
-        } else {
-            if !cardTakenByOpponent.isEmpty {
+            } else {
                 cardTakenByOpponent.append(contentsOf: cardsToTake)
-                lastPlayer = 1
             }
         }
-
+        
         sendTableCards() // aggiorna le carte del tavolo
         sendCardsToOpponent() // aggiorna le carte dell'avversario
         sendCardsToPlayer() // aggiorna le carte del giocatore

@@ -151,7 +151,6 @@ struct OneVsOneGameView: View {
                 }
             }
 
-
             VStack {
                 if peerManager.isHost {
                     VStack {
