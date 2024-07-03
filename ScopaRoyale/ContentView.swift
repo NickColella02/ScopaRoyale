@@ -35,12 +35,6 @@ struct ContentView: View {
                         .scaledToFit()
                         .frame(height: 180)
                         .padding(.bottom, 20)
-                        .onAppear() {
-                            if peerManager.isClient { // se il client arriva a questa pagina, si disconnette ed esce dalla lobby
-                                peerManager.reset()
-                            }
-                        }
-                                        
                         .navigationDestination(isPresented: $showJoinGame) {
                             JoinAGameView(username: username).environmentObject(peerManager)
                         }
@@ -50,6 +44,9 @@ struct ContentView: View {
                     }
                     
                     CreateNewLobby(showLobbyForm: $showLobbyForm)
+                        .onTapGesture {
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        }
                     
                     JoinExistentLobby(showJoinGame: $showJoinGame)
                     

@@ -7,21 +7,151 @@ struct OneVsOneGameView: View {
         scene.scaleMode = .aspectFill
         return scene
     }
-    
+
     @EnvironmentObject private var peerManager: MultiPeerManager
     @Environment(\.presentationMode) var presentationMode
-    @State private var username:           String = UserDefaults.standard.string(forKey: "username") ?? ""
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     @State private var backModality = false
     @State private var showPeerDisconnectedAlert = false
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) { // Align contents to top left
             SpriteView(scene: scene)
                 .edgesIgnoringSafeArea(.all)
                 .navigationBarBackButtonHidden(true)
-            
+            GeometryReader { geometry in
+                ZStack {
+                    // Top left (carti rimanenti)
+                    ZStack {
+                        if peerManager.deck.count > 0 {
+                            Image("retro")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 30)
+                                .padding(2)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 2))
+                                .shadow(radius: 2)
+                                .zIndex(1)
+                        }
+                        
+                        Text("\(peerManager.deck.count)")
+                            .font(.system(size: 12, design: .default))
+                            .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                            .padding(1)
+                            .background(Color(red: 59 / 255, green: 125 / 255, blue: 35 / 255))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                            .offset(x: 0, y: -36)
+                            .zIndex(2)
+                        
+                        Image("grayRectangle")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 90)
+                            .padding(2)
+                            .zIndex(0)
+                    }
+                    .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.1)
+                    
+                    // Lato host
+                    if peerManager.isHost {
+                        // Low Left (carte player)
+                        ZStack {
+                            Image("grayRectangle")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 90)
+                                .padding(2)
+                                .zIndex(0)
+                            if peerManager.cardTakenByPlayer.count > 0 {
+                                Image("retro")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 30)
+                                    .padding(2)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    .shadow(radius: 2)
+                                    .zIndex(1)
+                            }
+                        }
+                        .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
+                        
+                        // Top right (carte opponent)
+                        ZStack {
+                            Image("grayRectangle")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 90)
+                                .padding(2)
+                                .zIndex(0)
+                            if peerManager.cardTakenByOpponent.count > 0 {
+                                Image("retro")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 30)
+                                    .padding(2)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    .shadow(radius: 2)
+                                    .zIndex(1)
+                            }
+                        }
+                        .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.9)
+                    }
+                    
+                    // Lato client
+                    if peerManager.isClient {
+                        // Low Left (carte player)
+                        ZStack {
+                            Image("grayRectangle")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 90)
+                                .padding(2)
+                                .zIndex(0)
+                            if peerManager.cardTakenByPlayer.count > 0 {
+                                Image("retro")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 30)
+                                    .padding(2)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    .shadow(radius: 2)
+                                    .zIndex(1)
+                            }
+                        }
+                        .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
+                        
+                        // Top right (carte opponent)
+                        ZStack {
+                            Image("grayRectangle")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 90)
+                                .padding(2)
+                                .zIndex(0)
+                            if peerManager.cardTakenByOpponent.count > 0 {
+                                Image("retro")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 30)
+                                    .padding(2)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    .shadow(radius: 2)
+                                    .zIndex(1)
+                            }
+                        }
+                        .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.9)
+                    }
+                }
+            }
+
+
             VStack {
                 if peerManager.isHost {
                     VStack {
@@ -33,7 +163,7 @@ struct OneVsOneGameView: View {
                             .background(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255))
                             .clipShape(RoundedRectangle(cornerRadius: 5))
                             .shadow(radius: 5)
-                            .zIndex(3)
+                            .zIndex(2)
                         HStack(spacing: 4) {
                             ZStack {
                                 ForEach(0..<peerManager.opponentHand.count, id: \.self) { index in
@@ -66,7 +196,7 @@ struct OneVsOneGameView: View {
                             .background(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255))
                             .clipShape(RoundedRectangle(cornerRadius: 5))
                             .shadow(radius: 5)
-                            .zIndex(3)
+                            .zIndex(2)
                         HStack(spacing: 4) {
                             ZStack {
                                 ForEach(0..<peerManager.playerHand.count, id: \.self) { index in
@@ -89,9 +219,9 @@ struct OneVsOneGameView: View {
                         .padding(.horizontal)
                     }
                 }
-                
+
                 Spacer()
-                
+
                 // Sezione per le carte sul tavolo
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
@@ -107,16 +237,16 @@ struct OneVsOneGameView: View {
                 }
                 .padding(.horizontal, 40)
                 .padding(.bottom, 5)
-                
+
                 Spacer()
-                
+
                 if peerManager.isHost {
                     // Sezione per le carte dell'host
                     VStack {
                         HStack(spacing: 4) {
                             ForEach(peerManager.playerHand.indices, id: \.self) { index in
                                 let card = peerManager.playerHand[index] // Salva la carta in una costante
-                                
+
                                 Image(card.imageName) // Utilizza direttamente la proprietà imageName della carta
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
@@ -156,7 +286,7 @@ struct OneVsOneGameView: View {
                         HStack {
                             ForEach(peerManager.opponentHand.indices, id: \.self) { index in
                                 let card = peerManager.opponentHand[index] // Salva la carta in una costante
-                                
+
                                 Image(card.imageName) // Utilizza direttamente la proprietà imageName della carta
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
