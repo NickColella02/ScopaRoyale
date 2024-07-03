@@ -10,6 +10,7 @@ struct OneVsOneGameView: View {
     
     @EnvironmentObject private var peerManager: MultiPeerManager
     @Environment(\.presentationMode) var presentationMode
+    @State private var username:           String = UserDefaults.standard.string(forKey: "username") ?? ""
     @State private var backModality = false
     @State private var showPeerDisconnectedAlert = false
     @State private var draggedCard: Card? = nil
@@ -24,6 +25,15 @@ struct OneVsOneGameView: View {
             VStack {
                 if peerManager.isHost {
                     VStack {
+                        Text(peerManager.opponentName)
+                            .font(.system(size: 15, design: .default))
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(width: 90, height: 20)
+                            .background(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                            .shadow(radius: 5)
+                            .zIndex(3)
                         HStack(spacing: 4) {
                             ZStack {
                                 ForEach(0..<peerManager.opponentHand.count, id: \.self) { index in
@@ -34,21 +44,29 @@ struct OneVsOneGameView: View {
                                         .padding(2)
                                         .background(Color.white)
                                         .clipShape(RoundedRectangle(cornerRadius: 2))
-                                        .shadow(radius: 3)
-                                        .rotationEffect(peerManager.opponentHand.count >= 3 ? (index == 0 ? Angle(degrees: 10) : (index == 2 ? Angle(degrees: -10) : Angle(degrees: 0))) : Angle(degrees: 0))
+                                        .shadow(radius: 2)
+                                        .rotationEffect(peerManager.opponentHand.count >= 3 ? (index == 0 ? Angle(degrees: 10) : (index == 2 ? Angle(degrees: -10) : Angle(degrees: 0))) : (peerManager.opponentHand.count == 2 ? (index == 0 ? Angle(degrees: 5) : Angle(degrees: -5)) : Angle(degrees: 0)))
                                         .rotationEffect(.degrees(180))
                                         .zIndex(index == 1 ? 1 : 0)
-                                        .offset(x: peerManager.opponentHand.count >= 3 ? (index == 0 ? -20 : (index == 2 ? 20 : 0)) : 0)
-                                        .offset(y: peerManager.opponentHand.count < 3 ? -10 : 0) // Aggiunta l'offset verticale
+                                        .offset(x: peerManager.opponentHand.count == 3 ? (index == 0 ? -20 : (index == 2 ? 20 : 0)) : (peerManager.opponentHand.count == 2 ? (index == 0 ? -10 : 10) : 0), y: peerManager.opponentHand.count < 3 ? 4 : (index == 1 ? 4 : 0))
                                 }
                             }
+                            .offset(y: -15)
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 10)
                     }
                 }
                 if peerManager.isClient {
                     VStack {
+                        Text(peerManager.opponentName)
+                            .font(.system(size: 15, design: .default))
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(width: 90, height: 20)
+                            .background(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                            .shadow(radius: 5)
+                            .zIndex(3)
                         HStack(spacing: 4) {
                             ZStack {
                                 ForEach(0..<peerManager.playerHand.count, id: \.self) { index in
@@ -59,17 +77,16 @@ struct OneVsOneGameView: View {
                                         .padding(2)
                                         .background(Color.white)
                                         .clipShape(RoundedRectangle(cornerRadius: 2))
-                                        .shadow(radius: 3)
-                                        .rotationEffect(peerManager.playerHand.count >= 3 ? (index == 0 ? Angle(degrees: 20) : (index == 2 ? Angle(degrees: -20) : Angle(degrees: 0))) : Angle(degrees: 0))
+                                        .shadow(radius: 2)
+                                        .rotationEffect(peerManager.playerHand.count >= 3 ? (index == 0 ? Angle(degrees: 10) : (index == 2 ? Angle(degrees: -10) : Angle(degrees: 0))) : (peerManager.playerHand.count == 2 ? (index == 0 ? Angle(degrees: 5) : Angle(degrees: -5)) : Angle(degrees: 0)))
                                         .rotationEffect(.degrees(180))
                                         .zIndex(index == 1 ? 1 : 0)
-                                        .offset(x: peerManager.playerHand.count >= 3 ? (index == 0 ? -24 : (index == 2 ? 24 : 0)) : 0)
-                                        .offset(y: peerManager.playerHand.count < 3 ? -10 : 0) // Aggiunta l'offset verticale
+                                        .offset(x: peerManager.playerHand.count == 3 ? (index == 0 ? -20 : (index == 2 ? 20 : 0)) : (peerManager.playerHand.count == 2 ? (index == 0 ? -10 : 10) : 0), y: peerManager.playerHand.count < 3 ? 4 : (index == 1 ? 4 : 0))
                                 }
                             }
+                            .offset(y: -15)
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 10)
                     }
                 }
                 
@@ -108,9 +125,9 @@ struct OneVsOneGameView: View {
                                     .background(Color.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 5))
                                     .shadow(radius: 3)
-                                    .rotationEffect(peerManager.playerHand.count >= 3 ? (index == 0 ? Angle(degrees: -10) : (index == 2 ? Angle(degrees: 10) : Angle(degrees: 0))) : Angle(degrees: 0))
+                                    .rotationEffect(peerManager.playerHand.count >= 3 ? (index == 0 ? Angle(degrees: -10) : (index == 2 ? Angle(degrees: 10) : Angle(degrees: 0))) : (peerManager.playerHand.count == 2 ? (index == 0 ? Angle(degrees: -5) : Angle(degrees: 5)) : Angle(degrees: 0)))
                                     .zIndex(index == 1 ? 1 : 0)
-                                    .offset(x: peerManager.playerHand.count >= 3 ? (index == 0 ? 20 : (index == 2 ? -20 : 0)) : 0, y: peerManager.playerHand.count < 3 ? -10 : (index == 1 ? -10 : 0))
+                                    .offset(x: peerManager.playerHand.count == 3 ? (index == 0 ? 20 : (index == 2 ? -20 : 0)) : (peerManager.playerHand.count == 2 ? (index == 0 ? 10 : -10) : 0), y: peerManager.playerHand.count < 3 ? -10 : (index == 1 ? -10 : 0))
                                     .offset(card == draggedCard ? cardOffset : .zero)
                                     .gesture(
                                         DragGesture()
@@ -148,9 +165,9 @@ struct OneVsOneGameView: View {
                                     .background(Color.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 5))
                                     .shadow(radius: 3)
-                                    .rotationEffect(peerManager.opponentHand.count >= 3 ? (index == 0 ? Angle(degrees: -10) : (index == 2 ? Angle(degrees: 10) : Angle(degrees: 0))) : Angle(degrees: 0))
+                                    .rotationEffect(peerManager.opponentHand.count >= 3 ? (index == 0 ? Angle(degrees: -10) : (index == 2 ? Angle(degrees: 10) : Angle(degrees: 0))) : (peerManager.opponentHand.count == 2 ? (index == 0 ? Angle(degrees: -5) : Angle(degrees: 5)) : Angle(degrees: 0)))
                                     .zIndex(index == 1 ? 1 : 0)
-                                    .offset(x: peerManager.opponentHand.count >= 3 ? (index == 0 ? 20 : (index == 2 ? -20 : 0)) : 0, y: peerManager.opponentHand.count < 3 ? -10 : (index == 1 ? -10 : 0))
+                                    .offset(x: peerManager.opponentHand.count == 3 ? (index == 0 ? 20 : (index == 2 ? -20 : 0)) : (peerManager.opponentHand.count == 2 ? (index == 0 ? 10 : -10) : 0), y: peerManager.opponentHand.count < 3 ? -10 : (index == 1 ? -10 : 0))
                                     .offset(card == draggedCard ? cardOffset : .zero)
                                     .gesture(
                                         DragGesture()

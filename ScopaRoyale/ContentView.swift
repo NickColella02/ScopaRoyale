@@ -67,7 +67,7 @@ struct ContentView: View {
                             }) {
                                 Image(systemName: "person.circle.fill")
                                     .font(.system(size: 20, design: .default))
-                                    .padding(.horizontal, 20)
+                                    .padding(.horizontal, 12)
                                     .foregroundStyle(.gray)
                             }
                         }
@@ -154,7 +154,7 @@ struct ContentView: View {
                     .frame(width: 40, height: 40)
                     .padding(.top, 20)
                 Text("""
-                    Scopa is a traditional Italian card game. Here are the basic rules:
+                    Scopa is a traditional Italian card game:
                     **1. Objective**: the goal is to capture cards on the table by matching them with a card in your hand that has the same value or by adding up to 15.
                     **2. Gameplay**: the game is usually played with a 40-card Italian deck. Each player is dealt three cards, and four cards are placed face-up on the table. On your turn, you can capture cards from the table that add up to the value of one card in your hand. If you cannot capture any cards, you must place one card from your hand on the table.
                     **3. Scoring**: each captured card is worth 1 point, additional points can be earned for:
