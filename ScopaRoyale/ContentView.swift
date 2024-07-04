@@ -6,7 +6,7 @@ struct ContentView: View {
     @State private var showUsernameEntry:  Bool = false
     @State private var lobbyName:          String = ""
     @State private var showLobbyForm:      Bool = false
-    @State private var showSelectMode:     Bool = false
+    @State private var showGameView:       Bool = false
     @State private var showLobbyNameAlert: Bool = false
     @State private var showGameRules:      Bool = false
     @State private var showSettings:       Bool = false
@@ -39,8 +39,8 @@ struct ContentView: View {
                             JoinAGameView(username: username).environmentObject(peerManager)
                         }
                     
-                    .navigationDestination(isPresented: $showSelectMode) {
-                        SelectModeView(lobbyName: lobbyName).environmentObject(peerManager)
+                    .navigationDestination(isPresented: $showGameView) {
+                        OneVsOneView(numberOfPlayer: 2, lobbyName: lobbyName).environmentObject(peerManager)
                     }
                     
                     CreateNewLobby(showLobbyForm: $showLobbyForm)
@@ -113,7 +113,7 @@ struct ContentView: View {
                     .padding(.horizontal, 25)
                 Button(action: {
                     if !lobbyName.isEmpty {
-                        showSelectMode = true
+                        showGameView = true
                         showLobbyForm = false
                     } else {
                         showLobbyNameAlert = true

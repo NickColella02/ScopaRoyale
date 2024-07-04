@@ -30,13 +30,11 @@ struct OneVsOneGameView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 30)
-                                .padding(2)
                                 .background(Color.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 2))
                                 .shadow(radius: 2)
                                 .zIndex(1)
                         }
-                        
                         Text("\(peerManager.deck.count)")
                             .font(.system(size: 12, design: .default))
                             .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
@@ -45,12 +43,10 @@ struct OneVsOneGameView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 5))
                             .offset(x: 0, y: -36)
                             .zIndex(2)
-                        
                         Image("grayRectangle")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 90)
-                            .padding(2)
                             .zIndex(0)
                     }
                     .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.1)
@@ -63,18 +59,38 @@ struct OneVsOneGameView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 90)
-                                .padding(2)
                                 .zIndex(0)
-                            if peerManager.cardTakenByPlayer.count > 0 {
-                                Image("retro")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 30)
-                                    .padding(2)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                                    .shadow(radius: 2)
-                                    .zIndex(1)
+                            Text("\(peerManager.playerPoints.count)")
+                                .font(.system(size: 12, design: .default))
+                                .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                                .padding(1)
+                                .background(Color(red: 59 / 255, green: 125 / 255, blue: 35 / 255))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .offset(x: 0, y: -36)
+                                .zIndex(2)
+                            HStack {
+                                if peerManager.cardTakenByPlayer.count > 0 {
+                                    Image("retro")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
+                                if peerManager.playerPoints.count > 0 {
+                                    Image(peerManager.playerPoints.last!.imageName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
                             }
                         }
                         .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.9)
@@ -85,21 +101,47 @@ struct OneVsOneGameView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 90)
-                                .padding(2)
                                 .zIndex(0)
-                            if peerManager.cardTakenByOpponent.count > 0 {
-                                Image("retro")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 30)
-                                    .padding(2)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                                    .shadow(radius: 2)
-                                    .zIndex(1)
+                            Text("\(peerManager.opponentPoints.count)")
+                                .font(.system(size: 12, design: .default))
+                                .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                                .padding(1)
+                                .background(Color(red: 59 / 255, green: 125 / 255, blue: 35 / 255))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .offset(x: 0, y: -36)
+                                .zIndex(2)
+                            HStack {
+                                if peerManager.cardTakenByOpponent.count > 0 {
+                                    Image("retro")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
+                                if peerManager.opponentPoints.count > 0 {
+                                    Image(peerManager.opponentPoints.last!.imageName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
                             }
                         }
                         .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
+                        if peerManager.currentPlayer == 0 {
+                            RoundedRectangle(cornerRadius: 50)
+                                .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 2)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .edgesIgnoringSafeArea(.all)
+                        }
                     }
 
                     // Lato client
@@ -110,18 +152,38 @@ struct OneVsOneGameView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 90)
-                                .padding(2)
                                 .zIndex(0)
-                            if peerManager.cardTakenByPlayer.count > 0 {
-                                Image("retro")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 30)
-                                    .padding(2)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                                    .shadow(radius: 2)
-                                    .zIndex(1)
+                            Text("\(peerManager.playerPoints.count)")
+                                .font(.system(size: 12, design: .default))
+                                .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                                .padding(1)
+                                .background(Color(red: 59 / 255, green: 125 / 255, blue: 35 / 255))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .offset(x: 0, y: -36)
+                                .zIndex(2)
+                            HStack {
+                                if peerManager.cardTakenByPlayer.count > 0 {
+                                    Image("retro")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
+                                if peerManager.playerPoints.count > 0 {
+                                    Image(peerManager.playerPoints.last!.imageName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
                             }
                         }
                         .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
@@ -132,22 +194,63 @@ struct OneVsOneGameView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 90)
-                                .padding(2)
                                 .zIndex(0)
-                            if peerManager.cardTakenByOpponent.count > 0 {
-                                Image("retro")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 30)
-                                    .padding(2)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                                    .shadow(radius: 2)
-                                    .zIndex(1)
+                            Text("\(peerManager.opponentPoints.count)")
+                                .font(.system(size: 12, design: .default))
+                                .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                                .padding(1)
+                                .background(Color(red: 59 / 255, green: 125 / 255, blue: 35 / 255))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .offset(x: 0, y: -36)
+                                .zIndex(2)
+                            HStack {
+                                if peerManager.cardTakenByOpponent.count > 0 {
+                                    Image("retro")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
+                                if peerManager.opponentPoints.count > 0 {
+                                    Image(peerManager.opponentPoints.last!.imageName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 30)
+                                        .padding(1)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        .shadow(radius: 2)
+                                        .zIndex(1)
+                                }
                             }
                         }
                         .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.9)
+                        if peerManager.currentPlayer == 1 {
+                            RoundedRectangle(cornerRadius: 50)
+                                .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
+                                .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
+                                .edgesIgnoringSafeArea(.all)
+                        }
                     }
+                    /*VStack {
+                        Text("YOUR POINTS \(peerManager.playerPoints.count)")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                            .padding(.bottom, -5)
+                        Image("line")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 220)
+                        Text("OPPONENT'S POINTS \(peerManager.opponentPoints.count)")
+                            .font(.system(size: 15, design: .default))
+                            .foregroundColor(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
+                            .padding(.bottom, 10)
+                    }
+                    .position(x: geometry.size.width * 0.63, y: geometry.size.height * 0.905)*/
                 }
             }
 
@@ -282,7 +385,7 @@ struct OneVsOneGameView: View {
                 if peerManager.isClient {
                     // Sezione per le carte del client
                     VStack {
-                        HStack {
+                        HStack(spacing: 4) {
                             ForEach(peerManager.opponentHand.indices, id: \.self) { index in
                                 let card = peerManager.opponentHand[index] // Salva la carta in una costante
 

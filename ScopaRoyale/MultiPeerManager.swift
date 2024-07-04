@@ -180,7 +180,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     // MARK: - MCNearbyServiceBrowserDelegate
 
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        browser.invitePeer(peerID, to: session, withContext: nil, timeout: 5)
+            browser.invitePeer(peerID, to: session, withContext: nil, timeout: 5)
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {}
@@ -234,10 +234,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
         createDeck() // crea il mazzo iniziale
         placeTableCards() // posiziona le carte sul tavolo
-        sendCardsToPlayers() // assegna le mani ai giocatori
+        giveCardsToPlayers() // assegna le mani ai giocatori
         sendDeck() // aggiorna il mazzo iniziale
         sendPlayersPoints() // invia i mazzi contenenti le scope dei giocatori
-        sendCardsTaken() // invia i mazzi contenenti le carte prese dai giocatori
+        //sendCardsTaken() // invia i mazzi contenenti le carte prese dai giocatori
     }
     
     func sendCardsTaken() { // invia il mazzo delle carte prese all'avversario
@@ -264,10 +264,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe"//, "spade", "bastoni"
+            "denari", "coppe", "spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -302,10 +302,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 self.deck.removeFirst()
             }
         }
+        sendCardsToPlayers() // estrae le carte e le inserisce nelle mani dei giocatori
     }
     
     func sendCardsToPlayers() { // invia le carte delle mani dei giocatori
-        giveCardsToPlayers() // estrae le carte e le inserisce nelle mani dei giocatori
         let hand = Hands(playerHand: self.playerHand, opponentHand: self.opponentHand)
         do {
             let data = try JSONEncoder().encode(hand)
@@ -416,10 +416,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
             if currentPlayer == 0 {
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
+                //playerPoints.append(contentsOf: cardsToTake)
             } else {
                 cardTakenByOpponent.append(contentsOf: cardsToTake)
+                //opponentPoints.append(contentsOf: cardsToTake)
             }
             sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
+            sendPlayersPoints()
         }
         
         sendTableCards() // aggiorna le carte del tavolo
@@ -428,7 +431,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
 
         if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
             if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
-                sendCardsToPlayers() // invia le carte alle mani dei giocatori
+                giveCardsToPlayers() // invia le carte alle mani dei giocatori
                 sendDeck() // invia il mazzo iniziale aggiornato
             } else { // altrimenti si controllano i punteggi per decretare il vincitore
                 playerScore = 0 // azzera i punteggi del giocatore

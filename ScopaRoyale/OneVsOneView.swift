@@ -68,20 +68,30 @@ struct OneVsOneView: View {
             
             Button(action: { // bottone per avviare la partita
                 if peerManager.connectedPeers.isEmpty { // se non ci sono peer connessi
-                    showStartGameAlert = true
                 } else {
                     peerManager.sendStartGameSignal()
                     navigateToGame = true;
                 }
             }) {
-                Text("Start")
-                    .font(.system(size: 20, design: .default))
-                    .foregroundStyle(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
-                    .padding(.horizontal, 35)
+                if peerManager.connectedPeers.isEmpty { // se non ci sono peer connessi
+                    Text("Start")
+                        .font(.system(size: 20, design: .default))
+                        .foregroundStyle(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.gray)
+                        .clipShape(RoundedRectangle(cornerRadius: 100))
+                        .padding(.horizontal, 35)
+                } else {
+                    Text("Start")
+                        .font(.system(size: 20, design: .default))
+                        .foregroundStyle(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 100))
+                        .padding(.horizontal, 35)
+                }
             }
             .padding(.bottom, 20)
         }
