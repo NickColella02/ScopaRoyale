@@ -2,6 +2,27 @@ import Foundation
 import MultipeerConnectivity
 import SwiftUI
 
+struct Hands: Codable { // struttura dati contenente le mani dei giocatori
+    let playerHand: [Card] // mano del giocatore
+    let opponentHand: [Card] // mano dell'avversario
+}
+
+struct CardsTaken: Codable { // struttura dati contenente i mazzi di carte presi dai giocatori
+    let playerCards: [Card] // mazzo di carte prese dal giocatore
+    let opponentCards: [Card] // mazzo di carte prese dall'avversario
+}
+
+struct Points: Codable { // struttura dati contenente i mazzi di scope fatte dai giocatori
+    let playerPoints: [Card] // scope fatte dal giocatore
+    let opponentPoints: [Card] // scope fatte dell'avversario
+}
+
+struct Scores: Codable { // struttura dati contenente i punteggi dei giocatori
+    let playerScore: Int // punteggio del giocatore
+    let opponentScore: Int // punteggio dell'avversario
+    let winner: String // vincitore della partita
+}
+
 class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
     private let serviceType = "ScopaRoyale"
     private let peerID = MCPeerID(displayName: UIDevice.current.name)
@@ -48,14 +69,16 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         DispatchQueue.main.async {
             switch state {
             case .connected:
-                self.connectedPeers.append(peerID)
-                self.isConnected = true
-                self.sendUsername(username: self.myUsername)
-                self.sendLobbyName()
-                if self.connectedPeers.count == self.neededPlayers {
-                    self.isConnected = false
-                    self.browser?.stopBrowsingForPeers()
-                    self.advertiser?.stopAdvertisingPeer()
+                if !self.connectedPeers.contains(peerID) {
+                    self.connectedPeers.append(peerID)
+                    self.isConnected = true
+                    self.sendUsername(username: self.myUsername)
+                    self.sendLobbyName()
+                    if self.connectedPeers.count == self.neededPlayers {
+                        self.isConnected = false
+                        self.browser?.stopBrowsingForPeers()
+                        self.advertiser?.stopAdvertisingPeer()
+                    }
                 }
             case .notConnected:
                 self.peerDisconnected = true
@@ -87,24 +110,33 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 } else if receivedString.starts(with: "Deck:") { // riceve il deck
                     let data = data.dropFirst(5)
                     self.deck = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "OpponentHand:") { // riceve la mano
-                    let data = data.dropFirst(13)
-                    self.opponentHand = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "PlayerHand:") { // riceve la mano dell'avversario
-                    let data = data.dropFirst(11)
-                    self.playerHand = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "PlayerCards:") { // riceve il mazzo di carte prese del giocatore
-                    let data = data.dropFirst(12)
-                    self.cardTakenByOpponent = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "OpponentCards:") { // riceve il mazzo di carte prese del giocatore
-                    let data = data.dropFirst(14)
-                    self.cardTakenByPlayer = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "PlayerPoints:") { // riceve il mazzo di carte prese del giocatore
-                    let data = data.dropFirst(13)
-                    self.playerPoints = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "OpponentPoints:") { // riceve il mazzo di carte prese del giocatore
-                    let data = data.dropFirst(15)
-                    self.opponentPoints = [Card].fromJSON(data)!
+                } else if receivedString.starts(with: "PlayersHands:") { // riceve le mani dei giocatori
+                    let jsonData = data.dropFirst(13)
+                    do {
+                        let hands = try JSONDecoder().decode(Hands.self, from: jsonData)
+                        self.playerHand = hands.playerHand
+                        self.opponentHand = hands.opponentHand
+                    } catch {
+                        print("Errore nella decodifica dei dati Hands: \(error.localizedDescription)")
+                    }
+                } else if receivedString.starts(with: "CardsTaken:") { // riceve i mazzi di carte prese dai giocatori
+                    let jsonData = data.dropFirst(11)
+                    do {
+                        let cardsTaken = try JSONDecoder().decode(CardsTaken.self, from: jsonData)
+                        self.cardTakenByPlayer = cardsTaken.playerCards
+                        self.cardTakenByOpponent = cardsTaken.opponentCards
+                    } catch {
+                        print("Errore nella decodifica dei dati CardsTaken: \(error.localizedDescription)")
+                    }
+                } else if receivedString.starts(with: "PlayersPoints:") { // riceve i mazzi di scope dei giocatori
+                    let jsonData = data.dropFirst(14)
+                    do {
+                        let points = try JSONDecoder().decode(Points.self, from: jsonData)
+                        self.playerPoints = points.playerPoints
+                        self.opponentPoints = points.opponentPoints
+                    } catch {
+                        print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
+                    }
                 } else if receivedString.starts(with: "Table:") { // riceve le carte del tavolo
                     let data = data.dropFirst(6)
                     self.tableCards = [Card].fromJSON(data)!
@@ -116,16 +148,16 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.gameOver = true
                     self.startGame = false
                     self.isConnected2 = false
-                } else if receivedString.starts(with: "PlayerScore:") { // Gestisce l'aggiornamento del turno
-                    let data = data.dropFirst(12)
-                    let dataString = String(data: data, encoding: .utf8)
-                    self.playerScore = Int(dataString!)!
-                } else if receivedString.starts(with: "OpponentScore:") { // Gestisce l'aggiornamento del turno
-                    let data = data.dropFirst(14)
-                    let dataString = String(data: data, encoding: .utf8)
-                    self.opponentScore = Int(dataString!)!
-                } else if receivedString.starts(with: "Winner:") { // Gestisce l'aggiornamento del turno
-                    self.winner = String(receivedString.dropFirst(7))
+                } else if receivedString.starts(with: "PlayersScores:") { // riceve i punteggi dei giocatori e il vincitore
+                    let jsonData = data.dropFirst(14)
+                    do {
+                        let scores = try JSONDecoder().decode(Scores.self, from: jsonData)
+                        self.playerScore = scores.playerScore
+                        self.opponentScore = scores.opponentScore
+                        self.winner = scores.winner
+                    } catch {
+                        print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
+                    }
                 } else { // riceve l'username
                     self.opponentName = receivedString
                 }
@@ -202,65 +234,42 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
         createDeck() // crea il mazzo iniziale
         placeTableCards() // posiziona le carte sul tavolo
-        giveCardsToPlayer() // assegna le carte al giocatore
-        giveCardsToOpponent() // assegna le carte all'avversario
-        sendDeck()
-        sendPlayerPoints()
-        sendOpponentPoints()
-        sendCardTakenByPlayer()
-        sendCardTakenByOpponent()
-        sendPlayerScore()
-        sendOpponentScore()
+        sendCardsToPlayers() // assegna le mani ai giocatori
+        sendDeck() // aggiorna il mazzo iniziale
+        sendPlayersPoints() // invia i mazzi contenenti le scope dei giocatori
+        sendCardsTaken() // invia i mazzi contenenti le carte prese dai giocatori
     }
     
-    func sendCardTakenByPlayer() {
-        let cards = cardTakenByPlayer.toJSON()
-        let message = "PlayerCards:".data(using: .utf8)! + cards!
+    func sendCardsTaken() { // invia il mazzo delle carte prese all'avversario
+        let cardsTaken = CardsTaken(playerCards: cardTakenByPlayer, opponentCards: cardTakenByOpponent)
         do {
-            try session.send(message, toPeers: session.connectedPeers, with: .reliable)
+            let data = try JSONEncoder().encode(cardsTaken)
+            let prefixedData = "CardsTaken:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
         } catch {
-            print("Errore invio carte prese dal giocatore: \(error.localizedDescription)")
+            print("Errore invio carte prese dai giocatori: \(error.localizedDescription)")
+        }
+    }
+        
+    func sendPlayersPoints() { // invia il mazzo delle scope fatte all'avversario
+        let points = Points(playerPoints: self.playerPoints, opponentPoints: self.opponentPoints)
+        do {
+            let data = try JSONEncoder().encode(points)
+            let prefixedData = "PlayersPoints:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio scope dei giocatori: \(error.localizedDescription)")
         }
     }
     
-    func sendCardTakenByOpponent() {
-        let cards = cardTakenByOpponent.toJSON()
-        let message = "OpponentCards:".data(using: .utf8)! + cards!
-        do {
-            try session.send(message, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio carte prese dall'avversario: \(error.localizedDescription)")
-        }
-    }
-    
-    func sendPlayerPoints() {
-        let points = playerPoints.toJSON()
-        let message = "PlayerPoints:".data(using: .utf8)! + points!
-        do {
-            try session.send(message, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio scope del giocatore: \(error.localizedDescription)")
-        }
-    }
-    
-    func sendOpponentPoints() {
-        let points = opponentPoints.toJSON()
-        let message = "OpponentPoints:".data(using: .utf8)! + points!
-        do {
-            try session.send(message, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio scope del'avversario: \(error.localizedDescription)")
-        }
-    }
-
     func createDeck() { // crea il deck e lo mescola
-        let values: [String] = [
-            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
+        let values: [String] = [ // possibili valori per le carte
+            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
         ]
-        let seeds: [String] = [
-            "denari", "coppe", "spade", "bastoni"
+        let seeds: [String] = [ // possibili semi per le carte
+            "denari", "coppe"//, "spade", "bastoni"
         ]
-        for seed in seeds {
+        for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
                 let card = Card(value: value, seed: seed)
                 deck.append(card)
@@ -279,46 +288,34 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
     
-    func giveCardsToOpponent() { // assegna le carte all'avversario
-        for _ in 0..<3 {
-            if let card = deck.first {
-                self.opponentHand.append(card)
-                self.deck.removeFirst()
-            }
-        }
-        sendCardsToOpponent() // invia le carte all'avversario
-    }
-    
-    func sendCardsToOpponent() { // invia le carte all'avversario
-        let opponentHandData = opponentHand.toJSON()
-        let message = "OpponentHand:".data(using: .utf8)! + opponentHandData!
-        do {
-            try session.send(message, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio mano avversario: \(error.localizedDescription)")
-        }
-    }
-    
-    func giveCardsToPlayer() { // assegna le carte al giocatore
-        for _ in 0..<3 {
+    func giveCardsToPlayers() { // assegna 3 carte ad ogni giocatore
+        for _ in 0..<3 { // mano del giocatore
             if let card = deck.first {
                 self.playerHand.append(card)
                 self.deck.removeFirst()
             }
         }
-        sendCardsToPlayer() // invia le carte al giocatore
-    }
-    
-    func sendCardsToPlayer() { // invia le carte al giocatore
-        let playerHandData = playerHand.toJSON()
-        let message = "PlayerHand:".data(using: .utf8)! + playerHandData!
-        do {
-            try session.send(message, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio mano giocatore: \(error.localizedDescription)")
+        
+        for _ in 0..<3 { // mano dell'avversario
+            if let card = deck.first {
+                self.opponentHand.append(card)
+                self.deck.removeFirst()
+            }
         }
     }
     
+    func sendCardsToPlayers() { // invia le carte delle mani dei giocatori
+        giveCardsToPlayers() // estrae le carte e le inserisce nelle mani dei giocatori
+        let hand = Hands(playerHand: self.playerHand, opponentHand: self.opponentHand)
+        do {
+            let data = try JSONEncoder().encode(hand)
+            let prefixedData = "PlayersHands:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio mani dei giocatori: \(error.localizedDescription)")
+        }
+    }
+        
     func placeTableCards() { // estrae le carte del tavolo
         for _ in 0..<4 {
             if let card = deck.first {
@@ -340,6 +337,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendTurnChange() { // invia e notifica il cambio del turno
+        currentPlayer = 1 - currentPlayer // passa il turno
         let turnData = "CurrentPlayer:\(currentPlayer)".data(using: .utf8)!
         do {
             try session.send(turnData, toPeers: session.connectedPeers, with: .reliable)
@@ -357,48 +355,32 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
     
-    func sendPlayerScore() { // invia il punteggio del giocatore
-        let score = "PlayerScore:\(playerScore)".data(using: .utf8)!
+    func sendPlayersScores() { // invia i punteggi finali all'avversario
+        let scores = Scores(playerScore: self.playerScore, opponentScore: self.opponentScore, winner: self.winner)
         do {
-            try session.send(score, toPeers: session.connectedPeers, with: .reliable)
+            let data = try JSONEncoder().encode(scores)
+            let prefixedData = "PlayersScores:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
         } catch {
-            print("Errore punteggio giocatore: \(error.localizedDescription)")
+            print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
         }
     }
-    
-    func sendOpponentScore() { // invia il punteggio dell'avversario
-        let score = "OpponentScore:\(opponentScore)".data(using: .utf8)!
-        do {
-            try session.send(score, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore punteggio avversario: \(error.localizedDescription)")
-        }
-    }
-    
-    func sendWinner() { // invia il nome del vincitore
-        let winner = "Winner:\(winner)".data(using: .utf8)!
-        do {
-            try session.send(winner, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio vincitore: \(error.localizedDescription)")
-        }
-    }
-    
+            
     func playCard(card: Card) { // gestisce la mossa di un giocatore
-        if currentPlayer == 0 { // rimuove la carta dalla mano del giocatore
-            if let index = playerHand.firstIndex(of: card) {
+        if currentPlayer == 0 {
+            if let index = playerHand.firstIndex(of: card) { // rimuove la carta dalla mano del giocatore
                 playerHand.remove(at: index)
             }
         } else {
-            if let index = opponentHand.firstIndex(of: card) {
+            if let index = opponentHand.firstIndex(of: card) { // rimuove la carta dalla mano dell'avversario
                 opponentHand.remove(at: index)
             }
         }
 
         var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
-        var shortestCombination: [Card]? = nil
+        var shortestCombination: [Card]? = nil // combinazione di carte da prendere più breve
         if !tableCards.isEmpty { // controllo che il tavolo non sia vuoto
-            for length in 1...tableCards.count {
+            for length in 1...tableCards.count { // cerco, se possibile, la combinazione di carte più breve che il giocatore può prendere
                 for combination in tableCards.combinations(length: length) {
                     let combinationValues = combination.map { card in
                         return numericValue(for: card.value) ?? 0
@@ -437,36 +419,27 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             } else {
                 cardTakenByOpponent.append(contentsOf: cardsToTake)
             }
+            sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
         }
         
         sendTableCards() // aggiorna le carte del tavolo
-        sendCardsToOpponent() // aggiorna le carte dell'avversario
-        sendCardsToPlayer() // aggiorna le carte del giocatore
-        currentPlayer = 1 - currentPlayer // passa il turno
+        sendCardsToPlayers() // invia le carte alle mani dei giocatori
         sendTurnChange() // aggiorna il turno
 
         if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
             if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
-                giveCardsToPlayer()
-                giveCardsToOpponent()
-                sendDeck()
+                sendCardsToPlayers() // invia le carte alle mani dei giocatori
+                sendDeck() // invia il mazzo iniziale aggiornato
             } else { // altrimenti si controllano i punteggi per decretare il vincitore
-                if !tableCards.isEmpty { // se alla fine della partita ci sono carte sul tavolo, le prende l'ultimo ad aver fatto una presa
-                    if lastPlayer == 0 {
-                        for card in tableCards {
-                            cardTakenByPlayer.append(card)
-                            if let index = tableCards.firstIndex(of: card) { // rimuove le carte dal tavolo
-                                tableCards.remove(at: index)
-                            }
-                        }
-                    } else {
-                        for card in tableCards {
-                            cardTakenByOpponent.append(card)
-                        }
-                        if let index = tableCards.firstIndex(of: card) { // rimuove le carte dal tavolo
-                            tableCards.remove(at: index)
-                        }
+                playerScore = 0 // azzera i punteggi del giocatore
+                opponentScore = 0 // azzera i punteggi dell'avversario
+                if !tableCards.isEmpty {
+                    if lastPlayer == 0 { // se l'ultimo giocatore ad aver preso carte è l'advertiser
+                        cardTakenByPlayer += tableCards // aggiunge tutte le carte del tavolo al mazzo delle sue carte prese
+                    } else { // altrimenti le aggiunge al mazzo di carte prese dal browser
+                        cardTakenByOpponent += tableCards
                     }
+                    tableCards.removeAll() // rimuove tutte le carte dal tavolo in una volta sola
                 }
                 
                 // assegno un punto a chi ha preso più carte
@@ -517,9 +490,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 DispatchQueue.main.async {
                     self.gameOver = true // termina la partita
                 }
-                sendPlayerScore() // invia il punteggio del giocatore
-                sendOpponentScore() // invia il punteggio dell'avversario
-                sendWinner() // notifica il vincitore
+                sendPlayersScores() // invio i punteggi ai giocatori
                 sendEndGameSignal() // notifica la fine della partita
             }
         }
