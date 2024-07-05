@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1645DC012C37F53700E3C85D /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645DC002C37F53700E3C85D /* ProfileView.swift */; };
+		1645DC032C37FF6500E3C85D /* SwiftUISpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645DC022C37FF6500E3C85D /* SwiftUISpeech.swift */; };
 		165E20202C34251000B883D1 /* ShowWinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165E201F2C34251000B883D1 /* ShowWinnerView.swift */; };
 		167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */; };
 		169E707D2C3017DF007200FE /* StructCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169E707C2C3017DF007200FE /* StructCard.swift */; };
 		462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */; };
-		462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */; };
 		4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */; };
 		465878702C2997B2005D4788 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786F2C2997B2005D4788 /* ContentView.swift */; };
 		465878722C2997B2005D4788 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 465878712C2997B2005D4788 /* Assets.xcassets */; };
@@ -21,10 +22,8 @@
 		4658788B2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */; };
 		465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878972C2997FE005D4788 /* OneVsOneView.swift */; };
 		465878B02C299F35005D4788 /* MultipeerConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */; };
-		465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465878B32C29B5D0005D4788 /* SelectModeView.swift */; };
 		4662659F2C2EDE21004B963E /* OneVsOneGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4662659E2C2EDE21004B963E /* OneVsOneGameScene.swift */; };
 		466265A12C2EDE44004B963E /* OneVsOneGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466265A02C2EDE44004B963E /* OneVsOneGameView.swift */; };
-		4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4690AD502C2C67CE009D3DD1 /* SettingsView.swift */; };
 		4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,12 +45,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1645DC002C37F53700E3C85D /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		1645DC022C37FF6500E3C85D /* SwiftUISpeech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUISpeech.swift; sourceTree = "<group>"; };
 		165E201F2C34251000B883D1 /* ShowWinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowWinnerView.swift; sourceTree = "<group>"; };
 		167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPeerManager.swift; sourceTree = "<group>"; };
 		167C0B032C2C63A70054F0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		169E707C2C3017DF007200FE /* StructCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructCard.swift; sourceTree = "<group>"; };
 		462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinAGameView.swift; sourceTree = "<group>"; };
-		462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoVsTwoView.swift; sourceTree = "<group>"; };
 		4658786A2C2997B2005D4788 /* ScopaRoyale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScopaRoyale.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleApp.swift; sourceTree = "<group>"; };
 		4658786F2C2997B2005D4788 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -64,10 +64,8 @@
 		4658788A2C2997B3005D4788 /* ScopaRoyaleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		465878972C2997FE005D4788 /* OneVsOneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneView.swift; sourceTree = "<group>"; };
 		465878AE2C299F31005D4788 /* MultipeerConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultipeerConnectivity.framework; path = System/Library/Frameworks/MultipeerConnectivity.framework; sourceTree = SDKROOT; };
-		465878B32C29B5D0005D4788 /* SelectModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModeView.swift; sourceTree = "<group>"; };
 		4662659E2C2EDE21004B963E /* OneVsOneGameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneGameScene.swift; sourceTree = "<group>"; };
 		466265A02C2EDE44004B963E /* OneVsOneGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneVsOneGameView.swift; sourceTree = "<group>"; };
-		4690AD502C2C67CE009D3DD1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameEntryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -123,6 +121,8 @@
 			children = (
 				167C0B032C2C63A70054F0DD /* Info.plist */,
 				4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */,
+				1645DC022C37FF6500E3C85D /* SwiftUISpeech.swift */,
+				1645DC002C37F53700E3C85D /* ProfileView.swift */,
 				165E201F2C34251000B883D1 /* ShowWinnerView.swift */,
 				169E707C2C3017DF007200FE /* StructCard.swift */,
 				167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */,
@@ -130,10 +130,7 @@
 				4658786F2C2997B2005D4788 /* ContentView.swift */,
 				465878732C2997B2005D4788 /* Preview Content */,
 				465878972C2997FE005D4788 /* OneVsOneView.swift */,
-				465878B32C29B5D0005D4788 /* SelectModeView.swift */,
 				462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */,
-				462B69722C2BF8C300F8E3C0 /* TwoVsTwoView.swift */,
-				4690AD502C2C67CE009D3DD1 /* SettingsView.swift */,
 				4690AD522C2C6834009D3DD1 /* UsernameEntryView.swift */,
 				4662659E2C2EDE21004B963E /* OneVsOneGameScene.swift */,
 				466265A02C2EDE44004B963E /* OneVsOneGameView.swift */,
@@ -305,7 +302,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
-				4690AD512C2C67CE009D3DD1 /* SettingsView.swift in Sources */,
+				1645DC032C37FF6500E3C85D /* SwiftUISpeech.swift in Sources */,
 				4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */,
 				4662659F2C2EDE21004B963E /* OneVsOneGameScene.swift in Sources */,
 				167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */,
@@ -313,9 +310,8 @@
 				466265A12C2EDE44004B963E /* OneVsOneGameView.swift in Sources */,
 				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,
 				4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */,
-				465878B42C29B5D0005D4788 /* SelectModeView.swift in Sources */,
 				169E707D2C3017DF007200FE /* StructCard.swift in Sources */,
-				462B69732C2BF8C300F8E3C0 /* TwoVsTwoView.swift in Sources */,
+				1645DC012C37F53700E3C85D /* ProfileView.swift in Sources */,
 				165E20202C34251000B883D1 /* ShowWinnerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -481,10 +477,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
-				DEVELOPMENT_TEAM = A6WPN5LW29;
+				DEVELOPMENT_TEAM = 9AFL4Y4K2L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScopaRoyale/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Consenti l'utilizzo del microfono?";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Consenti la registrazione della tua voce?";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -495,12 +493,16 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale6999;
+				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale69;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -513,10 +515,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScopaRoyale/Preview Content\"";
-				DEVELOPMENT_TEAM = A6WPN5LW29;
+				DEVELOPMENT_TEAM = 9AFL4Y4K2L;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScopaRoyale/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Consenti l'utilizzo del microfono?";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Consenti la registrazione della tua voce?";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -527,12 +531,16 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale6999;
+				PRODUCT_BUNDLE_IDENTIFIER = ScopaRoyale69;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

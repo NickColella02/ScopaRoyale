@@ -8,7 +8,7 @@ struct JoinAGameView: View {
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
-            if !peerManager.isConnected2 { // se l'utente deve ancora connettersi alla lobby
+            if peerManager.connectedPeers.isEmpty { // se l'utente deve ancora connettersi alla lobby
                 VStack(spacing: 10) {
                     Text("Searching a lobby...")
                         .font(.headline)

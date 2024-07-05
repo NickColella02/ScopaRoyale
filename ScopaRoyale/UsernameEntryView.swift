@@ -59,10 +59,6 @@ struct WelcomeView: View {
                             .font(.system(size: 20, design: .default))
                             .foregroundStyle(.white)
                             .padding(.horizontal)
-                        
-                        /*Image(systemName: "arrow.right")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.white)*/
                     }
                     .frame(width: 330, height: 60)
                     .background(Color.black)
@@ -95,18 +91,28 @@ struct UsernameFormView: View {
     @Binding var showAlert: Bool
     @Binding var alertMessage: String
     
+    let maxUsernameLength = 14 // Limite massimo di caratteri per lo username
+    
     var body: some View {
         VStack {
             Image("username")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 40, height: 40) // Aumentato per coerenza con AppLogo
+                .frame(width: 40, height: 40)
             
             TextField("Enter username", text: $username)
                 .padding()
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 100))
                 .padding(.horizontal, 25)
+            
+            // Aggiunta del testo di avviso per il limite di caratteri
+            if username.count > maxUsernameLength {
+                Text("Username must be \(maxUsernameLength) characters or less.")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 25)
+            }
             
             Button(action: {
                 if username.isEmpty {
@@ -121,10 +127,11 @@ struct UsernameFormView: View {
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.black)
+                    .background(username.isEmpty || username.count > maxUsernameLength ? Color.gray : Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 25)
             }
+            .disabled(username.isEmpty || username.count > maxUsernameLength) // Disabilita il pulsante se lo username è vuoto o troppo lungo
             
             Text("You can change your username later in settings.")
                 .font(.system(size: 14, design: .default))
@@ -132,20 +139,12 @@ struct UsernameFormView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 35)
                 .padding(.top, 10)
-            
-            .alert("Username required", isPresented: $showAlert) {
-                VStack {
-                    Button("OK", role: .cancel) {
-                        showAlert = false
-                    }
-                }
-            } message: {
-                Text("You need to enter a username.")
-            }
         }
     }
 }
 
-#Preview {
-    UsernameEntryView()
+struct UsernameEntryView_Previews: PreviewProvider {
+    static var previews: some View {
+        UsernameEntryView()
+    }
 }

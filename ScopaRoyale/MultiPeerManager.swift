@@ -31,8 +31,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     private var browser: MCNearbyServiceBrowser?
     var myUsername: String = ""
     
-    @Published var isConnected: Bool = false // true se l'advertiser è connesso
-    @Published var isConnected2: Bool = false // true se il browser è connesso
     @Published var opponentName: String = "" // nome dell'avversario (browser)
     @Published var lobbyName: String = "" // nome della lobby
     @Published var startGame: Bool = false // true se la partita è iniziata
@@ -71,11 +69,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             case .connected:
                 if !self.connectedPeers.contains(peerID) {
                     self.connectedPeers.append(peerID)
-                    self.isConnected = true
                     self.sendUsername(username: self.myUsername)
                     self.sendLobbyName()
                     if self.connectedPeers.count == self.neededPlayers {
-                        self.isConnected = false
                         self.browser?.stopBrowsingForPeers()
                         self.advertiser?.stopAdvertisingPeer()
                     }
@@ -89,7 +85,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.browser?.startBrowsingForPeers()
                     self.advertiser?.startAdvertisingPeer()
                     self.opponentName = ""
-                    self.isConnected2 = false
                     self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: 1, username: self.myUsername)
                 }
             default:
@@ -98,6 +93,18 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
 
+    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
+        browser.invitePeer(peerID, to: session, withContext: nil, timeout: 5)
+    }
+
+    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+        guard let index = connectedPeers.firstIndex(of: peerID) else { return }
+        DispatchQueue.main.async {
+            self.connectedPeers.remove(at: index)
+            self.peerDisconnected = true
+        }
+    }
+    
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
             if let receivedString = String(data: data, encoding: .utf8) {
@@ -106,7 +113,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.gameOver = false
                 } else if receivedString.starts(with: "Lobby:") { // riceve il nome della lobby
                     self.lobbyName = String(receivedString.dropFirst(6))
-                    self.isConnected2 = true
                 } else if receivedString.starts(with: "Deck:") { // riceve il deck
                     let data = data.dropFirst(5)
                     self.deck = [Card].fromJSON(data)!
@@ -147,7 +153,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 } else if receivedString.starts(with: "GameOver:") { // Gestisce la ricezione del segnale di fine partita
                     self.gameOver = true
                     self.startGame = false
-                    self.isConnected2 = false
                 } else if receivedString.starts(with: "PlayersScores:") { // riceve i punteggi dei giocatori e il vincitore
                     let jsonData = data.dropFirst(14)
                     do {
@@ -171,21 +176,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
 
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {}
 
-    // MARK: - MCNearbyServiceAdvertiserDelegate
-
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         invitationHandler(true, self.session)
     }
-
-    // MARK: - MCNearbyServiceBrowserDelegate
-
-    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-            browser.invitePeer(peerID, to: session, withContext: nil, timeout: 5)
-    }
-
-    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {}
-
-    // MARK: - Custom Methods
 
     func startHosting(lobbyName: String, numberOfPlayers: Int, username: String) { // eseguito dall'advertiser
         self.neededPlayers = numberOfPlayers
@@ -264,10 +257,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe", "spade", "bastoni"
+            "denari", "coppe"//, "spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -507,7 +500,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         myUsername = ""
         opponentName = ""
         lobbyName = ""
-        isConnected = false
         sendUsername(username: self.myUsername)
         sendLobbyName()
     }
@@ -515,8 +507,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func reset() {
         DispatchQueue.main.async {
             self.peerDisconnected = false
-            self.isHost = false
-            self.isClient = false
             self.gameOver = false
             self.startGame = false
             self.deck = []
@@ -531,8 +521,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.opponentScore = 0
             self.currentPlayer = 1
             self.lastPlayer = 1
-            self.session = MCSession(peer: self.peerID, securityIdentity: nil, encryptionPreference: .none)
-            self.session.delegate = self
         }
     }
 }

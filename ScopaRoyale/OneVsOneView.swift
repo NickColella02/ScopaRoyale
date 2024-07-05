@@ -2,9 +2,8 @@ import SwiftUI
 
 struct OneVsOneView: View {
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
-    let numberOfPlayer: Int // numero di giocatori
+    private let numberOfPlayer: Int = 2 // numero di giocatori
     let lobbyName: String // nome della lobby
-    @State private var showStartGameAlert: Bool = false // true se si tenta di avviare una partita senza sufficienti giocatori
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
     @State private var navigateToGame = false
     
@@ -23,7 +22,7 @@ struct OneVsOneView: View {
             
             Spacer()
             
-            if !peerManager.isConnected {
+            if peerManager.connectedPeers.isEmpty {
                 VStack(spacing: 10) {
                     Text("Searching for an opponent...")
                         .font(.headline)
@@ -67,8 +66,7 @@ struct OneVsOneView: View {
             Spacer()
             
             Button(action: { // bottone per avviare la partita
-                if peerManager.connectedPeers.isEmpty { // se non ci sono peer connessi
-                } else {
+                if !peerManager.connectedPeers.isEmpty {
                     peerManager.sendStartGameSignal()
                     navigateToGame = true;
                 }
@@ -100,17 +98,8 @@ struct OneVsOneView: View {
         }
         .preferredColorScheme(.light) // forza la light mode
         .onAppear() { // quando la pagina è caricata, da avvio alla connessione
-            peerManager.startHosting(lobbyName: lobbyName, numberOfPlayers: numberOfPlayer, username: username)
+            peerManager.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.numberOfPlayer, username: username)
         }
         .navigationTitle("")
-        .alert("Unable to Start the Game", isPresented: $showStartGameAlert) { // messaggio di errore se si tenta di avviare la partita senza avversario
-            VStack {
-                Button("OK", role: .cancel) {
-                    showStartGameAlert = false
-                }
-            }
-        } message: {
-            Text("You need another player to start a 1 vs 1 game.")
-        }
     }
 }

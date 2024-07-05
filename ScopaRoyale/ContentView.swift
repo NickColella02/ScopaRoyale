@@ -1,28 +1,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var username:           String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var showJoinGame:       Bool = false
-    @State private var showUsernameEntry:  Bool = false
-    @State private var lobbyName:          String = ""
-    @State private var showLobbyForm:      Bool = false
-    @State private var showGameView:       Bool = false
-    @State private var showLobbyNameAlert: Bool = false
-    @State private var showGameRules:      Bool = false
-    @State private var showSettings:       Bool = false
-    @State private var newUsername:        String = ""
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
+    @State private var showJoinGame: Bool = false
+    @State private var showUsernameEntry: Bool = false
+    @State private var createLobby: Bool = false
+    @State private var lobbyName: String = ""
+    @State private var showLobbyForm: Bool = false
+    @State private var showGameRules: Bool = false
+    @State private var showSettings: Bool = false
+    @State private var newUsername: String = ""
     @State private var showEmptyUsernameAlert = false
     @State private var showChangeUsernameForm = false
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
-
+    
     init() {
         // Controlla se è presente un username nell'app
         if username.isEmpty {
             _showUsernameEntry = State(initialValue: true)
         }
     }
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -39,8 +38,8 @@ struct ContentView: View {
                             JoinAGameView(username: username).environmentObject(peerManager)
                         }
                     
-                    .navigationDestination(isPresented: $showGameView) {
-                        OneVsOneView(numberOfPlayer: 2, lobbyName: lobbyName).environmentObject(peerManager)
+                    .navigationDestination(isPresented: $createLobby) {
+                        OneVsOneView(lobbyName: self.lobbyName).environmentObject(peerManager)
                     }
                     
                     CreateNewLobby(showLobbyForm: $showLobbyForm)
@@ -56,17 +55,13 @@ struct ContentView: View {
             }
             .navigationTitle("")
             .toolbar {
-                if (!showUsernameEntry) {
+                if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
-                        HStack {
-                            Button(action: {
-                                showSettings = true
-                            }) {
-                                Image(systemName: "person.circle.fill")
-                                    .font(.system(size: 20, design: .default))
-                                    .padding(.horizontal, 12)
-                                    .foregroundStyle(.gray)
-                            }
+                        NavigationLink(destination: ProfileView(username: $username)) {
+                            Image(systemName: "person.crop.circle")
+                                .font(.system(size: 20, weight: .regular))
+                                .padding(.horizontal, 12)
+                                .foregroundStyle(.black)
                         }
                     }
                 }
@@ -75,20 +70,10 @@ struct ContentView: View {
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
                 self.showUsernameEntry = false
             }
-            .alert("Lobby's name required", isPresented: $showLobbyNameAlert) { // messaggio di errore se non si assegna un nome alla lobby
-                VStack {
-                    Button("OK", role: .cancel) {
-                        showLobbyNameAlert = false
-                    }
-                }
-            } message: {
-                Text("You need to assign a name to the lobby.")
-            }
         }
         .preferredColorScheme(.light) // forza la light mode
         .overlay(Group { if showLobbyForm { lobbyFormOverlay() } })
         .overlay(Group { if showGameRules { gameRulesOverlay() } })
-        .overlay(Group { if showSettings  { settingsOverlay()  } })
     }
     
     private func lobbyFormOverlay() -> some View {
@@ -113,20 +98,29 @@ struct ContentView: View {
                     .padding(.horizontal, 25)
                 Button(action: {
                     if !lobbyName.isEmpty {
-                        showGameView = true
+                        createLobby = true
                         showLobbyForm = false
-                    } else {
-                        showLobbyNameAlert = true
                     }
                 }) {
-                    Text("Create lobby")
-                        .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 25)
+                    if !lobbyName.isEmpty {
+                        Text("Create lobby")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 50))
+                            .padding(.horizontal, 25)
+                    } else {
+                        Text("Create lobby")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray)
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .padding(.horizontal, 35)
+                    }
                 }
                 .padding(.bottom, 20)
             }
@@ -152,7 +146,7 @@ struct ContentView: View {
                     .padding(.top, 20)
                 Text("""
                     Scopa is a traditional Italian card game:
-                    **1. Objective**: the goal is to capture cards on the table by matching them with a card in your hand that has the same value or by adding up to 15.
+                    **1. Goal**: the goal is to capture cards on the table by matching them with a card in your hand that has the same value or by adding up to 15.
                     **2. Gameplay**: the game is usually played with a 40-card Italian deck. Each player is dealt three cards, and four cards are placed face-up on the table. On your turn, you can capture cards from the table that add up to the value of one card in your hand. If you cannot capture any cards, you must place one card from your hand on the table.
                     **3. Scoring**: each captured card is worth 1 point, additional points can be earned for:
                     - The most cards.
@@ -184,58 +178,6 @@ struct ContentView: View {
             .shadow(radius: 20)
         }
     }
-    
-    private func settingsOverlay() -> some View {
-        ZStack {
-            Color.black.opacity(0.4)
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    showSettings = false
-                }
-            VStack {
-                HStack {
-                    Image("username")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 40, height: 40)
-                        .padding(.top, 20)
-                }
-                TextField("Enter new username", text: $newUsername)
-                    .onAppear {
-                        self.newUsername = self.username
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
-                    .padding(.horizontal, 25)
-                Button(action: {
-                    if !newUsername.isEmpty {
-                        UserDefaults.standard.set(newUsername, forKey: "username")
-                        username = newUsername
-                        UserDefaults.standard.set(newUsername, forKey: "username")
-                        username = newUsername
-                        showSettings = false
-                    } else {
-                        showSettings = true
-                    }
-                }) {
-                    Text("Done")
-                        .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 25)
-                }
-                .padding(.bottom, 20)
-            }
-            .frame(width: 370, height: 215)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(radius: 20)
-        }
-    }
 }
 
 struct ContentView_Previews: PreviewProvider {
@@ -245,18 +187,13 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-#Preview {
-    ContentView()
-        .environmentObject(MultiPeerManager())
-}
-
 extension Notification.Name {
     static let usernameEntered = Notification.Name("usernameEntered")
 }
 
 struct CreateNewLobby: View {
     @Binding var showLobbyForm: Bool
-
+    
     var body: some View {
         Button(action: {
             showLobbyForm = true
@@ -283,7 +220,7 @@ struct CreateNewLobby: View {
 
 struct JoinExistentLobby: View {
     @Binding var showJoinGame: Bool
-
+    
     var body: some View {
         Button(action: {
             showJoinGame = true
@@ -308,7 +245,7 @@ struct JoinExistentLobby: View {
 
 struct HowToPlay: View {
     @Binding var showGameRules: Bool
-
+    
     var body: some View {
         Button(action: {
             showGameRules = true
