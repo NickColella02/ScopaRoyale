@@ -1,25 +1,24 @@
 import SwiftUI
+import AVFoundation
 
 struct ProfileView: View {
     @Binding var username: String
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject private var peerManager: MultiPeerManager
     
-    // Aggiungi una variabile di stato per gestire l'avatar
     @State private var avatarImage: Image
-    
     @State private var showPicker: Bool = false
-    @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar") // Carica l'avatar salvato
+    @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
+    @State private var showAlert: Bool = false
+    @State private var localUsername: String
+    @State private var blindMode: Bool = false
     
-    @State private var showAlert: Bool = false // Per mostrare l'alert se lo username è vuoto
-    
-    let maxUsernameLength = 14 // Limite massimo di caratteri per lo username
-    
-    @State private var localUsername: String // Variabile di stato locale per lo username
+    let maxUsernameLength = 14
+    let synthesizer = AVSpeechSynthesizer()
     
     init(username: Binding<String>) {
         self._username = username
-        self._localUsername = State(initialValue: username.wrappedValue) // Inizializza localUsername con il valore corrente di username
-        // Imposta l'avatar iniziale dal UserDefaults o usa un valore di default
+        self._localUsername = State(initialValue: username.wrappedValue)
         if let selectedAvatar = UserDefaults.standard.string(forKey: "selectedAvatar") {
             self._avatarImage = State(initialValue: Image(selectedAvatar))
         } else {
@@ -32,7 +31,6 @@ struct ProfileView: View {
             Spacer()
             
             ZStack {
-                // Visualizzazione dell'avatar
                 avatarImage
                     .resizable()
                     .scaledToFit()
@@ -41,39 +39,36 @@ struct ProfileView: View {
                     .overlay(
                         Circle()
                             .stroke(Color.black, lineWidth: 1)
-                            .scaleEffect(1.1) // Aumenta leggermente la dimensione del cerchio
+                            .scaleEffect(1.1)
                             .padding(3)
                     )
             }
             .padding(.bottom, 10)
             
-            // Aggiungi un testo per cambiare l'avatar
             Text("Change avatar")
                 .font(.system(size: 16))
-                .foregroundStyle(.blue)
+                .foregroundColor(.blue)
                 .onTapGesture {
                     showPicker = true
                 }
                 .padding(.bottom, 50)
             
-            VStack() {
-                // Campo per l'inserimento del nuovo username
+            VStack {
                 Image("username")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 40, height: 40)
                 
-                TextField("Enter username", text: $localUsername) // Usa localUsername come binding
+                TextField("Enter username", text: $localUsername)
                     .padding()
                     .background(Color(.systemGray6))
                     .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 25)
                 
-                // Aggiunta del testo di avviso per il limite di caratteri
                 if localUsername.count > maxUsernameLength {
                     Text("Username must be \(maxUsernameLength) characters or less.")
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundColor(.red)
                         .padding(.horizontal, 25)
                 }
                 
@@ -81,14 +76,14 @@ struct ProfileView: View {
                     if localUsername.isEmpty {
                         showAlert = true
                     } else {
-                        username = localUsername // Aggiorna il binding con il nuovo username
+                        username = localUsername
                         UserDefaults.standard.set(localUsername, forKey: "username")
-                        presentationMode.wrappedValue.dismiss() // Chiudi la vista
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }) {
                     Text("Done")
                         .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(localUsername.isEmpty || localUsername.count > maxUsernameLength ? Color.gray : Color.black)
@@ -96,30 +91,65 @@ struct ProfileView: View {
                         .padding(.horizontal, 25)
                         .padding(.top, 20)
                 }
-                .disabled(localUsername.isEmpty || localUsername.count > maxUsernameLength) // Disabilita il pulsante se lo username è vuoto o troppo lungo
+                .disabled(localUsername.isEmpty || localUsername.count > maxUsernameLength)
             }
             .padding(.horizontal)
             
             Spacer()
+            
+            VStack {
+                Image(systemName: peerManager.blindMode ? "eye.slash.fill" : "eye.fill")
+                   .resizable()
+                   .aspectRatio(contentMode: .fit)
+                   .frame(width: 30, height: 30)
+                   .foregroundColor(blindMode ? .red : .green)
+                   .padding(.bottom, 20)
+               
+               Toggle(isOn: $peerManager.blindMode) {
+                   Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
+                       .font(.title3)
+                       .foregroundColor(.primary)
+               }
+               .toggleStyle(SwitchToggleStyle(tint: peerManager.blindMode ? .red : .green))
+               .padding(.horizontal, 25)
+               .padding(.bottom, 20)
+           }
+           .background(Color(.systemGray6))
+           .clipShape(RoundedRectangle(cornerRadius: 15))
+           .padding(.horizontal, 25)
         }
         .navigationBarTitle("Your profile", displayMode: .inline)
         .sheet(isPresented: $showPicker) {
-            // Visualizza il picker personalizzato per la selezione dell'avatar
             AvatarPickerView(selectedAvatar: $selectedAvatar, avatarImage: $avatarImage) {
-                // Chiusura della sheet e salvataggio dell'avatar selezionato negli UserDefaults
                 if let selectedAvatar = selectedAvatar {
                     UserDefaults.standard.set(selectedAvatar, forKey: "selectedAvatar")
-                    self.selectedAvatar = selectedAvatar // Aggiorna lo stato di selectedAvatar
+                    self.selectedAvatar = selectedAvatar
                 }
-                showPicker = false // Chiudi la sheet dopo aver selezionato un avatar
+                showPicker = false
             }
         }
         .onAppear {
-            // Assicurati che l'avatar venga caricato correttamente all'apertura della vista
             if let savedAvatar = UserDefaults.standard.string(forKey: "selectedAvatar") {
                 avatarImage = Image(savedAvatar)
             }
         }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("Invalid Username"), message: Text("Username cannot be empty."), dismissButton: .default(Text("OK")))
+        }
+    }
+    
+    private func toggleBlindMode() {
+        peerManager.blindMode.toggle()
+        let message = peerManager.blindMode ? "Blind mode attivata" : "Blind mode disattivata"
+        speakText(message)
+    }
+    
+    private func speakText(_ text: String) {
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+        utterance.pitchMultiplier = 1.0
+        utterance.rate = 0.5
+        synthesizer.speak(utterance)
     }
 }
 
@@ -128,7 +158,7 @@ struct AvatarPickerView: View {
     @Binding var avatarImage: Image
     var onSelection: () -> Void
     
-    let avatarOptions = ["assobastoni", "assocoppe", "assodenari", "assospade", "duebastoni", "duecoppe", "duedenari", "duespade", "trebastoni", "trecoppe", "tredenari", "trespade", "quattrobastoni", "quattrocoppe", "quattrodenari", "quattrospade", "cinquebastoni", "cinquecoppe", "cinquedenari", "cinquespade", "seibastoni", "seicoppe", "seidenari", "seispade", "settebastoni", "settecoppe", "settedenari", "settespade", "ottobastoni", "ottocoppe", "ottodenari", "ottospade", "novebastoni", "novecoppe", "novedenari", "novespade", "diecibastoni", "diecicoppe", "diecidenari", "diecispade"] // Lista degli avatar disponibili
+    let avatarOptions = ["assobastoni", "assocoppe", "assodenari", "assospade", "duebastoni", "duecoppe", "duedenari", "duespade", "trebastoni", "trecoppe", "tredenari", "trespade", "quattrobastoni", "quattrocoppe", "quattrodenari", "quattrospade", "cinquebastoni", "cinquecoppe", "cinquedenari", "cinquespade", "seibastoni", "seicoppe", "seidenari", "seispade", "settebastoni", "settecoppe", "settedenari", "settespade", "ottobastoni", "ottocoppe", "ottodenari", "ottospade", "novebastoni", "novecoppe", "novedenari", "novespade", "diecibastoni", "diecicoppe", "diecidenari", "diecispade"]
     
     var body: some View {
         VStack {
@@ -142,7 +172,7 @@ struct AvatarPickerView: View {
                         Button(action: {
                             selectedAvatar = avatar
                             avatarImage = Image(avatar)
-                            onSelection() // Chiamata alla chiusura della sheet e salvataggio
+                            onSelection()
                         }) {
                             Image(avatar)
                                 .resizable()
@@ -163,5 +193,6 @@ struct AvatarPickerView: View {
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView(username: .constant("TestUser"))
+            .environmentObject(MultiPeerManager())
     }
 }

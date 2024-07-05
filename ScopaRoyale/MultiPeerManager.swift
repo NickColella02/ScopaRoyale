@@ -38,6 +38,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var connectedPeers: [MCPeerID] = [] // lista di peer connessi
     @Published var isHost: Bool = false // true se è l'advertiser
     @Published var isClient: Bool = false // true se è l'host
+    @Published var blindMode: Bool = false
     
     @Published var deck: [Card] = [] // mazzo di carte iniziale
     @Published var tableCards: [Card] = [] // carte presenti sul tavolo

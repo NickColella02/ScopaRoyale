@@ -13,43 +13,23 @@ struct ContentView: View {
     @State private var showEmptyUsernameAlert = false
     @State private var showChangeUsernameForm = false
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
+    @EnvironmentObject private var peerManager: MultiPeerManager
+    @EnvironmentObject private var speechRecognized: SwiftUISpeech
     
     init() {
-        // Controlla se è presente un username nell'app
-        if username.isEmpty {
-            _showUsernameEntry = State(initialValue: true)
+            if username.isEmpty {
+                _showUsernameEntry = State(initialValue: true)
+            }
         }
-    }
     
     var body: some View {
         NavigationStack {
             VStack {
                 Spacer()
-                if showUsernameEntry { // mostra la schermata di inserimento dell'username se non ancora inserito
+                if showUsernameEntry {
                     UsernameEntryView()
                 } else {
-                    Image("AppLogo") // logo dell'app
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 180)
-                        .padding(.bottom, 20)
-                        .navigationDestination(isPresented: $showJoinGame) {
-                            JoinAGameView(username: username).environmentObject(peerManager)
-                        }
-                    
-                    .navigationDestination(isPresented: $createLobby) {
-                        OneVsOneView(lobbyName: self.lobbyName).environmentObject(peerManager)
-                    }
-                    
-                    CreateNewLobby(showLobbyForm: $showLobbyForm)
-                        .onTapGesture {
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                        }
-                    
-                    JoinExistentLobby(showJoinGame: $showJoinGame)
-                    
-                    HowToPlay(showGameRules: $showGameRules)
+                    content
                 }
                 Spacer()
             }
@@ -57,7 +37,7 @@ struct ContentView: View {
             .toolbar {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink(destination: ProfileView(username: $username)) {
+                        NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager).environmentObject(speechRecognized)) {
                             Image(systemName: "person.crop.circle")
                                 .font(.system(size: 20, weight: .regular))
                                 .padding(.horizontal, 12)
@@ -71,39 +51,117 @@ struct ContentView: View {
                 self.showUsernameEntry = false
             }
         }
-        .preferredColorScheme(.light) // forza la light mode
-        .overlay(Group { if showLobbyForm { lobbyFormOverlay() } })
-        .overlay(Group { if showGameRules { gameRulesOverlay() } })
+        .preferredColorScheme(.light)
+        .overlay(lobbyFormOverlay)
+        .overlay(gameRulesOverlay)
     }
     
-    private func lobbyFormOverlay() -> some View {
-        ZStack {
-            Color.black.opacity(0.4)
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    showLobbyForm = false
+    @ViewBuilder
+    private var content: some View {
+        VStack {
+            Image("AppLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 180)
+                .padding(.bottom, 20)
+                .navigationDestination(isPresented: $showJoinGame) {
+                    JoinAGameView(username: username).environmentObject(peerManager).environmentObject(speechRecognized)
                 }
-            VStack() {
-                HStack {
-                    Image("lobbyName")
+                .navigationDestination(isPresented: $createLobby) {
+                    OneVsOneView(lobbyName: self.lobbyName).environmentObject(peerManager).environmentObject(speechRecognized)
+                }
+            
+            CreateNewLobby(showLobbyForm: $showLobbyForm)
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+            
+            JoinExistentLobby(showJoinGame: $showJoinGame)
+            
+            HowToPlay(showGameRules: $showGameRules)
+        }
+    }
+    
+    @ViewBuilder
+    private var lobbyFormOverlay: some View {
+        if showLobbyForm {
+            ZStack {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        showLobbyForm = false
+                    }
+                VStack {
+                    HStack {
+                        Image("lobbyName")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 40, height: 40)
+                            .padding(.top, 20)
+                    }
+                    TextField("Enter lobby name", text: $lobbyName)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .clipShape(RoundedRectangle(cornerRadius: 100))
+                        .padding(.horizontal, 25)
+                    Button(action: {
+                        if !lobbyName.isEmpty {
+                            createLobby = true
+                            showLobbyForm = false
+                        }
+                    }) {
+                        Text("Create lobby")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundStyle(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(lobbyName.isEmpty ? Color.gray : Color.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 50))
+                            .padding(.horizontal, 25)
+                            .padding(.bottom, 20)
+                    }
+                    .disabled(lobbyName.isEmpty)
+                }
+                .frame(width: 370, height: 215)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(radius: 20)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var gameRulesOverlay: some View {
+        if showGameRules {
+            ZStack {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        showGameRules = false
+                    }
+                VStack {
+                    Image("rules")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 40, height: 40)
                         .padding(.top, 20)
-                }
-                TextField("Enter lobby name", text: $lobbyName)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
-                    .padding(.horizontal, 25)
-                Button(action: {
-                    if !lobbyName.isEmpty {
-                        createLobby = true
-                        showLobbyForm = false
-                    }
-                }) {
-                    if !lobbyName.isEmpty {
-                        Text("Create lobby")
+                    Text("""
+                        Scopa is a traditional Italian card game:
+                        **1. Goal**: the goal is to capture cards on the table by matching them with a card in your hand that has the same value or by adding up to 15.
+                        **2. Gameplay**: the game is usually played with a 40-card Italian deck. Each player is dealt three cards, and four cards are placed face-up on the table. On your turn, you can capture cards from the table that add up to the value of one card in your hand. If you cannot capture any cards, you must place one card from your hand on the table.
+                        **3. Scoring**: each captured card is worth 1 point, additional points can be earned for:
+                        - The most cards.
+                        - The most 'coins' (denari) cards.
+                        - The 7 of coins (Settebello).
+                        - The most 'prime' cards (7s, 6s, aces, etc.).
+                        **4. Winning**: The game continues until all cards are played. The player with the most points at the end wins.
+                        """)
+                        .font(.body)
+                        .padding(.horizontal, 20)
+                    Button(action: {
+                        showGameRules = false
+                    }) {
+                        Text("Close")
                             .font(.system(size: 20, design: .default))
                             .foregroundStyle(.white)
                             .padding()
@@ -111,71 +169,15 @@ struct ContentView: View {
                             .background(.black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
                             .padding(.horizontal, 25)
-                    } else {
-                        Text("Create lobby")
-                            .font(.system(size: 20, design: .default))
-                            .foregroundStyle(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray)
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .padding(.horizontal, 35)
                     }
+                    .frame(width: 330, height: 60)
+                    .padding(.bottom, 20)
                 }
-                .padding(.bottom, 20)
+                .frame(width: 370, height: 700)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(radius: 20)
             }
-            .frame(width: 370, height: 215)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(radius: 20)
-        }
-    }
-    
-    private func gameRulesOverlay() -> some View {
-        ZStack {
-            Color.black.opacity(0.4)
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    showGameRules = false
-                }
-            VStack() {
-                Image("rules")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 40, height: 40)
-                    .padding(.top, 20)
-                Text("""
-                    Scopa is a traditional Italian card game:
-                    **1. Goal**: the goal is to capture cards on the table by matching them with a card in your hand that has the same value or by adding up to 15.
-                    **2. Gameplay**: the game is usually played with a 40-card Italian deck. Each player is dealt three cards, and four cards are placed face-up on the table. On your turn, you can capture cards from the table that add up to the value of one card in your hand. If you cannot capture any cards, you must place one card from your hand on the table.
-                    **3. Scoring**: each captured card is worth 1 point, additional points can be earned for:
-                    - The most cards.
-                    - The most 'coins' (denari) cards.
-                    - The 7 of coins (Settebello).
-                    - The most 'prime' cards (7s, 6s, aces, etc.).
-                    **4. Winning**: The game continues until all cards are played. The player with the most points at the end wins.
-                    """)
-                    .font(.body)
-                    .padding(.horizontal, 20)
-                Button(action: {
-                    showGameRules = false
-                }) {
-                    Text("Close")
-                        .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 25)
-                }
-                .frame(width: 330, height: 60)
-                .padding(.bottom, 20)
-            }
-            .frame(width: 370, height: 700)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(radius: 20)
         }
     }
 }
@@ -184,6 +186,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(MultiPeerManager())
+            .environmentObject(SwiftUISpeech())
     }
 }
 

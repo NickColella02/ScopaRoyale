@@ -1,13 +1,20 @@
 import Speech
 import SwiftUI
-import Foundation
+import AVFoundation
 
-public class SwiftUISpeech: ObservableObject{
+public class SwiftUISpeech: ObservableObject {
     @EnvironmentObject private var peerManager: MultiPeerManager
+    
     public let verbi: [String] = [ // verbi da riconoscere per il comando vocale del voice over
         "Gioca",
         "Butta",
-        "Lancia"
+        "Lancia",
+    ]
+    
+    public let verbiRipetizione: [String] = [
+        "Ripeti",
+        "Dimmi",
+        "Dici"
     ]
     
     public let semi: [String] = [ // possibili parole attribuibili ai semi delle carte (compresi sinonimi)
@@ -39,7 +46,14 @@ public class SwiftUISpeech: ObservableObject{
         "fante"
     ]
     
-    let separatori: [String] = [" ", "il", "lo","la", "di", "l'", "le", "un"] // parole da ignorare nel riconoscimento vocale
+    public let oggetti: [String] = [
+        "tavolo",
+        "banco",
+        "mano",
+        "mie"
+    ]
+    
+    let separatori: [String] = [" ", "il", "lo", "la", "di", "l'", "le", "un", "le"] // parole da ignorare nel riconoscimento vocale
     
     var stringa = ""
     @Published var isRecording: Bool = false // vero se l'utente sta utilizzando il voice over
@@ -50,6 +64,7 @@ public class SwiftUISpeech: ObservableObject{
     private let audioEngine = AVAudioEngine()
     public var outputText: String = ""
     public var outputCart: String = ""
+    let synthesizer = AVSpeechSynthesizer()
     
     init() {
         // Requests auth from User
@@ -74,53 +89,36 @@ public class SwiftUISpeech: ObservableObject{
         self.recognitionTask = nil
     }
     
-    
-    func startRecording() { // starts the recording sequence
-        
+    func startRecording() {
         outputText = ""
-        
-        // Configure the audio session for the app
-        let audioSession = AVAudioSession.sharedInstance()
+
         let inputNode = audioEngine.inputNode
-        
-        // try catch to start audio session
-        do {
-            try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            print("ERROR: - Audio Session Failed!")
-        }
-        
-        // Configure the microphone input and request auth
         let recordingFormat = inputNode.outputFormat(forBus: 0)
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer: AVAudioPCMBuffer, when: AVAudioTime) in
+
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer, when) in
             self.recognitionRequest?.append(buffer)
         }
-        
-        audioEngine.prepare()
-        
+
         do {
             try audioEngine.start()
         } catch {
-            print("ERROR: - Audio Engine failed to start")
+            print("Errore durante l'avvio dell'AVAudioEngine: \(error.localizedDescription)")
         }
-        
-        // Create and configure the speech recognition request
+
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-        guard let recognitionRequest = recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
+        guard let recognitionRequest = recognitionRequest else {
+            fatalError("Impossibile creare un oggetto SFSpeechAudioBufferRecognitionRequest")
+        }
         recognitionRequest.shouldReportPartialResults = true
-        
-        // Create a recognition task for the speech recognition session
+
         recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { result, error in
             if let result = result {
-                // Update the text view with the results
                 self.outputText = result.bestTranscription.formattedString
                 self.recognizeCommand(command: self.outputText)
-                //self.processCommand(command: self.outputText)
             }
-            
-            if error != nil {
-                // Stop recognizing speech if there is a problem
+
+            if let error = error {
+                print("Errore durante il riconoscimento vocale: \(error.localizedDescription)")
                 self.audioEngine.stop()
                 inputNode.removeTap(onBus: 0)
                 self.recognitionRequest = nil
@@ -129,12 +127,12 @@ public class SwiftUISpeech: ObservableObject{
         }
     }
     
-    func stopRecording() { // end recording
+    func stopRecording() {
         audioEngine.stop()
         recognitionRequest?.endAudio()
-        self.audioEngine.inputNode.removeTap(onBus: 0)
-        self.recognitionTask?.cancel()
-        self.recognitionTask = nil
+        audioEngine.inputNode.removeTap(onBus: 0)
+        recognitionTask?.cancel()
+        recognitionTask = nil
     }
     
     func getSpeechStatus() -> String { // gets the status of authorization
@@ -154,26 +152,32 @@ public class SwiftUISpeech: ObservableObject{
     
     private func validateCommand(Value: String, Seed: String) { // controlla che la carta da giocare sia effettivamente presente nella mano del giocatore
         let cardValue = Card(value: Value, seed: Seed)
-        if peerManager.playerHand.contains(cardValue) { // se la carta è nella mano del giocatore
+        if  peerManager.playerHand.contains(cardValue) { // se la carta è nella mano del giocatore
             print("Hai giocato la carta \(Value) di \(Seed)")
             peerManager.playCard(card: cardValue)
         } else { // se la carta non è nella mano del giocatore
-            print("Carta non trovata o non valida")
-            
+            outputCart = "Carta non in mano al giocatore o non valida"
         }
+        //speakText(text: outputCart)
     }
-
+    
+    private func validateRepeatCommand(oggetto: String) {
+        if oggetto == "tavolo" || oggetto == "banco" {
+            outputCart = "Leggo il tavolo"
+        } else {
+            outputCart = "Leggo la mia mano"
+        }
+        //speakText(text: outputCart)
+    }
+    
     private func recognizeCommand(command: String) {
         for separatore in separatori {
-                stringa = command.replacingOccurrences(of: separatore, with: "")
-            }
+            stringa = command.replacingOccurrences(of: separatore, with: "")
+        }
         
         var isVerbFound: Bool = false // vero se la frase riconosciuta contiene uno dei verbi
-        var isSeedFound: Bool = false // vero se la frase riconosciuta contiene uno dei semi
-        var isValueFound: Bool = false // vero se la frase riconosciuta contiene uno dei valori
-        var foundValue: String? // valore riconosciuto
-        var foundSeed: String? // seme riconosciuto
-
+        var isRepeatFound: Bool = false
+        
         for verbo in verbi { // controlla che la frase riconosciuta contenga uno dei verbi
             if stringa.contains(verbo) {
                 isVerbFound = true
@@ -181,35 +185,68 @@ public class SwiftUISpeech: ObservableObject{
             }
         }
         
-        for seme in semi { // controlla che la frase riconosciuta contenga uno dei semi
-            if stringa.contains(seme) {
-                isSeedFound = true
-                foundSeed = seme
+        for verbo in verbiRipetizione { // controlla che la frase riconosciuta contenga uno dei verbi
+            if stringa.contains(verbo) {
+                isRepeatFound = true
                 break
             }
         }
         
-        for valore in valori { // controlla che la frase riconosciuta contenga uno dei valori
-            if stringa.contains(valore) {
-                isValueFound = true
-                foundValue = valore
-                break
+        if isVerbFound {
+            var isSeedFound: Bool = false // vero se la frase riconosciuta contiene uno dei semi
+            var isValueFound: Bool = false // vero se la frase riconosciuta contiene uno dei valori
+            var foundValue: String? // valore riconosciuto
+            var foundSeed: String? // seme riconosciuto
+            for seme in semi { // controlla che la frase riconosciuta contenga uno dei semi
+                if stringa.contains(seme) {
+                    isSeedFound = true
+                    foundSeed = seme
+                    break
+                }
             }
+            
+            for valore in valori { // controlla che la frase riconosciuta contenga uno dei valori
+                if stringa.contains(valore) {
+                    isValueFound = true
+                    foundValue = valore
+                    break
+                }
+            }
+            if !isSeedFound { // gestisce il caso in cui non è riconosciuto il seme
+                print("Seme non riconosciuto")
+            }
+            if !isValueFound { // gestisce il caso in cui non è riconosciuto il valore
+                print("Valore non riconosciuto")
+            }
+            if isVerbFound && isSeedFound && isValueFound { // se nella frase riconosciuta c'è un verbo, un seme e un valore
+                print(foundSeed!)
+                print(foundValue!)
+                validateCommand(Value: foundValue!, Seed: foundSeed!) // controlla che la carta da giocare appartenga alla mano del giocatore
+            }
+        } else if isRepeatFound {
+            var isObjectFound: Bool = false
+            var foundObject: String? // seme riconosciuto
+            for oggetto in oggetti { // controlla che la frase riconosciuta contenga uno dei semi
+                if stringa.contains(oggetto) {
+                    isObjectFound = true
+                    foundObject = oggetto
+                    break
+                }
+            }
+            if isObjectFound {
+                print(foundObject!)
+                validateRepeatCommand(oggetto: foundObject!)
+            }
+        } else {
+            print("frase non riconosciuta")
         }
-        
-        if !isVerbFound { // gestisce il caso in cui non è riconosciuto il verbo
-            print("Verbo non riconosciuto")
-        }
-        if !isSeedFound { // gestisce il caso in cui non è riconosciuto il seme
-            print("Seme non riconosciuto")
-        }
-        if !isValueFound { // gestisce il caso in cui non è riconosciuto il valore
-            print("Valore non riconosciuto")
-        }
-        if isVerbFound && isSeedFound && isValueFound { // se nella frase riconosciuta c'è un verbo, un seme e un valore
-            print(foundSeed!)
-            print(foundValue!)
-            validateCommand(Value: foundValue!, Seed: foundSeed!) // controlla che la carta da giocare appartenga alla mano del giocatore
-        }
+    }
+    
+    private func speakText(text: String) {
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+        utterance.pitchMultiplier = 1.0
+        utterance.rate = 0.5
+        self.synthesizer.speak(utterance)
     }
 }

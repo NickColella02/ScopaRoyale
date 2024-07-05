@@ -14,7 +14,9 @@ struct OneVsOneGameView: View {
     @State private var backModality = false
     @State private var showPeerDisconnectedAlert = false
     @State private var draggedCard: Card? = nil
+    @State private var isRecording = false
     @State private var cardOffset: CGSize = .zero
+    @EnvironmentObject public var speechRecognized: SwiftUISpeech
 
     var body: some View {
         ZStack(alignment: .topLeading) { // Align contents to top left
@@ -431,16 +433,29 @@ struct OneVsOneGameView: View {
             })
         }
         .fullScreenCover(isPresented: $backModality) {
-            ContentView().environmentObject(peerManager)
+            ContentView().environmentObject(peerManager).environmentObject(speechRecognized)
         }
         .fullScreenCover(isPresented: $peerManager.gameOver) {
-            ShowWinnerView().environmentObject(peerManager)
+            ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognized)
         }
         .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
             if newValue {
                 showPeerDisconnectedAlert = true
             }
         }
+        .gesture(
+            LongPressGesture(minimumDuration: 2.0) // Imposta la durata minima a 2 secondo
+                .onChanged { gesture in
+                    if !isRecording {
+                        isRecording = true
+                        speechRecognized.startRecording() // Avvia la registrazione quando la pressione lunga inizia
+                    }
+                }
+                .onEnded { gesture in
+                    isRecording = false
+                    speechRecognized.stopRecording() // Fai qualcosa quando la pressione lunga finisce
+                }
+        )
     }
 
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {
