@@ -4,7 +4,7 @@ struct JoinAGameView: View {
     let username: String
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @State private var navigateToGame = false
-    @EnvironmentObject public var speechRecognized: SwiftUISpeech
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer
     
     var body: some View {
         VStack(spacing: 30) {
@@ -68,7 +68,7 @@ struct JoinAGameView: View {
             Spacer()
         }
         .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
-            OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognized)
+            OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
         .onAppear {
             peerManager.sendUsername(username: username)

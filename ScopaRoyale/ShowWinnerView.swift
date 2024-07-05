@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ShowWinnerView: View {
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
-    @EnvironmentObject public var speechRecognized: SwiftUISpeech
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer
     @State private var showHomeView: Bool = false
     @State private var animateWinner: Bool = false
     
@@ -116,7 +116,7 @@ struct ShowWinnerView: View {
             }
             .padding()
             .fullScreenCover(isPresented: $showHomeView) {
-                ContentView().environmentObject(peerManager).environmentObject(speechRecognized)
+                ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)
             }
         }
     }

@@ -14,7 +14,9 @@ struct ContentView: View {
     @State private var showChangeUsernameForm = false
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject private var peerManager: MultiPeerManager
-    @EnvironmentObject private var speechRecognized: SwiftUISpeech
+    private var speechRecognizer: SpeechRecognizer {
+        SpeechRecognizer(peerManager: peerManager)
+    }
     
     init() {
             if username.isEmpty {
@@ -37,7 +39,7 @@ struct ContentView: View {
             .toolbar {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager).environmentObject(speechRecognized)) {
+                        NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager).environmentObject(speechRecognizer)) {
                             Image(systemName: "person.crop.circle")
                                 .font(.system(size: 20, weight: .regular))
                                 .padding(.horizontal, 12)
@@ -65,10 +67,10 @@ struct ContentView: View {
                 .frame(height: 180)
                 .padding(.bottom, 20)
                 .navigationDestination(isPresented: $showJoinGame) {
-                    JoinAGameView(username: username).environmentObject(peerManager).environmentObject(speechRecognized)
+                    JoinAGameView(username: username).environmentObject(peerManager).environmentObject(speechRecognizer)
                 }
                 .navigationDestination(isPresented: $createLobby) {
-                    OneVsOneView(lobbyName: self.lobbyName).environmentObject(peerManager).environmentObject(speechRecognized)
+                    OneVsOneView(lobbyName: self.lobbyName).environmentObject(peerManager).environmentObject(speechRecognizer)
                 }
             
             CreateNewLobby(showLobbyForm: $showLobbyForm)
@@ -186,7 +188,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(MultiPeerManager())
-            .environmentObject(SwiftUISpeech())
+            .environmentObject(SpeechRecognizer(peerManager: MultiPeerManager()))
     }
 }
 

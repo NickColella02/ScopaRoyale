@@ -6,7 +6,7 @@ struct OneVsOneView: View {
     let lobbyName: String // nome della lobby
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
     @State private var navigateToGame = false
-    @EnvironmentObject public var speechRecognized: SwiftUISpeech
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer
     
     var body: some View {
         VStack(spacing: 30) {
@@ -95,7 +95,7 @@ struct OneVsOneView: View {
             .padding(.bottom, 20)
         }
         .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
-            OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognized)
+            OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
         .preferredColorScheme(.light) // forza la light mode
         .onAppear() { // quando la pagina è caricata, da avvio alla connessione

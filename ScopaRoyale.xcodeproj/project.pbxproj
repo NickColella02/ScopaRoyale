@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		1645DC012C37F53700E3C85D /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645DC002C37F53700E3C85D /* ProfileView.swift */; };
-		1645DC032C37FF6500E3C85D /* SwiftUISpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645DC022C37FF6500E3C85D /* SwiftUISpeech.swift */; };
 		165E20202C34251000B883D1 /* ShowWinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165E201F2C34251000B883D1 /* ShowWinnerView.swift */; };
 		167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */; };
 		169E707D2C3017DF007200FE /* StructCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169E707C2C3017DF007200FE /* StructCard.swift */; };
+		16D18C512C3886BD009B3B7C /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D18C502C3886BD009B3B7C /* SpeechRecognizer.swift */; };
 		462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */; };
 		4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */; };
 		465878702C2997B2005D4788 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4658786F2C2997B2005D4788 /* ContentView.swift */; };
@@ -46,11 +46,11 @@
 
 /* Begin PBXFileReference section */
 		1645DC002C37F53700E3C85D /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		1645DC022C37FF6500E3C85D /* SwiftUISpeech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUISpeech.swift; sourceTree = "<group>"; };
 		165E201F2C34251000B883D1 /* ShowWinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowWinnerView.swift; sourceTree = "<group>"; };
 		167C0B012C2C638B0054F0DD /* MultiPeerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPeerManager.swift; sourceTree = "<group>"; };
 		167C0B032C2C63A70054F0DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		169E707C2C3017DF007200FE /* StructCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructCard.swift; sourceTree = "<group>"; };
+		16D18C502C3886BD009B3B7C /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		462B69702C2BF76300F8E3C0 /* JoinAGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinAGameView.swift; sourceTree = "<group>"; };
 		4658786A2C2997B2005D4788 /* ScopaRoyale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScopaRoyale.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopaRoyaleApp.swift; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 			children = (
 				167C0B032C2C63A70054F0DD /* Info.plist */,
 				4658786D2C2997B2005D4788 /* ScopaRoyaleApp.swift */,
-				1645DC022C37FF6500E3C85D /* SwiftUISpeech.swift */,
+				16D18C502C3886BD009B3B7C /* SpeechRecognizer.swift */,
 				1645DC002C37F53700E3C85D /* ProfileView.swift */,
 				165E201F2C34251000B883D1 /* ShowWinnerView.swift */,
 				169E707C2C3017DF007200FE /* StructCard.swift */,
@@ -302,11 +302,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				465878702C2997B2005D4788 /* ContentView.swift in Sources */,
-				1645DC032C37FF6500E3C85D /* SwiftUISpeech.swift in Sources */,
 				4690AD532C2C6834009D3DD1 /* UsernameEntryView.swift in Sources */,
 				4662659F2C2EDE21004B963E /* OneVsOneGameScene.swift in Sources */,
 				167C0B022C2C638B0054F0DD /* MultiPeerManager.swift in Sources */,
 				462B69712C2BF76300F8E3C0 /* JoinAGameView.swift in Sources */,
+				16D18C512C3886BD009B3B7C /* SpeechRecognizer.swift in Sources */,
 				466265A12C2EDE44004B963E /* OneVsOneGameView.swift in Sources */,
 				465878982C2997FE005D4788 /* OneVsOneView.swift in Sources */,
 				4658786E2C2997B2005D4788 /* ScopaRoyaleApp.swift in Sources */,

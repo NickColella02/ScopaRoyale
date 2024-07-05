@@ -11,7 +11,6 @@ struct ProfileView: View {
     @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
     @State private var showAlert: Bool = false
     @State private var localUsername: String
-    @State private var blindMode: Bool = false
     
     let maxUsernameLength = 14
     let synthesizer = AVSpeechSynthesizer()
@@ -52,6 +51,29 @@ struct ProfileView: View {
                     showPicker = true
                 }
                 .padding(.bottom, 50)
+            
+            VStack {
+                Image(systemName: peerManager.blindMode ? "eye.slash.fill" : "eye.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(peerManager.blindMode ? .red : .green)
+                    .padding(.bottom, 20)
+                
+                Button(action: {
+                    toggleBlindMode()
+                }) {
+                    Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
+                        .font(.title3)
+                        .foregroundColor(.primary)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(peerManager.blindMode ? .systemRed : .systemGreen))
+                        .cornerRadius(10)
+                }
+                .padding(.horizontal, 25)
+                .padding(.bottom, 20)
+            }
             
             VStack {
                 Image("username")
@@ -96,27 +118,6 @@ struct ProfileView: View {
             .padding(.horizontal)
             
             Spacer()
-            
-            VStack {
-                Image(systemName: peerManager.blindMode ? "eye.slash.fill" : "eye.fill")
-                   .resizable()
-                   .aspectRatio(contentMode: .fit)
-                   .frame(width: 30, height: 30)
-                   .foregroundColor(blindMode ? .red : .green)
-                   .padding(.bottom, 20)
-               
-               Toggle(isOn: $peerManager.blindMode) {
-                   Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
-                       .font(.title3)
-                       .foregroundColor(.primary)
-               }
-               .toggleStyle(SwitchToggleStyle(tint: peerManager.blindMode ? .red : .green))
-               .padding(.horizontal, 25)
-               .padding(.bottom, 20)
-           }
-           .background(Color(.systemGray6))
-           .clipShape(RoundedRectangle(cornerRadius: 15))
-           .padding(.horizontal, 25)
         }
         .navigationBarTitle("Your profile", displayMode: .inline)
         .sheet(isPresented: $showPicker) {
@@ -133,25 +134,23 @@ struct ProfileView: View {
                 avatarImage = Image(savedAvatar)
             }
         }
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("Invalid Username"), message: Text("Username cannot be empty."), dismissButton: .default(Text("OK")))
-        }
     }
     
     private func toggleBlindMode() {
         peerManager.blindMode.toggle()
-        let message = peerManager.blindMode ? "Blind mode attivata" : "Blind mode disattivata"
+        let message = peerManager.blindMode ? "Blind mode enabled" : "Blind mode disabled"
         speakText(message)
     }
     
     private func speakText(_ text: String) {
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
         synthesizer.speak(utterance)
     }
 }
+
 
 struct AvatarPickerView: View {
     @Binding var selectedAvatar: String?

@@ -16,7 +16,7 @@ struct OneVsOneGameView: View {
     @State private var draggedCard: Card? = nil
     @State private var isRecording = false
     @State private var cardOffset: CGSize = .zero
-    @EnvironmentObject public var speechRecognized: SwiftUISpeech
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer
 
     var body: some View {
         ZStack(alignment: .topLeading) { // Align contents to top left
@@ -433,29 +433,42 @@ struct OneVsOneGameView: View {
             })
         }
         .fullScreenCover(isPresented: $backModality) {
-            ContentView().environmentObject(peerManager).environmentObject(speechRecognized)
+            ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
         .fullScreenCover(isPresented: $peerManager.gameOver) {
-            ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognized)
+            ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
         .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
             if newValue {
                 showPeerDisconnectedAlert = true
             }
         }
-        .gesture(
-            LongPressGesture(minimumDuration: 2.0) // Imposta la durata minima a 2 secondo
-                .onChanged { gesture in
-                    if !isRecording {
-                        isRecording = true
-                        speechRecognized.startRecording() // Avvia la registrazione quando la pressione lunga inizia
-                    }
-                }
-                .onEnded { gesture in
-                    isRecording = false
-                    speechRecognized.stopRecording() // Fai qualcosa quando la pressione lunga finisce
-                }
-        )
+        Button(action: {
+            if !isRecording {
+                isRecording = true
+                speechRecognizer.startTranscribing()
+            } else {
+                isRecording = false
+                speechRecognizer.stopTranscribing()
+            }
+        }) {
+            if !isRecording {
+                Text("Avvia registrazione")
+                    .font(.headline)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            } else {
+                Text("Chiudi registrazione")
+                    .font(.headline)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+        }
+        .padding(.bottom, 20)
     }
 
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {
