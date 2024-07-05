@@ -1,14 +1,5 @@
 import Foundation
 
-// Definizione del valore e dei semi delle carte
-public let values: [String] = [
-    "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
-]
-
-public let seeds: [String] = [
-    "denari", "coppe", "bastoni", "spade"
-]
-
 // Definizione della struttura Card
 struct Card: CustomStringConvertible, Equatable, Hashable, Codable {
     let value: String

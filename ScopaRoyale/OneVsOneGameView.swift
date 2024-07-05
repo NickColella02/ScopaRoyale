@@ -14,7 +14,6 @@ struct OneVsOneGameView: View {
     @State private var backModality = false
     @State private var showPeerDisconnectedAlert = false
     @State private var draggedCard: Card? = nil
-    @State private var isRecording = false
     @State private var cardOffset: CGSize = .zero
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
 
@@ -443,32 +442,64 @@ struct OneVsOneGameView: View {
                 showPeerDisconnectedAlert = true
             }
         }
-        Button(action: {
-            if !isRecording {
-                isRecording = true
-                speechRecognizer.startTranscribing()
-            } else {
-                isRecording = false
-                speechRecognizer.stopTranscribing()
+        if peerManager.blindMode {
+            if peerManager.isHost && peerManager.currentPlayer == 0 {
+                Button(action: {
+                    if !peerManager.isHostRecording {
+                        peerManager.isHostRecording = true
+                        speechRecognizer.startTranscribing()
+                    } else {
+                        peerManager.isHostRecording = false
+                        speechRecognizer.stopTranscribing()
+                    }
+                }) {
+                    if !peerManager.isHostRecording {
+                        Text("Avvia registrazione")
+                            .font(.headline)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    } else {
+                        Text("Chiudi registrazione")
+                            .font(.headline)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
+                }
+                .padding(.bottom, 20)
             }
-        }) {
-            if !isRecording {
-                Text("Avvia registrazione")
-                    .font(.headline)
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            } else {
-                Text("Chiudi registrazione")
-                    .font(.headline)
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .cornerRadius(10)
+            if peerManager.isClient && peerManager.currentPlayer == 1 {
+                Button(action: {
+                    if !peerManager.isClientRecording {
+                        peerManager.isClientRecording = true
+                        speechRecognizer.startTranscribing()
+                    } else {
+                        peerManager.isClientRecording = false
+                        speechRecognizer.stopTranscribing()
+                    }
+                }) {
+                    if !peerManager.isClientRecording {
+                        Text("Avvia registrazione")
+                            .font(.headline)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    } else {
+                        Text("Chiudi registrazione")
+                            .font(.headline)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
+                }
+                .padding(.bottom, 20)
             }
         }
-        .padding(.bottom, 20)
     }
 
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {

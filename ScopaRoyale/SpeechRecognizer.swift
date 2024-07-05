@@ -22,15 +22,15 @@ actor SpeechRecognizer: ObservableObject {
     
     @MainActor var transcript: String = ""
     public let verbi: [String] = [ // verbi da riconoscere per il comando vocale del voice over
-        "Gioca",
-        "Butta",
-        "Lancia",
+        "gioca",
+        "butta",
+        "lancia",
     ]
     
     public let verbiRipetizione: [String] = [
-        "Ripeti",
-        "Dimmi",
-        "Dici"
+        "ripeti",
+        "dimmi",
+        "dici"
     ]
     
     public let semi: [String] = [ // possibili parole attribuibili ai semi delle carte (compresi sinonimi)
@@ -59,7 +59,17 @@ actor SpeechRecognizer: ObservableObject {
         "dieci",
         "re",
         "cavallo",
-        "fante"
+        "fante",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
     ]
     
     public let oggetti: [String] = [
@@ -76,6 +86,7 @@ actor SpeechRecognizer: ObservableObject {
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
     private let recognizer: SFSpeechRecognizer?
+    private let synthesizer = AVSpeechSynthesizer()
     
     /**
      Initializes a new speech recognizer. If this is the first time you've used the class, it
@@ -176,7 +187,7 @@ actor SpeechRecognizer: ObservableObject {
         return (audioEngine, request)
     }
     
-    nonisolated private func recognitionHandler(audioEngine: AVAudioEngine, result: SFSpeechRecognitionResult?, error: Error?) {
+    private func recognitionHandler(audioEngine: AVAudioEngine, result: SFSpeechRecognitionResult?, error: Error?) {
         let receivedFinalResult = result?.isFinal ?? false
         let receivedError = error != nil
         
@@ -186,15 +197,12 @@ actor SpeechRecognizer: ObservableObject {
         }
         
         if let result {
-            print(result.bestTranscription.formattedString)
             transcribe(result.bestTranscription.formattedString)
-            Task {
-                await processTranscript(result.bestTranscription.formattedString)
-            }
+            processTranscript(transcription: result.bestTranscription.formattedString)
         }
     }
     
-    private func processTranscript(_ transcription: String) async {
+    private func processTranscript(transcription: String) {
         var cleanedTranscription = transcription.lowercased()
         
         // Rimuovi i separatori
@@ -202,9 +210,7 @@ actor SpeechRecognizer: ObservableObject {
             cleanedTranscription = cleanedTranscription.replacingOccurrences(of: separatore, with: "")
         }
                 
-        var foundVerb: String?
-        var foundValue: String?
-        var foundSeed: String?
+        var foundVerb: String = ""
         
         for verbo in verbi {
             if cleanedTranscription.contains(verbo) {
@@ -213,15 +219,107 @@ actor SpeechRecognizer: ObservableObject {
             }
         }
         
-        for valore in valori {
-            if cleanedTranscription.contains(valore) {
-                foundValue = valore
+        for verbo in verbiRipetizione {
+            if cleanedTranscription.contains(verbo) {
+                foundVerb = verbo
                 break
             }
         }
-        
-        for seme in semi {
-            
+        if !foundVerb.isEmpty {
+        print("Verbo riconosciuto: \(foundVerb)")
+            if foundVerb == "gioca" || foundVerb == "lancia" {
+                var foundValue: String = ""
+                var foundSeed: String = ""
+                
+                for valore in valori {
+                    if cleanedTranscription.contains(valore) {
+                        foundValue = valore
+                        break
+                    }
+                }
+                
+                for seme in semi {
+                    if cleanedTranscription.contains(seme) {
+                        foundSeed = seme
+                        break
+                    }
+                }
+                
+                if !foundValue.isEmpty && !foundSeed.isEmpty {
+                    print("Valore riconosciuto: \(foundValue)")
+                    print("Seme riconosciuto: \(foundSeed)")
+                    if peerManager.isHost {
+                        if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) {
+                            print("Carta nella mano del giocatore, la gioco")
+                            peerManager.playCard(card: Card(value: foundValue, seed: foundSeed))
+                            peerManager.isHostRecording = false
+                        } else {
+                            print("Carta non nella mano del giocatore")
+                        }
+                    } else if peerManager.isClient {
+                        if peerManager.opponentHand.contains(Card(value: foundValue, seed: foundSeed)) {
+                            print("Carta nella mano del giocatore, la gioco")
+                            peerManager.playCard(card: Card(value: foundValue, seed: foundSeed))
+                            peerManager.isClientRecording = false
+                        } else {
+                            print("Carta non nella mano del giocatore")
+                        }
+                    }
+                } else {
+                    print("Valore o seme non riconosciuto")
+                }
+            } else if foundVerb == "ripeti" || foundVerb == "dimmi" {
+                var foundObject: String = ""
+                for oggetto in oggetti {
+                    if cleanedTranscription.contains(oggetto) {
+                        foundObject = oggetto
+                        break
+                    }
+                }
+                if !foundObject.isEmpty {
+                    print("Oggetto riconosciuto: \(foundObject)")
+                    if foundObject == "tavolo" || foundObject == "banco" {
+                        print("Ripeto tavolo")
+                        for card in peerManager.tableCards {
+                            let utterance = AVSpeechUtterance(string: "\(card.value) di \(card.seed)")
+                            utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+                            utterance.pitchMultiplier = 1.0
+                            utterance.rate = 0.5
+                            synthesizer.speak(utterance)
+                        }
+                        if peerManager.isHost {
+                            peerManager.isHostRecording = false
+                        } else if peerManager.isClient {
+                            peerManager.isClientRecording = false
+                        }
+                    }
+                     if foundObject == "mie" || foundObject == "mano" {
+                        if peerManager.isHost {
+                            print("Ripeto mano")
+                            for card in peerManager.playerHand {
+                                let utterance = AVSpeechUtterance(string: "\(card.value) di \(card.seed)")
+                                utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+                                utterance.pitchMultiplier = 1.0
+                                utterance.rate = 0.5
+                                synthesizer.speak(utterance)
+                            }
+                            peerManager.isHostRecording = false
+                        } else if peerManager.isClient {
+                            if foundObject == "mie" || foundObject == "mano" {
+                                print("Ripeto mano")
+                                for card in peerManager.opponentHand {
+                                    let utterance = AVSpeechUtterance(string: "\(card.value) di \(card.seed)")
+                                    utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+                                    utterance.pitchMultiplier = 1.0
+                                    utterance.rate = 0.5
+                                    synthesizer.speak(utterance)
+                                }
+                                peerManager.isClientRecording = false
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     
