@@ -7,9 +7,5 @@
 		<string>_ScopaRoyale._tcp</string>
 		<string>_ScopaRoyale._udp</string>
 	</array>
-	<key>NSMicrophoneUsageDescription</key>
-    <string>Usiamo il microfono per la registrazione audio durante il gioco.</string>
-    <key>NSSpeechRecognitionUsageDescription</key>
-    <string>Usiamo il riconoscimento vocale per interagire con il gioco tramite comandi vocali.</string>
 </dict>
 </plist>

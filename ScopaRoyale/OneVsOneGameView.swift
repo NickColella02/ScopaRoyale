@@ -235,6 +235,9 @@ struct OneVsOneGameView: View {
                                 .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
                                 .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
                                 .edgesIgnoringSafeArea(.all)
+                                .onAppear(){
+                                    speechRecognizer.speakText("E' il tuo turno")
+                                }
                         }
                     }
                     /*VStack {
@@ -437,6 +440,17 @@ struct OneVsOneGameView: View {
         .fullScreenCover(isPresented: $peerManager.gameOver) {
             ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
+        .onChange(of: peerManager.currentPlayer) { oldValue, newValue in
+            Task{
+                if peerManager.blindMode{
+                    if peerManager.isClient && peerManager.currentPlayer == 1 {
+                        speechRecognizer.speakText("E' il tuo turno")
+                    } else if peerManager.isHost && peerManager.currentPlayer == 0{
+                        speechRecognizer.speakText("E' il tuo turno")
+                    }
+                }
+            }
+        }
         .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
             if newValue {
                 showPeerDisconnectedAlert = true
@@ -499,6 +513,7 @@ struct OneVsOneGameView: View {
                 }
                 .padding(.bottom, 20)
             }
+                
         }
     }
 
