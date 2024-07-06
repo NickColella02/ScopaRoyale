@@ -333,12 +333,17 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendTurnChange() { // invia e notifica il cambio del turno
-        currentPlayer = 1 - currentPlayer // passa il turno
-        let turnData = "CurrentPlayer:\(currentPlayer)".data(using: .utf8)!
-        do {
-            try session.send(turnData, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio aggiornamento turno: \(error.localizedDescription)")
+        DispatchQueue.global(qos: .background).async {
+            DispatchQueue.main.async {
+                self.currentPlayer = 1 - self.currentPlayer // passa il turno
+
+                let turnData = "CurrentPlayer:\(self.currentPlayer)".data(using: .utf8)!
+                do {
+                    try self.session.send(turnData, toPeers: self.session.connectedPeers, with: .reliable)
+                } catch {
+                    print("Errore invio aggiornamento turno: \(error.localizedDescription)")
+                }
+            }
         }
     }
     
@@ -352,145 +357,149 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendPlayersScores() { // invia i punteggi finali all'avversario
-        let scores = Scores(playerScore: self.playerScore, opponentScore: self.opponentScore, winner: self.winner)
-        do {
-            let data = try JSONEncoder().encode(scores)
-            let prefixedData = "PlayersScores:".data(using: .utf8)! + data
-            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
+        DispatchQueue.main.async { [self] in
+            let scores = Scores(playerScore: self.playerScore, opponentScore: self.opponentScore, winner: self.winner)
+            do {
+                let data = try JSONEncoder().encode(scores)
+                let prefixedData = "PlayersScores:".data(using: .utf8)! + data
+                try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+            } catch {
+                print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
+            }
         }
     }
             
     func playCard(card: Card) { // gestisce la mossa di un giocatore
-        if currentPlayer == 0 {
-            if let index = playerHand.firstIndex(of: card) { // rimuove la carta dalla mano del giocatore
-                playerHand.remove(at: index)
+        DispatchQueue.main.async{ [self] in
+            if currentPlayer == 0 {
+                if let index = self.playerHand.firstIndex(of: card) { // rimuove la carta dalla mano del giocatore
+                    playerHand.remove(at: index)
+                }
+            } else {
+                if let index = self.opponentHand.firstIndex(of: card) { // rimuove la carta dalla mano dell'avversario
+                    opponentHand.remove(at: index)
+                }
             }
-        } else {
-            if let index = opponentHand.firstIndex(of: card) { // rimuove la carta dalla mano dell'avversario
-                opponentHand.remove(at: index)
-            }
-        }
-
-        var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
-        var shortestCombination: [Card]? = nil // combinazione di carte da prendere più breve
-        if !tableCards.isEmpty { // controllo che il tavolo non sia vuoto
-            for length in 1...tableCards.count { // cerco, se possibile, la combinazione di carte più breve che il giocatore può prendere
-                for combination in tableCards.combinations(length: length) {
-                    let combinationValues = combination.map { card in
-                        return numericValue(for: card.value) ?? 0
-                    }
-                    if combinationValues.reduce(0, +) == numericValue(for: card.value) ?? 0 {
-                        if shortestCombination == nil || combination.count < shortestCombination!.count {
-                            shortestCombination = combination
+            
+            var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
+            var shortestCombination: [Card]? = nil // combinazione di carte da prendere più breve
+            if !tableCards.isEmpty { // controllo che il tavolo non sia vuoto
+                for length in 1...tableCards.count { // cerco, se possibile, la combinazione di carte più breve che il giocatore può prendere
+                    for combination in tableCards.combinations(length: length) {
+                        let combinationValues = combination.map { card in
+                            return numericValue(for: card.value) ?? 0
+                        }
+                        if combinationValues.reduce(0, +) == numericValue(for: card.value) ?? 0 {
+                            if shortestCombination == nil || combination.count < shortestCombination!.count {
+                                shortestCombination = combination
+                            }
                         }
                     }
                 }
             }
-        }
-        
-        
-        if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
-            tableCards.append(card) // aggiungi la carta giocata al tavolo
-        } else if let validCombination = shortestCombination { // se ha trovato una combinazione
-            cardsToTake = validCombination
-            for cardToTake in cardsToTake {
-                if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte dal tavolo
-                    tableCards.remove(at: index)
-                }
-            }
-            if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
-                if currentPlayer == 0 {
-                    playerPoints.append(card)
-                } else {
-                    opponentPoints.append(card)
-                }
-            }
-        }
-
-        if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
-            if currentPlayer == 0 {
-                cardTakenByPlayer.append(contentsOf: cardsToTake)
-                //playerPoints.append(contentsOf: cardsToTake)
-            } else {
-                cardTakenByOpponent.append(contentsOf: cardsToTake)
-                //opponentPoints.append(contentsOf: cardsToTake)
-            }
-            sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
-            sendPlayersPoints()
-        }
-        
-        sendTableCards() // aggiorna le carte del tavolo
-        sendCardsToPlayers() // invia le carte alle mani dei giocatori
-        sendTurnChange() // aggiorna il turno
-
-        if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
-            if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
-                giveCardsToPlayers() // invia le carte alle mani dei giocatori
-                sendDeck() // invia il mazzo iniziale aggiornato
-            } else { // altrimenti si controllano i punteggi per decretare il vincitore
-                playerScore = 0 // azzera i punteggi del giocatore
-                opponentScore = 0 // azzera i punteggi dell'avversario
-                if !tableCards.isEmpty {
-                    if lastPlayer == 0 { // se l'ultimo giocatore ad aver preso carte è l'advertiser
-                        cardTakenByPlayer += tableCards // aggiunge tutte le carte del tavolo al mazzo delle sue carte prese
-                    } else { // altrimenti le aggiunge al mazzo di carte prese dal browser
-                        cardTakenByOpponent += tableCards
+            
+            
+            if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
+                tableCards.append(card) // aggiungi la carta giocata al tavolo
+            } else if let validCombination = shortestCombination { // se ha trovato una combinazione
+                cardsToTake = validCombination
+                for cardToTake in cardsToTake {
+                    if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte dal tavolo
+                        tableCards.remove(at: index)
                     }
-                    tableCards.removeAll() // rimuove tutte le carte dal tavolo in una volta sola
                 }
-                
-                // assegno un punto a chi ha preso più carte
-                if cardTakenByPlayer.count > cardTakenByOpponent.count {
-                    playerScore += 1
-                } else if cardTakenByPlayer.count < cardTakenByOpponent.count {
-                    opponentScore += 1
+                if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
+                    if currentPlayer == 0 {
+                        playerPoints.append(card)
+                    } else {
+                        opponentPoints.append(card)
+                    }
                 }
-                
-                // assegno un punto per ogni scopa fatta dai giocatori
-                playerScore += playerPoints.count
-                opponentScore += opponentPoints.count
-                
-                // assegno un punto a chi ha il 7 denari
-                if cardTakenByPlayer.contains(where: { $0.value == "sette" && $0.seed == "denari" }) || playerPoints.contains(where: { $0.value == "sette" && $0.seed == "denari" }) {
-                    playerScore += 1
+            }
+            
+            if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
+                if currentPlayer == 0 {
+                    cardTakenByPlayer.append(contentsOf: cardsToTake)
+                    
                 } else {
-                    opponentScore += 1
+                    cardTakenByOpponent.append(contentsOf: cardsToTake)
+                    //opponentPoints.append(contentsOf: cardsToTake)
                 }
-                
-                // assegno un punto a chi ha più carte denari nel proprio mazzo
-                let playerDenariCount = cardTakenByPlayer.filter{$0.seed == "denari"}.count
-                let opponentDenariCount = cardTakenByOpponent.filter{$0.seed == "denari"}.count
-                if playerDenariCount > opponentDenariCount {
-                    playerScore += 1
-                } else if playerDenariCount < opponentDenariCount {
-                    opponentScore += 1
+                sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
+                sendPlayersPoints()
+            }
+            
+            sendTableCards() // aggiorna le carte del tavolo
+            sendCardsToPlayers() // invia le carte alle mani dei giocatori
+            sendTurnChange() // aggiorna il turno
+            
+            if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
+                if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
+                    giveCardsToPlayers() // invia le carte alle mani dei giocatori
+                    sendDeck() // invia il mazzo iniziale aggiornato
+                } else { // altrimenti si controllano i punteggi per decretare il vincitore
+                    playerScore = 0 // azzera i punteggi del giocatore
+                    opponentScore = 0 // azzera i punteggi dell'avversario
+                    if !tableCards.isEmpty {
+                        if lastPlayer == 0 { // se l'ultimo giocatore ad aver preso carte è l'advertiser
+                            cardTakenByPlayer += tableCards // aggiunge tutte le carte del tavolo al mazzo delle sue carte prese
+                        } else { // altrimenti le aggiunge al mazzo di carte prese dal browser
+                            cardTakenByOpponent += tableCards
+                        }
+                        tableCards.removeAll() // rimuove tutte le carte dal tavolo in una volta sola
+                    }
+                    
+                    // assegno un punto a chi ha preso più carte
+                    if cardTakenByPlayer.count > cardTakenByOpponent.count {
+                        playerScore += 1
+                    } else if cardTakenByPlayer.count < cardTakenByOpponent.count {
+                        opponentScore += 1
+                    }
+                    
+                    // assegno un punto per ogni scopa fatta dai giocatori
+                    playerScore += playerPoints.count
+                    opponentScore += opponentPoints.count
+                    
+                    // assegno un punto a chi ha il 7 denari
+                    if cardTakenByPlayer.contains(where: { $0.value == "sette" && $0.seed == "denari" }) || playerPoints.contains(where: { $0.value == "sette" && $0.seed == "denari" }) {
+                        playerScore += 1
+                    } else {
+                        opponentScore += 1
+                    }
+                    
+                    // assegno un punto a chi ha più carte denari nel proprio mazzo
+                    let playerDenariCount = cardTakenByPlayer.filter{$0.seed == "denari"}.count
+                    let opponentDenariCount = cardTakenByOpponent.filter{$0.seed == "denari"}.count
+                    if playerDenariCount > opponentDenariCount {
+                        playerScore += 1
+                    } else if playerDenariCount < opponentDenariCount {
+                        opponentScore += 1
+                    }
+                    
+                    // assegno un punto a chi ha completato la "primera" (più sette)
+                    let playerSevenCount = cardTakenByPlayer.filter { $0.value == "sette" }.count
+                    let opponentSevenCount = cardTakenByOpponent.filter { $0.value == "sette" }.count
+                    if playerSevenCount > opponentSevenCount {
+                        playerScore += 1
+                    } else if playerSevenCount < opponentSevenCount {
+                        opponentScore += 1
+                    }
+                    
+                    // decreto il vincitore
+                    if playerScore > opponentScore {
+                        winner = myUsername
+                    } else if playerScore < opponentScore {
+                        winner = opponentName
+                    } else {
+                        winner = "Pareggio"
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.gameOver = true // termina la partita
+                    }
+                    sendPlayersScores() // invio i punteggi ai giocatori
+                    sendEndGameSignal() // notifica la fine della partita
                 }
-                
-                // assegno un punto a chi ha completato la "primera" (più sette)
-                let playerSevenCount = cardTakenByPlayer.filter { $0.value == "sette" }.count
-                let opponentSevenCount = cardTakenByOpponent.filter { $0.value == "sette" }.count
-                if playerSevenCount > opponentSevenCount {
-                    playerScore += 1
-                } else if playerSevenCount < opponentSevenCount {
-                    opponentScore += 1
-                }
-                
-                // decreto il vincitore
-                if playerScore > opponentScore {
-                    winner = myUsername
-                } else if playerScore < opponentScore {
-                    winner = opponentName
-                } else {
-                    winner = "Pareggio"
-                }
-                
-                DispatchQueue.main.async {
-                    self.gameOver = true // termina la partita
-                }
-                sendPlayersScores() // invio i punteggi ai giocatori
-                sendEndGameSignal() // notifica la fine della partita
             }
         }
     }
@@ -527,3 +536,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
 }
+
+
+
+

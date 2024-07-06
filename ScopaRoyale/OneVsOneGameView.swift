@@ -16,6 +16,7 @@ struct OneVsOneGameView: View {
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
+    private var isYourTurn: Bool = false
 
     var body: some View {
         ZStack(alignment: .topLeading) { // Align contents to top left
@@ -235,9 +236,6 @@ struct OneVsOneGameView: View {
                                 .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
                                 .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
                                 .edgesIgnoringSafeArea(.all)
-                                .onAppear(){
-                                    speechRecognizer.speakText("E' il tuo turno")
-                                }
                         }
                     }
                     /*VStack {
@@ -428,6 +426,14 @@ struct OneVsOneGameView: View {
                 }
             }
         }
+        
+        .onChange(of: peerManager.currentPlayer) { oldPlayer, newPlayer in
+            if peerManager.blindMode{
+                if (peerManager.isHost && newPlayer == 0) || (peerManager.isClient && newPlayer == 1) {
+                    speechRecognizer.speakText("È il tuo turno")
+                }
+            }
+        }
         .alert(isPresented: $showPeerDisconnectedAlert) {
             Alert(title: Text("Disconnessione"), message: Text("Il giocatore ha abbandonato la partita."), dismissButton: .default(Text("OK")) {
                 peerManager.reset()
@@ -439,17 +445,6 @@ struct OneVsOneGameView: View {
         }
         .fullScreenCover(isPresented: $peerManager.gameOver) {
             ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognizer)
-        }
-        .onChange(of: peerManager.currentPlayer) { oldValue, newValue in
-            Task{
-                if peerManager.blindMode{
-                    if peerManager.isClient && peerManager.currentPlayer == 1 {
-                        speechRecognizer.speakText("E' il tuo turno")
-                    } else if peerManager.isHost && peerManager.currentPlayer == 0{
-                        speechRecognizer.speakText("E' il tuo turno")
-                    }
-                }
-            }
         }
         .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
             if newValue {
@@ -523,3 +518,6 @@ struct OneVsOneGameView: View {
         }
     }
 }
+
+
+

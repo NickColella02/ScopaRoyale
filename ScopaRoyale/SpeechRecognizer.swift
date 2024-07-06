@@ -193,6 +193,7 @@ actor SpeechRecognizer: ObservableObject {
     }
     
     private func recognitionHandler(audioEngine: AVAudioEngine, result: SFSpeechRecognitionResult?, error: Error?) async {
+    
         let receivedFinalResult = result?.isFinal ?? false
         let receivedError = error != nil
         
