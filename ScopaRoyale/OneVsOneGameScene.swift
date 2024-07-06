@@ -9,7 +9,7 @@ class OneVsOneGameScene: SKScene {
         let background = SKSpriteNode(imageNamed: "table")
         background.position = CGPoint(x: size.width / 2, y: size.height / 2)
         background.size = self.size
-        background.zPosition = -1 // Make sure the background is behind other nodes
+        background.zPosition = -1
         addChild(background)
     }
 }

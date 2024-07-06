@@ -82,6 +82,7 @@ struct OneVsOneGameView: View {
                                         .shadow(radius: 2)
                                         .zIndex(1)
                                 }
+                                
                                 if peerManager.playerPoints.count > 0 {
                                     Image(peerManager.playerPoints.last!.imageName)
                                         .resizable()
@@ -124,6 +125,7 @@ struct OneVsOneGameView: View {
                                         .shadow(radius: 2)
                                         .zIndex(1)
                                 }
+                                
                                 if peerManager.opponentPoints.count > 0 {
                                     Image(peerManager.opponentPoints.last!.imageName)
                                         .resizable()
@@ -138,12 +140,6 @@ struct OneVsOneGameView: View {
                             }
                         }
                         .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
-                        if peerManager.currentPlayer == 0 {
-                            RoundedRectangle(cornerRadius: 50)
-                                .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 2)
-                                .frame(width: geometry.size.width, height: geometry.size.height)
-                                .edgesIgnoringSafeArea(.all)
-                        }
                     }
 
                     // Lato client
@@ -175,6 +171,7 @@ struct OneVsOneGameView: View {
                                         .shadow(radius: 2)
                                         .zIndex(1)
                                 }
+                                
                                 if peerManager.playerPoints.count > 0 {
                                     Image(peerManager.playerPoints.last!.imageName)
                                         .resizable()
@@ -217,6 +214,7 @@ struct OneVsOneGameView: View {
                                         .shadow(radius: 2)
                                         .zIndex(1)
                                 }
+                                
                                 if peerManager.opponentPoints.count > 0 {
                                     Image(peerManager.opponentPoints.last!.imageName)
                                         .resizable()
@@ -231,13 +229,16 @@ struct OneVsOneGameView: View {
                             }
                         }
                         .position(x: geometry.size.width * 0.2, y: geometry.size.height * 0.9)
-                        if peerManager.currentPlayer == 1 {
-                            RoundedRectangle(cornerRadius: 50)
-                                .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
-                                .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
-                                .edgesIgnoringSafeArea(.all)
-                        }
                     }
+                    
+                    
+                    if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
+                        RoundedRectangle(cornerRadius: 50)
+                            .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
+                            .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
+                            .edgesIgnoringSafeArea(.all)
+                    }
+
                     /*VStack {
                         Text("YOUR POINTS \(peerManager.playerPoints.count)")
                             .font(.system(size: 20, design: .default))
@@ -290,6 +291,7 @@ struct OneVsOneGameView: View {
                         .padding(.horizontal)
                     }
                 }
+                
                 if peerManager.isClient {
                     VStack {
                         Text(peerManager.opponentName)
@@ -370,7 +372,7 @@ struct OneVsOneGameView: View {
                                                 cardOffset = gesture.translation
                                             }
                                             .onEnded { gesture in
-                                                if gesture.translation.height < 400 && peerManager.currentPlayer == 0 {
+                                                if gesture.translation.height < -50 && peerManager.currentPlayer == 0 {
                                                     peerManager.playCard(card: card) // Gioca la carta intera
                                                 }
                                                 draggedCard = nil
@@ -384,6 +386,7 @@ struct OneVsOneGameView: View {
                         .padding(.bottom, 150)
                     }
                 }
+                
                 if peerManager.isClient {
                     // Sezione per le carte del client
                     VStack {
@@ -410,7 +413,7 @@ struct OneVsOneGameView: View {
                                                 cardOffset = gesture.translation
                                             }
                                             .onEnded { gesture in
-                                                if gesture.translation.height < 400 && peerManager.currentPlayer == 1 {
+                                                if gesture.translation.height < -50 && peerManager.currentPlayer == 1 {
                                                     peerManager.playCard(card: card) // Gioca la carta intera
                                                 }
                                                 draggedCard = nil
@@ -451,6 +454,7 @@ struct OneVsOneGameView: View {
                 showPeerDisconnectedAlert = true
             }
         }
+        
         if peerManager.blindMode {
             if peerManager.isHost && peerManager.currentPlayer == 0 {
                 Button(action: {
@@ -462,24 +466,16 @@ struct OneVsOneGameView: View {
                         speechRecognizer.stopTranscribing()
                     }
                 }) {
-                    if !peerManager.isHostRecording {
-                        Text("Avvia registrazione")
-                            .font(.headline)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                    } else {
-                        Text("Chiudi registrazione")
-                            .font(.headline)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                    }
+                    Text(peerManager.isHostRecording ? "Chiudi registrazione" : "Avvia registrazione")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.yellow)
+                        .cornerRadius(10)
                 }
                 .padding(.bottom, 20)
             }
+
             if peerManager.isClient && peerManager.currentPlayer == 1 {
                 Button(action: {
                     if !peerManager.isClientRecording {
@@ -490,25 +486,15 @@ struct OneVsOneGameView: View {
                         speechRecognizer.stopTranscribing()
                     }
                 }) {
-                    if !peerManager.isClientRecording {
-                        Text("Avvia registrazione")
-                            .font(.headline)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                    } else {
-                        Text("Chiudi registrazione")
-                            .font(.headline)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                    }
+                    Text(peerManager.isClientRecording ? "Chiudi registrazione" : "Avvia registrazione")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.yellow)
+                        .cornerRadius(10)
                 }
                 .padding(.bottom, 20)
             }
-                
         }
     }
 
@@ -518,6 +504,3 @@ struct OneVsOneGameView: View {
         }
     }
 }
-
-
-
