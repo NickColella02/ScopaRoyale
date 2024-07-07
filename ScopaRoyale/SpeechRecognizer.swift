@@ -240,31 +240,14 @@ actor SpeechRecognizer: ObservableObject {
             if !foundValue.isEmpty && !foundSeed.isEmpty { // se sono riconosciuti un valore e un seme
                 print("Valore riconosciuto: \(foundValue)")
                 print("Seme riconosciuto: \(foundSeed)")
-                if peerManager.isHost && peerManager.currentPlayer == 0 { // se è il turno dell'host
-                    if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
-                        let utterance = AVSpeechUtterance(string: "Gioco la carta \(foundValue) di \(foundSeed)")
-                        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
-                        utterance.pitchMultiplier = 1.0
-                        utterance.rate = 0.5
-                        synthesizer.speak(utterance)
-                        peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
-                        peerManager.isHostRecording = false // fermo la registrazione
-                    } else {
-                        let utterance = AVSpeechUtterance(string: "La carta non è nella tua mano")
-                        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
-                        utterance.pitchMultiplier = 1.0
-                        utterance.rate = 0.5
-                        synthesizer.speak(utterance)
-                        peerManager.isHostRecording = false
-                    }
-                } else if peerManager.isClient && peerManager.currentPlayer == 1 { // se è il turno del client
-                    if peerManager.opponentHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
-                        await speakText("Gioco la carta \(foundValue) di \(foundSeed)")
-                        peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
-                        peerManager.isClientRecording = false // fermo la registrazione
-                    } else {
-                        await speakText("La carta non è nella tua mano")
-                    }
+                if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
+                    await speakText("Gioco la carta \(foundValue) di \(foundSeed)")
+                    peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
+                } else {
+                    await speakText("La carta non è nella tua mano")
+                }
+                DispatchQueue.main.async {
+                    self.peerManager.isRecording = false // fermo la registrazione
                 }
             } else {
                 print("Valore o seme non riconosciuto")
@@ -290,24 +273,15 @@ actor SpeechRecognizer: ObservableObject {
                         for card in peerManager.tableCards {
                             await speakText("\(card.value) di \(card.seed)")
                         }
-                        if peerManager.isHost {
-                            peerManager.isHostRecording = false
-                        } else if peerManager.isClient {
-                            peerManager.isClientRecording = false
+                        DispatchQueue.main.async {
+                            self.peerManager.isRecording = false
                         }
                     } else if foundObject == "mie" || foundObject == "mano" {
-                        if peerManager.isHost {
-                            for card in peerManager.playerHand {
-                                await speakText("\(card.value) di \(card.seed)")
-                            }
-                            peerManager.isHostRecording = false
-                        } else if peerManager.isClient {
-                            if foundObject == "mie" || foundObject == "mano" {
-                                    for card in peerManager.opponentHand {
-                                        await speakText("\(card.value) di \(card.seed)")
-                                    }
-                                peerManager.isClientRecording = false
-                            }
+                        for card in peerManager.playerHand {
+                            await speakText("\(card.value) di \(card.seed)")
+                        }
+                        DispatchQueue.main.async {
+                            self.peerManager.isRecording = false
                         }
                     }
                 }

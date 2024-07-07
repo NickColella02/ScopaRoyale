@@ -1,4 +1,5 @@
 import Foundation
+import AVFAudio
 import MultipeerConnectivity
 import SwiftUI
 
@@ -30,6 +31,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
     var myUsername: String = ""
+    private let synthesizer = AVSpeechSynthesizer()
     
     @Published var opponentName: String = "" // nome dell'avversario (browser)
     @Published var lobbyName: String = "" // nome della lobby
@@ -38,10 +40,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var connectedPeers: [MCPeerID] = [] // lista di peer connessi
     @Published var isHost: Bool = false // true se è l'advertiser
     @Published var isClient: Bool = false // true se è l'host
-    @Published var blindMode: Bool = false
-    @Published var isHostRecording: Bool = false
-    @Published var isClientRecording: Bool = false
-    
+    @Published var blindMode: Bool {
+        didSet {
+            UserDefaults.standard.set(blindMode, forKey: "blindMode")
+        }
+    }
+    @Published var isRecording: Bool = false
     @Published var deck: [Card] = [] // mazzo di carte iniziale
     @Published var tableCards: [Card] = [] // carte presenti sul tavolo
     @Published var playerHand: [Card] = [] // carte nella mano del giocatore
@@ -52,6 +56,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var opponentPoints: [Card] = [] // scope dell'avversario
     @Published var playerScore: Int = 0 // punteggio del giocatore
     @Published var opponentScore: Int = 0 // punteggio dell'avversario
+    @Published var playerHasSettebello: Bool = false // true se il giocatore ha il 7 bello tra le carte prese
+    @Published var opponentHasSettebello: Bool = false // true se l'avversario ha il 7 bello tra le carte prese
+    @Published var playerCoins: Int = 0
+    @Published var opponentCoins: Int = 0
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
     @State var neededPlayers: Int = 0 // numero di giocatori necessari
     @State var lastPlayer: Int = 1 // indice dell'ultimo giocatore che ha preso carte dal tavolo
@@ -59,6 +67,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var winner: String = "" // nome del giocatore che ha vinto
 
     override init() {
+        self.blindMode = UserDefaults.standard.bool(forKey: "blindMode")
         super.init()
         self.session = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .none)
         self.session.delegate = self
@@ -97,7 +106,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        browser.invitePeer(peerID, to: session, withContext: nil, timeout: 5)
+        DispatchQueue.main.async {
+            browser.invitePeer(peerID, to: self.session, withContext: nil, timeout: 5)
+        }
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
@@ -184,22 +195,26 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func startHosting(lobbyName: String, numberOfPlayers: Int, username: String) { // eseguito dall'advertiser
-        self.neededPlayers = numberOfPlayers
-        self.lobbyName = lobbyName
-        self.myUsername = username
-        self.isHost = true // sono l'advertiser
-        self.isClient = false // non sono il browser
-        advertiser = MCNearbyServiceAdvertiser(peer: peerID, discoveryInfo: nil, serviceType: serviceType)
-        advertiser?.delegate = self
-        advertiser?.startAdvertisingPeer()
+        DispatchQueue.main.async {
+            self.neededPlayers = numberOfPlayers
+            self.lobbyName = lobbyName
+            self.myUsername = username
+            self.isHost = true // sono l'advertiser
+            self.isClient = false // non sono il browser
+            self.advertiser = MCNearbyServiceAdvertiser(peer: self.peerID, discoveryInfo: nil, serviceType: self.serviceType)
+            self.advertiser?.delegate = self
+            self.advertiser?.startAdvertisingPeer()
+        }
     }
 
     func joinSession() { // eseguito dal browser
-        browser = MCNearbyServiceBrowser(peer: peerID, serviceType: serviceType)
-        browser?.delegate = self
-        self.isClient = true // sono il browser
-        self.isHost = false // non sono l'advertiser
-        browser?.startBrowsingForPeers()
+        DispatchQueue.main.async {
+            self.browser = MCNearbyServiceBrowser(peer: self.peerID, serviceType: self.serviceType)
+            self.browser?.delegate = self
+            self.isClient = true // sono il browser
+            self.isHost = false // non sono l'advertiser
+            self.browser?.startBrowsingForPeers()
+        }
     }
 
     func sendUsername(username: String) { // usato dal browser per inviare il suo username all'advertiser
@@ -222,22 +237,22 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func sendStartGameSignal() { // segnala l'inizio della partita ai giocatori
+        createDeck() // crea il mazzo iniziale
+        placeTableCards() // posiziona le carte sul tavolo
+        giveCardsToPlayers() // assegna le mani ai giocatori
+        sendDeck() // aggiorna il mazzo iniziale
+        sendCardsTaken() // invia i mazzi contenenti le carte prese
+        sendPlayersPoints() // invia i mazzi contenenti le scope dei giocatori
         let startData = "START_GAME".data(using: .utf8)
         do {
             try session.send(startData!, toPeers: session.connectedPeers, with: .reliable)
         } catch {
             print("Errore invio segnale inizio partita: \(error.localizedDescription)")
         }
-        createDeck() // crea il mazzo iniziale
-        placeTableCards() // posiziona le carte sul tavolo
-        giveCardsToPlayers() // assegna le mani ai giocatori
-        sendDeck() // aggiorna il mazzo iniziale
-        sendPlayersPoints() // invia i mazzi contenenti le scope dei giocatori
-        //sendCardsTaken() // invia i mazzi contenenti le carte prese dai giocatori
     }
     
     func sendCardsTaken() { // invia il mazzo delle carte prese all'avversario
-        let cardsTaken = CardsTaken(playerCards: cardTakenByPlayer, opponentCards: cardTakenByOpponent)
+        let cardsTaken = CardsTaken(playerCards: cardTakenByOpponent, opponentCards: cardTakenByPlayer)
         do {
             let data = try JSONEncoder().encode(cardsTaken)
             let prefixedData = "CardsTaken:".data(using: .utf8)! + data
@@ -248,7 +263,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
         
     func sendPlayersPoints() { // invia il mazzo delle scope fatte all'avversario
-        let points = Points(playerPoints: self.playerPoints, opponentPoints: self.opponentPoints)
+        let points = Points(playerPoints: opponentPoints, opponentPoints: playerPoints)
         do {
             let data = try JSONEncoder().encode(points)
             let prefixedData = "PlayersPoints:".data(using: .utf8)! + data
@@ -257,13 +272,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio scope dei giocatori: \(error.localizedDescription)")
         }
     }
-    
+        
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe", "spade", "bastoni"
+            "denari", "coppe"//, "spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -302,7 +317,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendCardsToPlayers() { // invia le carte delle mani dei giocatori
-        let hand = Hands(playerHand: self.playerHand, opponentHand: self.opponentHand)
+        let hand = Hands(playerHand: self.opponentHand, opponentHand: self.playerHand)
         do {
             let data = try JSONEncoder().encode(hand)
             let prefixedData = "PlayersHands:".data(using: .utf8)! + data
@@ -332,11 +347,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
     
-    func sendTurnChange() { // invia e notifica il cambio del turno
-        DispatchQueue.global(qos: .background).async {
+    func sendTurnChange() {
+        DispatchQueue.global(qos: .userInitiated).async {
             DispatchQueue.main.async {
-                self.currentPlayer = 1 - self.currentPlayer // passa il turno
-
+                self.currentPlayer = 1 - self.currentPlayer
                 let turnData = "CurrentPlayer:\(self.currentPlayer)".data(using: .utf8)!
                 do {
                     try self.session.send(turnData, toPeers: self.session.connectedPeers, with: .reliable)
@@ -357,28 +371,20 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendPlayersScores() { // invia i punteggi finali all'avversario
-        DispatchQueue.main.async { [self] in
-            let scores = Scores(playerScore: self.playerScore, opponentScore: self.opponentScore, winner: self.winner)
-            do {
-                let data = try JSONEncoder().encode(scores)
-                let prefixedData = "PlayersScores:".data(using: .utf8)! + data
-                try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
-            } catch {
-                print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
-            }
+        let scores = Scores(playerScore: opponentScore, opponentScore: playerScore, winner: self.winner)
+        do {
+            let data = try JSONEncoder().encode(scores)
+            let prefixedData = "PlayersScores:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
         }
     }
             
     func playCard(card: Card) { // gestisce la mossa di un giocatore
-        DispatchQueue.main.async{ [self] in
-            if currentPlayer == 0 {
-                if let index = self.playerHand.firstIndex(of: card) { // rimuove la carta dalla mano del giocatore
-                    playerHand.remove(at: index)
-                }
-            } else {
-                if let index = self.opponentHand.firstIndex(of: card) { // rimuove la carta dalla mano dell'avversario
-                    opponentHand.remove(at: index)
-                }
+        DispatchQueue.main.async { [self] in
+            if let index = self.playerHand.firstIndex(of: card) { // rimuove la carta dalla mano del giocatore
+                playerHand.remove(at: index)
             }
             
             var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
@@ -398,38 +404,33 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 }
             }
             
-            
             if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
                 tableCards.append(card) // aggiungi la carta giocata al tavolo
+                sendTableCards()
             } else if let validCombination = shortestCombination { // se ha trovato una combinazione
                 cardsToTake = validCombination
                 for cardToTake in cardsToTake {
                     if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte dal tavolo
                         tableCards.remove(at: index)
+                        sendTableCards()
                     }
                 }
                 if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
-                    if currentPlayer == 0 {
-                        playerPoints.append(card)
-                    } else {
-                        opponentPoints.append(card)
+                    playerPoints.append(card)
+                    if blindMode {
+                        speakText("Hai fatto scopa")
                     }
+                    sendPlayersPoints()
                 }
             }
             
             if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
-                if currentPlayer == 0 {
-                    cardTakenByPlayer.append(contentsOf: cardsToTake)
-                    
-                } else {
-                    cardTakenByOpponent.append(contentsOf: cardsToTake)
-                    //opponentPoints.append(contentsOf: cardsToTake)
+                cardTakenByPlayer.append(contentsOf: cardsToTake)
+                if cardsToTake.contains(Card(value: "sette", seed: "denari")) {
+                    playerHasSettebello = true
                 }
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
-                sendPlayersPoints()
             }
-            
-            sendTableCards() // aggiorna le carte del tavolo
             sendCardsToPlayers() // invia le carte alle mani dei giocatori
             sendTurnChange() // aggiorna il turno
             
@@ -441,11 +442,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     playerScore = 0 // azzera i punteggi del giocatore
                     opponentScore = 0 // azzera i punteggi dell'avversario
                     if !tableCards.isEmpty {
-                        if lastPlayer == 0 { // se l'ultimo giocatore ad aver preso carte è l'advertiser
-                            cardTakenByPlayer += tableCards // aggiunge tutte le carte del tavolo al mazzo delle sue carte prese
-                        } else { // altrimenti le aggiunge al mazzo di carte prese dal browser
-                            cardTakenByOpponent += tableCards
-                        }
+                        cardTakenByPlayer += tableCards // aggiunge tutte le carte del tavolo al mazzo delle sue carte prese
                         tableCards.removeAll() // rimuove tutte le carte dal tavolo in una volta sola
                     }
                     
@@ -468,11 +465,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     }
                     
                     // assegno un punto a chi ha più carte denari nel proprio mazzo
-                    let playerDenariCount = cardTakenByPlayer.filter{$0.seed == "denari"}.count
-                    let opponentDenariCount = cardTakenByOpponent.filter{$0.seed == "denari"}.count
-                    if playerDenariCount > opponentDenariCount {
+                    playerCoins = cardTakenByPlayer.filter{$0.seed == "denari"}.count
+                    opponentCoins = cardTakenByOpponent.filter{$0.seed == "denari"}.count
+                    if playerCoins > opponentCoins {
                         playerScore += 1
-                    } else if playerDenariCount < opponentDenariCount {
+                    } else if playerCoins < opponentCoins {
                         opponentScore += 1
                     }
                     
@@ -493,9 +490,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     } else {
                         winner = "Pareggio"
                     }
-                    
-                    DispatchQueue.main.async {
-                        self.gameOver = true // termina la partita
+                    self.gameOver = true // termina la partita
+                    if blindMode {
+                        speakText("Partita terminata")
                     }
                     sendPlayersScores() // invio i punteggi ai giocatori
                     sendEndGameSignal() // notifica la fine della partita
@@ -521,6 +518,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.peerDisconnected = false
             self.gameOver = false
             self.startGame = false
+            self.playerHasSettebello = false
+            self.opponentHasSettebello = false
             self.deck = []
             self.opponentHand = []
             self.playerHand = []
@@ -534,5 +533,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.currentPlayer = 1
             self.lastPlayer = 1
         }
+    }
+    
+    public func speakText(_ testo: String) {
+        let utterance = AVSpeechUtterance(string: testo)
+        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+        utterance.pitchMultiplier = 1.0
+        utterance.rate = 0.5
+        self.synthesizer.speak(utterance)
     }
 }

@@ -11,7 +11,7 @@ struct ProfileView: View {
     @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
     @State private var showAlert: Bool = false
     @State private var localUsername: String
-    
+
     let maxUsernameLength = 14
     let synthesizer = AVSpeechSynthesizer()
     
@@ -46,7 +46,7 @@ struct ProfileView: View {
             
             Text("Change avatar")
                 .font(.system(size: 16))
-                .foregroundColor(.blue)
+                .foregroundStyle(.blue)
                 .onTapGesture {
                     showPicker = true
                 }
@@ -57,7 +57,7 @@ struct ProfileView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 30, height: 30)
-                    .foregroundColor(peerManager.blindMode ? .red : .green)
+                    .foregroundStyle(peerManager.blindMode ? .red : .green)
                     .padding(.bottom, 20)
                 
                 Button(action: {
@@ -65,11 +65,11 @@ struct ProfileView: View {
                 }) {
                     Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
                         .font(.title3)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color(peerManager.blindMode ? .systemRed : .systemGreen))
-                        .cornerRadius(10)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 .padding(.horizontal, 25)
                 .padding(.bottom, 20)
@@ -90,7 +90,7 @@ struct ProfileView: View {
                 if localUsername.count > maxUsernameLength {
                     Text("Username must be \(maxUsernameLength) characters or less.")
                         .font(.caption)
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .padding(.horizontal, 25)
                 }
                 
@@ -105,7 +105,7 @@ struct ProfileView: View {
                 }) {
                     Text("Done")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(localUsername.isEmpty || localUsername.count > maxUsernameLength ? Color.gray : Color.black)

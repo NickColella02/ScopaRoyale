@@ -39,7 +39,7 @@ struct ContentView: View {
             .toolbar {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager).environmentObject(speechRecognizer)) {
+                        NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager)) {
                             Image(systemName: "person.crop.circle")
                                 .font(.system(size: 20, weight: .regular))
                                 .padding(.horizontal, 12)

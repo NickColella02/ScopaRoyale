@@ -1,8 +1,7 @@
-import Foundation
 import SwiftUI
 
 struct ShowWinnerView: View {
-    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
+    @EnvironmentObject private var peerManager: MultiPeerManager
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     @State private var showHomeView: Bool = false
     @State private var animateWinner: Bool = false
@@ -14,7 +13,7 @@ struct ShowWinnerView: View {
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea(edges: .all)
-                .blur(radius: 10) // aggiunge un effetto blur
+                .blur(radius: 10)
             
             VStack {
                 Text("Risultato della Partita")
@@ -25,59 +24,67 @@ struct ShowWinnerView: View {
                 
                 Spacer()
                 
-                if peerManager.isHost {
-                    HStack {
-                        VStack {
-                            Text("\(peerManager.myUsername)")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                            Text("\(peerManager.playerScore)")
-                                .font(.largeTitle)
-                                .foregroundStyle(.yellow)
-                                .bold()
-                        }
-                        .padding()
+                HStack {
+                    VStack {
+                        Text(peerManager.myUsername)
+                            .font(.title2)
+                            .foregroundStyle(.white)
                         
-                        VStack {
-                            Text("\(peerManager.opponentName)")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                            Text("\(peerManager.opponentScore)")
-                                .font(.largeTitle)
-                                .foregroundStyle(.yellow)
-                                .bold()
-                        }
-                        .padding()
-                    }
-                    .background(Color.black.opacity(0.7))
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                } else {
-                    HStack {
-                        VStack {
-                            Text("\(peerManager.myUsername)")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                            Text("\(peerManager.opponentScore)")
-                                .font(.largeTitle)
-                                .foregroundStyle(.yellow)
-                                .bold()
-                        }
-                        .padding()
+                        Text("\(peerManager.playerScore)")
+                            .font(.largeTitle)
+                            .foregroundStyle(.yellow)
+                            .bold()
                         
-                        VStack {
-                            Text("\(peerManager.opponentName)")
-                                .font(.title2)
+                        Text("Carte prese: \(peerManager.cardTakenByPlayer.count)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                        
+                        Text("Scope fatte: \(peerManager.playerPoints.count)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                        
+                        if peerManager.playerHasSettebello {
+                            Text("Settebello")
+                                .font(.subheadline)
                                 .foregroundStyle(.white)
-                            Text("\(peerManager.playerScore)")
-                                .font(.largeTitle)
-                                .foregroundStyle(.yellow)
-                                .bold()
                         }
-                        .padding()
+                        
+                        Text("Carte oro: \(peerManager.playerCoins)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
                     }
-                    .background(Color.black.opacity(0.7))
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    
+                    VStack {
+                        Text(peerManager.opponentName)
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                        
+                        Text("\(peerManager.opponentScore)")
+                            .font(.largeTitle)
+                            .foregroundStyle(.yellow)
+                            .bold()
+                        
+                        Text("Carte prese: \(peerManager.cardTakenByOpponent.count)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                        
+                        Text("Scope fatte: \(peerManager.opponentPoints.count)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                        
+                        if peerManager.opponentHasSettebello {
+                            Text("Settebello")
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                        }
+                        
+                        Text("Carte oro: \(peerManager.opponentCoins)")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                    }
                 }
+                .background(Color.black.opacity(0.7))
+                .clipShape(RoundedRectangle(cornerRadius: 15))
                 
                 Spacer()
                 
