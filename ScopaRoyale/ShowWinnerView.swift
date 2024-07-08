@@ -1,3 +1,7 @@
+
+
+
+
 import SwiftUI
 
 struct ShowWinnerView: View {
@@ -44,14 +48,20 @@ struct ShowWinnerView: View {
                             .foregroundStyle(.white)
                         
                         if peerManager.playerHasSettebello {
-                            Text("Settebello")
+                            Text("Settebello fatto")
                                 .font(.subheadline)
                                 .foregroundStyle(.white)
                         }
                         
-                        Text("Carte oro: \(peerManager.playerCoins)")
+                        Text("Carte oro: \(peerManager.playerCoinsCount)")
                             .font(.subheadline)
                             .foregroundStyle(.white)
+                        
+                        if peerManager.playerHasPrimera {
+                            Text("Primera fatta")
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                        }
                     }
                     
                     VStack {
@@ -73,14 +83,20 @@ struct ShowWinnerView: View {
                             .foregroundStyle(.white)
                         
                         if peerManager.opponentHasSettebello {
-                            Text("Settebello")
+                            Text("Settebello fatto")
                                 .font(.subheadline)
                                 .foregroundStyle(.white)
                         }
                         
-                        Text("Carte oro: \(peerManager.opponentCoins)")
+                        Text("Carte oro: \(peerManager.opponentCoinsCount)")
                             .font(.subheadline)
                             .foregroundStyle(.white)
+                        
+                        if peerManager.opponentHasPrimera {
+                            Text("Primera fatta")
+                                .font(.subheadline)
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
                 .background(Color.black.opacity(0.7))
@@ -122,8 +138,11 @@ struct ShowWinnerView: View {
                 Spacer()
             }
             .padding()
+            .onAppear() {
+                speechRecognizer.speakText("Il vincitore è \(peerManager.winner)")
+            }
             .fullScreenCover(isPresented: $showHomeView) {
-                ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)
+                ContentView().environmentObject(peerManager)
             }
         }
     }

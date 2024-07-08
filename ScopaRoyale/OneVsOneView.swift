@@ -1,3 +1,5 @@
+
+
 import SwiftUI
 
 struct OneVsOneView: View {
@@ -7,6 +9,9 @@ struct OneVsOneView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
     @State private var navigateToGame = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
+    
+    // Avatar dell'utente recuperato dagli UserDefaults
+    @State private var userAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
     
     var body: some View {
         VStack(spacing: 30) {
@@ -27,7 +32,8 @@ struct OneVsOneView: View {
                 VStack(spacing: 10) {
                     Text("Searching for an opponent...")
                         .font(.headline)
-                        .foregroundStyle(.gray)
+                        .foregroundColor(.gray)
+                        .padding()
                     
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
@@ -37,10 +43,13 @@ struct OneVsOneView: View {
             
             HStack {
                 VStack {
-                    Image("1user")
+                    // Immagine dell'avatar dell'utente
+                    avatarImage(for: userAvatar)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 120)
+                        .frame(width: 80, height: 80)
+                        .clipShape(Circle())
+                    
                     Text(username) // nome dell'avversario
                         .font(.title2)
                         .padding(.top, 10)
@@ -52,11 +61,14 @@ struct OneVsOneView: View {
                 
                 if !peerManager.opponentName.isEmpty {
                     VStack {
+                        // va aggiunto l'avatar dell'avversario
                         Image("1user")
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 120)
-                        Text(peerManager.opponentName) // nome dell'utente
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
+                        
+                        Text(peerManager.opponentName) // nome dell'avversario
                             .font(.title2)
                             .padding(.top, 10)
                     }
@@ -69,13 +81,13 @@ struct OneVsOneView: View {
             Button(action: { // bottone per avviare la partita
                 if !peerManager.connectedPeers.isEmpty {
                     peerManager.sendStartGameSignal()
-                    navigateToGame = true;
+                    navigateToGame = true
                 }
             }) {
                 if peerManager.connectedPeers.isEmpty { // se non ci sono peer connessi
                     Text("Start")
                         .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.gray)
@@ -84,7 +96,7 @@ struct OneVsOneView: View {
                 } else {
                     Text("Start")
                         .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.black)
@@ -102,5 +114,14 @@ struct OneVsOneView: View {
             peerManager.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.numberOfPlayer, username: username)
         }
         .navigationTitle("")
+    }
+    
+    // Funzione per recuperare l'immagine dell'avatar dell'utente
+    private func avatarImage(for avatarName: String?) -> Image {
+        if let avatarName = avatarName {
+            return Image(avatarName)
+        } else {
+            return Image(systemName: "person.circle")
+        }
     }
 }

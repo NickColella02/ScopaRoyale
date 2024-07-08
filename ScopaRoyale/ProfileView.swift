@@ -11,7 +11,7 @@ struct ProfileView: View {
     @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
     @State private var showAlert: Bool = false
     @State private var localUsername: String
-
+    
     let maxUsernameLength = 14
     let synthesizer = AVSpeechSynthesizer()
     
@@ -21,12 +21,17 @@ struct ProfileView: View {
         if let selectedAvatar = UserDefaults.standard.string(forKey: "selectedAvatar") {
             self._avatarImage = State(initialValue: Image(selectedAvatar))
         } else {
-            self._avatarImage = State(initialValue: Image(systemName: "person.circle"))
+            self._avatarImage = State(initialValue: Image("defaultUser").resizable())
         }
     }
     
     var body: some View {
         VStack {
+            /*Image("yourProfile")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 40, height: 40)
+                .padding(.top, 20)*/
             Spacer()
             
             ZStack {
@@ -37,64 +42,36 @@ struct ProfileView: View {
                     .clipShape(Circle())
                     .overlay(
                         Circle()
-                            .stroke(Color.black, lineWidth: 1)
+                            .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 3)
                             .scaleEffect(1.1)
                             .padding(3)
                     )
+                    .onTapGesture {
+                        showPicker = true
+                    }
             }
             .padding(.bottom, 10)
             
-            Text("Change avatar")
-                .font(.system(size: 16))
-                .foregroundStyle(.blue)
-                .onTapGesture {
-                    showPicker = true
-                }
-                .padding(.bottom, 50)
-            
             VStack {
-                Image(systemName: peerManager.blindMode ? "eye.slash.fill" : "eye.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
-                    .foregroundStyle(peerManager.blindMode ? .red : .green)
-                    .padding(.bottom, 20)
+                Text("Welcome back, \(username)")
+                    .font(.system(size: 20, design: .default))
+                    .foregroundColor(.black)
+                    .bold()
+                    .padding(.bottom, 10)
                 
-                Button(action: {
-                    toggleBlindMode()
-                }) {
-                    Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
-                        .font(.title3)
-                        .foregroundStyle(.primary)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(peerManager.blindMode ? .systemRed : .systemGreen))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                if localUsername.count > maxUsernameLength {
+                    Text("Username must be \(maxUsernameLength) characters or less.")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .padding(.horizontal, 25)
                 }
-                .padding(.horizontal, 25)
-                .padding(.bottom, 20)
-            }
-            
-            VStack {
-                Image("username")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 40, height: 40)
-                
                 TextField("Enter username", text: $localUsername)
                     .padding()
                     .background(Color(.systemGray6))
                     .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 25)
                 
-                if localUsername.count > maxUsernameLength {
-                    Text("Username must be \(maxUsernameLength) characters or less.")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, 25)
-                }
-                
-                Button(action: {
+                /*Button(action: {
                     if localUsername.isEmpty {
                         showAlert = true
                     } else {
@@ -105,21 +82,52 @@ struct ProfileView: View {
                 }) {
                     Text("Done")
                         .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(localUsername.isEmpty || localUsername.count > maxUsernameLength ? Color.gray : Color.black)
                         .clipShape(RoundedRectangle(cornerRadius: 50))
                         .padding(.horizontal, 25)
-                        .padding(.top, 20)
                 }
-                .disabled(localUsername.isEmpty || localUsername.count > maxUsernameLength)
+                .disabled(localUsername.isEmpty || localUsername.count > maxUsernameLength)*/
+                
+                Button(action: {
+                    toggleBlindMode()
+                }) {
+                    Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
+                        .font(.system(size: 20, design: .default))
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(!peerManager.blindMode ? .black : Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255)))
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
+                        .padding(.horizontal, 25)
+                }
             }
             .padding(.horizontal)
+            Text("La Blind mode fornisce, ai giocatori non udenti, un ​​supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
+                .font(.system(size: 14, design: .default))
+                .foregroundStyle(.gray)
+                .padding(.horizontal, 45)
+                .padding(.top, 10)
             
             Spacer()
         }
-        .navigationBarTitle("Your profile", displayMode: .inline)
+        .navigationBarTitle("", displayMode: .inline) // lasciare così
+        .toolbar {
+            Text("Fine")
+                .bold()
+                .foregroundColor(.blue)
+                .onTapGesture {
+                    if localUsername.isEmpty {
+                        showAlert = true
+                    } else {
+                        username = localUsername
+                        UserDefaults.standard.set(localUsername, forKey: "username")
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        }
         .sheet(isPresented: $showPicker) {
             AvatarPickerView(selectedAvatar: $selectedAvatar, avatarImage: $avatarImage) {
                 if let selectedAvatar = selectedAvatar {
@@ -134,6 +142,14 @@ struct ProfileView: View {
                 avatarImage = Image(savedAvatar)
             }
         }
+        /*.navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: Button(action: {
+            presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .bold()
+                .foregroundColor(.black)
+        })*/
     }
     
     private func toggleBlindMode() {
@@ -161,9 +177,11 @@ struct AvatarPickerView: View {
     
     var body: some View {
         VStack {
-            Text("Choose an avatar")
-                .font(.title2)
-                .padding()
+            Image("chooseAnAvatar")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 40, height: 40)
+                .padding(.top, 20)
             
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {

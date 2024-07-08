@@ -18,20 +18,38 @@ struct Points: Codable { // struttura dati contenente i mazzi di scope fatte dai
     let opponentPoints: [Card] // scope fatte dell'avversario
 }
 
+struct Coins: Codable {
+    let playerCoins: Int
+    let opponentCoins: Int
+}
+
 struct Scores: Codable { // struttura dati contenente i punteggi dei giocatori
     let playerScore: Int // punteggio del giocatore
     let opponentScore: Int // punteggio dell'avversario
     let winner: String // vincitore della partita
 }
 
+struct Primera: Codable {
+    let playerHasPrimera: Bool
+    let opponentHasPrimera: Bool
+}
+
+struct Settebello: Codable {
+    let playerHasSettebello: Bool
+    let opponentHasSettebello: Bool
+}
+
 class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
-    private let serviceType = "ScopaRoyale"
+    private let serviceType = "ScopaRoyale3"
     private let peerID = MCPeerID(displayName: UIDevice.current.name)
     private var session: MCSession!
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
     var myUsername: String = ""
-    private let synthesizer = AVSpeechSynthesizer()
+    private var synthetizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
+    
+    @State var neededPlayers: Int = 0 // numero di giocatori necessari
+    @State var lastPlayer: Int = 1 // indice dell'ultimo giocatore che ha preso carte dal tavolo
     
     @Published var opponentName: String = "" // nome dell'avversario (browser)
     @Published var lobbyName: String = "" // nome della lobby
@@ -40,12 +58,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var connectedPeers: [MCPeerID] = [] // lista di peer connessi
     @Published var isHost: Bool = false // true se è l'advertiser
     @Published var isClient: Bool = false // true se è l'host
-    @Published var blindMode: Bool {
+    @Published var blindMode: Bool { // vero se l'utente ha abilitato la blind mode
         didSet {
             UserDefaults.standard.set(blindMode, forKey: "blindMode")
         }
     }
-    @Published var isRecording: Bool = false
+    @Published var isRecording: Bool = false // true se l'utente sta registrando
     @Published var deck: [Card] = [] // mazzo di carte iniziale
     @Published var tableCards: [Card] = [] // carte presenti sul tavolo
     @Published var playerHand: [Card] = [] // carte nella mano del giocatore
@@ -58,11 +76,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var opponentScore: Int = 0 // punteggio dell'avversario
     @Published var playerHasSettebello: Bool = false // true se il giocatore ha il 7 bello tra le carte prese
     @Published var opponentHasSettebello: Bool = false // true se l'avversario ha il 7 bello tra le carte prese
-    @Published var playerCoins: Int = 0
-    @Published var opponentCoins: Int = 0
+    @Published var playerHasPrimera: Bool = false
+    @Published var opponentHasPrimera: Bool = false
+    @Published var playerCoinsCount: Int = 0 // numero di carte oro prese dal giocatore
+    @Published var opponentCoinsCount: Int = 0 // numero di carte oro prese dall'avversario
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
-    @State var neededPlayers: Int = 0 // numero di giocatori necessari
-    @State var lastPlayer: Int = 1 // indice dell'ultimo giocatore che ha preso carte dal tavolo
     @Published var gameOver: Bool = false // true quando la partita finisce
     @Published var winner: String = "" // nome del giocatore che ha vinto
 
@@ -73,8 +91,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.session.delegate = self
     }
 
-    // MARK: - MCSessionDelegate
-
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         DispatchQueue.main.async {
             switch state {
@@ -83,10 +99,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.connectedPeers.append(peerID)
                     self.sendUsername(username: self.myUsername)
                     self.sendLobbyName()
-                    if self.connectedPeers.count == self.neededPlayers {
-                        self.browser?.stopBrowsingForPeers()
-                        self.advertiser?.stopAdvertisingPeer()
-                    }
                 }
             case .notConnected:
                 self.peerDisconnected = true
@@ -156,6 +168,33 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         self.opponentPoints = points.opponentPoints
                     } catch {
                         print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
+                    }
+                } else if receivedString.starts(with: "Primera:") { // riceve i mazzi di scope dei giocatori
+                    let jsonData = data.dropFirst(8)
+                    do {
+                        let primera = try JSONDecoder().decode(Primera.self, from: jsonData)
+                        self.playerHasPrimera = primera.playerHasPrimera
+                        self.opponentHasPrimera = primera.opponentHasPrimera
+                    } catch {
+                        print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
+                    }
+                } else if receivedString.starts(with: "Settebello:") { // riceve i mazzi di scope dei giocatori
+                    let jsonData = data.dropFirst(11)
+                    do {
+                        let settebello = try JSONDecoder().decode(Settebello.self, from: jsonData)
+                        self.playerHasSettebello = settebello.playerHasSettebello
+                        self.opponentHasPrimera = settebello.opponentHasSettebello
+                    } catch {
+                        print("Errore nella decodifica dei dati Settebello: \(error.localizedDescription)")
+                    }
+                } else if receivedString.starts(with: "PlayersCoins:") {
+                    let jsonData = data.dropFirst(13)
+                    do {
+                        let coins = try JSONDecoder().decode(Coins.self, from: jsonData)
+                        self.playerCoinsCount = coins.playerCoins
+                        self.opponentCoinsCount = coins.opponentCoins
+                    } catch {
+                        print("Errore nella decodifica dei dati Coins: \(error.localizedDescription)")
                     }
                 } else if receivedString.starts(with: "Table:") { // riceve le carte del tavolo
                     let data = data.dropFirst(6)
@@ -272,13 +311,46 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio scope dei giocatori: \(error.localizedDescription)")
         }
     }
+    
+    func sendPlayersCoins() {
+        let coins = Coins(playerCoins: opponentCoinsCount, opponentCoins: playerCoinsCount)
+        do {
+            let data = try JSONEncoder().encode(coins)
+            let prefixedData = "PlayersCoins:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio denari dei giocatori: \(error.localizedDescription)")
+        }
+    }
+    
+    func sendPrimera() {
+        let primera = Primera(playerHasPrimera: self.opponentHasPrimera, opponentHasPrimera: self.playerHasPrimera)
+        do {
+            let data = try JSONEncoder().encode(primera)
+            let prefixedData = "Primera:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio primera: \(error.localizedDescription)")
+        }
+    }
+    
+    func sendSettebello() {
+        let settebello = Settebello(playerHasSettebello: self.opponentHasSettebello, opponentHasSettebello: self.playerHasSettebello)
+        do {
+            let data = try JSONEncoder().encode(settebello)
+            let prefixedData = "Settebello:".data(using: .utf8)! + data
+            try session.send(prefixedData, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio settebello: \(error.localizedDescription)")
+        }
+    }
         
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe"//, "spade", "bastoni"
+            "denari", "coppe", "spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -348,7 +420,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendTurnChange() {
-        DispatchQueue.global(qos: .userInitiated).async {
+        DispatchQueue.global(qos: .background).async {
             DispatchQueue.main.async {
                 self.currentPlayer = 1 - self.currentPlayer
                 let turnData = "CurrentPlayer:\(self.currentPlayer)".data(using: .utf8)!
@@ -406,7 +478,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             
             if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
                 tableCards.append(card) // aggiungi la carta giocata al tavolo
-                sendTableCards()
+                sendTableCards() // notifica l'aggiornamento del tavolo
             } else if let validCombination = shortestCombination { // se ha trovato una combinazione
                 cardsToTake = validCombination
                 for cardToTake in cardsToTake {
@@ -459,26 +531,30 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     
                     // assegno un punto a chi ha il 7 denari
                     if cardTakenByPlayer.contains(where: { $0.value == "sette" && $0.seed == "denari" }) || playerPoints.contains(where: { $0.value == "sette" && $0.seed == "denari" }) {
+                        playerHasSettebello = true
                         playerScore += 1
                     } else {
+                        opponentHasSettebello = true
                         opponentScore += 1
                     }
                     
                     // assegno un punto a chi ha più carte denari nel proprio mazzo
-                    playerCoins = cardTakenByPlayer.filter{$0.seed == "denari"}.count
-                    opponentCoins = cardTakenByOpponent.filter{$0.seed == "denari"}.count
-                    if playerCoins > opponentCoins {
+                    playerCoinsCount = cardTakenByPlayer.filter{$0.seed == "denari"}.count
+                    opponentCoinsCount = 10 - playerCoinsCount
+                    if playerCoinsCount > opponentCoinsCount {
                         playerScore += 1
-                    } else if playerCoins < opponentCoins {
+                    } else if playerCoinsCount < opponentCoinsCount {
                         opponentScore += 1
                     }
                     
                     // assegno un punto a chi ha completato la "primera" (più sette)
                     let playerSevenCount = cardTakenByPlayer.filter { $0.value == "sette" }.count
-                    let opponentSevenCount = cardTakenByOpponent.filter { $0.value == "sette" }.count
+                    let opponentSevenCount = 4 - playerSevenCount
                     if playerSevenCount > opponentSevenCount {
+                        playerHasPrimera = true
                         playerScore += 1
                     } else if playerSevenCount < opponentSevenCount {
+                        opponentHasPrimera = true
                         opponentScore += 1
                     }
                     
@@ -492,13 +568,23 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     }
                     self.gameOver = true // termina la partita
                     if blindMode {
-                        speakText("Partita terminata")
+                        //synthetizer.speakText("Partita terminata")
                     }
+                    sendSettebello()
+                    sendPrimera()
                     sendPlayersScores() // invio i punteggi ai giocatori
                     sendEndGameSignal() // notifica la fine della partita
                 }
             }
         }
+    }
+    
+    private func speakText(_ text: String) {
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.pitchMultiplier = 1.0
+        utterance.rate = 0.5
+        synthetizer.speak(utterance)
     }
 
     func closeConnection() {
@@ -520,6 +606,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.startGame = false
             self.playerHasSettebello = false
             self.opponentHasSettebello = false
+            self.playerHasPrimera = false
+            self.opponentHasPrimera = false
             self.deck = []
             self.opponentHand = []
             self.playerHand = []
@@ -533,13 +621,5 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.currentPlayer = 1
             self.lastPlayer = 1
         }
-    }
-    
-    public func speakText(_ testo: String) {
-        let utterance = AVSpeechUtterance(string: testo)
-        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
-        utterance.pitchMultiplier = 1.0
-        utterance.rate = 0.5
-        self.synthesizer.speak(utterance)
     }
 }

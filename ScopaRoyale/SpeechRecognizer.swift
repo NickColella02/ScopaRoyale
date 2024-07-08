@@ -88,6 +88,9 @@ actor SpeechRecognizer: ObservableObject {
     private let recognizer: SFSpeechRecognizer?
     private let synthesizer = AVSpeechSynthesizer()
     
+    private var messageQueue: [String] = []
+    private var isProcessingMessage: Bool = false
+    
     /**
      Initializes a new speech recognizer. If this is the first time you've used the class, it
      requests access to the speech recognizer and the microphone.
@@ -193,7 +196,6 @@ actor SpeechRecognizer: ObservableObject {
     }
     
     private func recognitionHandler(audioEngine: AVAudioEngine, result: SFSpeechRecognitionResult?, error: Error?) async {
-    
         let receivedFinalResult = result?.isFinal ?? false
         let receivedError = error != nil
         
@@ -205,7 +207,27 @@ actor SpeechRecognizer: ObservableObject {
         if let result {
             let command: String = result.bestTranscription.formattedString
             transcribe(result.bestTranscription.formattedString)
-            await processCommand(transcription: command)
+            await enqueueMessage(command)
+        }
+    }
+    
+    private func enqueueMessage(_ message: String) async {
+        messageQueue.append(message)
+        await processNextMessage()
+    }
+    
+    private func processNextMessage() async {
+        guard !isProcessingMessage, !messageQueue.isEmpty else {
+            return
+        }
+        isProcessingMessage = true
+        
+        let message = messageQueue.removeFirst()
+        await processCommand(transcription: message)
+        
+        isProcessingMessage = false
+        if !messageQueue.isEmpty {
+            await processNextMessage()
         }
     }
     
@@ -288,7 +310,6 @@ actor SpeechRecognizer: ObservableObject {
             }
         }
     }
-    
     
     nonisolated private func transcribe(_ message: String) {
         Task { @MainActor in

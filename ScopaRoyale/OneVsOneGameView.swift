@@ -16,6 +16,7 @@ struct OneVsOneGameView: View {
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
+    @State private var recordingInitiator: String?
 
     var body: some View {
         ZStack(alignment: .topLeading) { // Align contents to top left
@@ -138,10 +139,12 @@ struct OneVsOneGameView: View {
                     }
                     .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
 
-                    RoundedRectangle(cornerRadius: 50)
-                        .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
-                        .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
-                        .edgesIgnoringSafeArea(.all)
+                    if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1{
+                        RoundedRectangle(cornerRadius: 50)
+                            .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
+                            .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
+                            .edgesIgnoringSafeArea(.all)
+                    }
 
                     /*VStack {
                         Text("YOUR POINTS \(peerManager.playerPoints.count)")
@@ -285,21 +288,21 @@ struct OneVsOneGameView: View {
         }
         
         if peerManager.blindMode {
-           RecordingButton(isRecording: peerManager.isRecording) {
-               if !peerManager.isRecording {
-                   DispatchQueue.main.async {
-                       peerManager.isRecording = true
-                       speechRecognizer.startTranscribing()
-                   }
-               } else {
-                   DispatchQueue.main.async {
-                       peerManager.isRecording = false
-                       speechRecognizer.stopTranscribing()
+                   RecordingButton(isRecording: peerManager.isRecording) {
+                       if peerManager.isRecording {
+                           if recordingInitiator == (peerManager.isClient ? "client" : "host") {
+                               peerManager.isRecording = false
+                               speechRecognizer.stopTranscribing()
+                               recordingInitiator = nil
+                           }
+                       } else {
+                           peerManager.isRecording = true
+                           speechRecognizer.startTranscribing()
+                           recordingInitiator = peerManager.isClient ? "client" : "host"
+                       }
                    }
                }
-           }
-       }
-    }
+            }
 
     private func RecordingButton(isRecording: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {

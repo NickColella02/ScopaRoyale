@@ -4,23 +4,27 @@ struct JoinAGameView: View {
     let username: String
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @State private var navigateToGame = false
+    @State private var rotationAngle: Double = 0
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     
     var body: some View {
-        VStack(spacing: 30) {
+        VStack {
             Spacer()
-            if peerManager.connectedPeers.isEmpty { // se l'utente deve ancora connettersi alla lobby
-                VStack(spacing: 10) {
-                    Text("Searching a lobby...")
-                        .font(.headline)
-                        .foregroundStyle(.gray)
-                    
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
+            if peerManager.connectedPeers.isEmpty {
+                VStack {
+                    RotatingImageView(rotationAngle: $rotationAngle)
+                        .frame(width: 120, height: 120)
+                        .onAppear {
+                            startRotating()
+                        }
+                    Image("searchingALobby")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
                 }
                 .padding()
-            } else { // quando l'utente si connette alla lobby
-                VStack(spacing: 10) {
+            } else {
+                VStack {
                     Text("Lobby's Name")
                         .font(.title)
                         .fontWeight(.bold)
@@ -59,26 +63,45 @@ struct JoinAGameView: View {
                     // Messaggio di attesa
                     Text("Waiting for the host to start the game...")
                         .font(.headline)
-                        .foregroundStyle(.gray)
+                        .foregroundColor(.gray) // Cambiato da .foregroundStyle a .foregroundColor
                         .padding(.top, 20)
                 }
                 .padding()
             }
-            
             Spacer()
         }
-        .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
+        .navigationDestination(isPresented: $navigateToGame) {
             OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
         .onAppear {
             peerManager.sendUsername(username: username)
             peerManager.joinSession()
         }
+        .navigationBarTitle("", displayMode: .inline)
         .onReceive(peerManager.$startGame) { startGame in
             if startGame {
                 navigateToGame = true
             }
         }
-        .preferredColorScheme(.light) // Forza la light mode
+        .preferredColorScheme(.light)
+    }
+    
+    private func startRotating() {
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+            withAnimation(Animation.linear(duration: 1)) {
+                rotationAngle += 360
+            }
+        }
+    }
+}
+
+struct RotatingImageView: View {
+    @Binding var rotationAngle: Double
+    
+    var body: some View {
+        Image("charging")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .rotationEffect(.degrees(rotationAngle))
     }
 }
