@@ -147,7 +147,7 @@ struct OneVsOneGameView: View {
                     }
 
                     VStack {
-                        Text("YOUR POINTS \(peerManager.playerPoints.count)")
+                        Text("LE TUE SCOPE \(peerManager.playerPoints.count)")
                             .font(.system(size: 20, design: .default))
                             .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
                             .padding(.bottom, -5)
@@ -155,7 +155,7 @@ struct OneVsOneGameView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 220)
-                        Text("OPPONENT'S POINTS \(peerManager.opponentPoints.count)")
+                        Text("SCOPE DELL'AVVERSARIO \(peerManager.opponentPoints.count)")
                             .font(.system(size: 15, design: .default))
                             .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
                             .padding(.bottom, 10)
@@ -273,12 +273,10 @@ struct OneVsOneGameView: View {
                 }
             }
         }
-        .onChange(of: peerManager.currentPlayer) { oldPlayer, newPlayer in
+        .onChange(of: peerManager.currentPlayer) {
             if peerManager.blindMode && !peerManager.gameOver {
-                if (peerManager.isHost && newPlayer == 0) || (peerManager.isClient && newPlayer == 1) {
-                    DispatchQueue.main.async {
-                        speechRecognizer.speakText("È il tuo turno")
-                    }
+                if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
+                    speechRecognizer.speakText("È il tuo turno")
                 }
             }
         }
@@ -294,8 +292,8 @@ struct OneVsOneGameView: View {
         .fullScreenCover(isPresented: $peerManager.gameOver) {
             ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
-        .onChange(of: peerManager.peerDisconnected) { oldValue, newValue in
-            if newValue {
+        .onChange(of: peerManager.peerDisconnected) {
+            if peerManager.peerDisconnected {
                 DispatchQueue.main.async {
                     showPeerDisconnectedAlert = true
                 }
@@ -309,7 +307,7 @@ struct OneVsOneGameView: View {
                 .font(.system(size: 30, weight: .regular))
                 .bold()
                 .padding()
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.black).opacity(0.8)

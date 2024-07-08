@@ -16,7 +16,7 @@ struct OneVsOneView: View {
     var body: some View {
         VStack(spacing: 30) {
             VStack(spacing: 10) {
-                Text("Lobby's Name")
+                Text("Nome della lobby")
                     .font(.title)
                     .fontWeight(.bold)
                     .padding(.horizontal)
@@ -30,9 +30,9 @@ struct OneVsOneView: View {
             
             if peerManager.connectedPeers.isEmpty {
                 VStack(spacing: 10) {
-                    Text("Searching for an opponent...")
+                    Text("In attesa di un avversario...")
                         .font(.headline)
-                        .foregroundColor(.gray)
+                        .foregroundStyle(.gray)
                         .padding()
                     
                     ProgressView()
@@ -85,18 +85,18 @@ struct OneVsOneView: View {
                 }
             }) {
                 if peerManager.connectedPeers.isEmpty { // se non ci sono peer connessi
-                    Text("Start")
+                    Text("Gioca")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.gray)
                         .clipShape(RoundedRectangle(cornerRadius: 100))
                         .padding(.horizontal, 35)
                 } else {
-                    Text("Start")
+                    Text("Gioca")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.black)

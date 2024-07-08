@@ -101,7 +101,7 @@ struct ContentView: View {
                             .frame(width: 40, height: 40)
                             .padding(.top, 20)
                     }
-                    TextField("Enter lobby name", text: $lobbyName)
+                    TextField("Inserisci il nome della lobby", text: $lobbyName)
                         .padding()
                         .background(Color(.systemGray6))
                         .clipShape(RoundedRectangle(cornerRadius: 100))
@@ -112,7 +112,7 @@ struct ContentView: View {
                             showLobbyForm = false
                         }
                     }) {
-                        Text("Create lobby")
+                        Text("Crea lobby")
                             .font(.system(size: 20, design: .default))
                             .foregroundStyle(.white)
                             .padding()
@@ -148,22 +148,22 @@ struct ContentView: View {
                         .frame(width: 40, height: 40)
                         .padding(.top, 20)
                     Text("""
-                        Scopa is a traditional Italian card game:
-                        **1. Goal**: the goal is to capture cards on the table by matching them with a card in your hand that has the same value or by adding up to 15.
-                        **2. Gameplay**: the game is usually played with a 40-card Italian deck. Each player is dealt three cards, and four cards are placed face-up on the table. On your turn, you can capture cards from the table that add up to the value of one card in your hand. If you cannot capture any cards, you must place one card from your hand on the table.
-                        **3. Scoring**: each captured card is worth 1 point, additional points can be earned for:
-                        - The most cards.
-                        - The most 'coins' (denari) cards.
-                        - The 7 of coins (Settebello).
-                        - The most 'prime' cards (7s, 6s, aces, etc.).
-                        **4. Winning**: The game continues until all cards are played. The player with the most points at the end wins.
+                        Scopa è un tradizionale gioco di carte italiano:
+                        **1. Obiettivo**: l'obiettivo è catturare le carte sul tavolo abbinandole con una carta nella tua mano che ha lo stesso valore o sommando fino a 15.
+                        **2. Svolgimento del gioco**: il gioco si gioca solitamente con un mazzo di carte italiane da 40 carte. A ciascun giocatore vengono distribuite tre carte, e quattro carte vengono messe scoperte sul tavolo. Al tuo turno, puoi catturare le carte dal tavolo che sommano al valore di una carta nella tua mano. Se non puoi catturare alcuna carta, devi mettere una carta dalla tua mano sul tavolo.
+                        **3. Punteggio**: ogni carta catturata vale 1 punto, punti aggiuntivi possono essere guadagnati per:
+                        - Il maggior numero di carte.
+                        - Il maggior numero di carte di 'denari'.
+                        - Il 7 di denari (Settebello).
+                        - Il maggior numero di carte 'prime' (7, 6, assi, ecc.).
+                        **4. Vittoria**: il gioco continua fino a quando tutte le carte sono state giocate. Il giocatore con il maggior numero di punti alla fine vince.
                         """)
                         .font(.body)
                         .padding(.horizontal, 20)
                     Button(action: {
                         showGameRules = false
                     }) {
-                        Text("Close")
+                        Text("Chiudi")
                             .font(.system(size: 20, design: .default))
                             .foregroundStyle(.white)
                             .padding()
@@ -204,7 +204,7 @@ struct CreateNewLobby: View {
             showLobbyForm = true
         }) {
             HStack {
-                Text("Create a new lobby")
+                Text("Crea una lobby")
                     .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding(.horizontal)
@@ -231,7 +231,7 @@ struct JoinExistentLobby: View {
             showJoinGame = true
         }) {
             HStack {
-                Text("Join existent lobby")
+                Text("Entra in una lobby")
                     .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding(.horizontal)
@@ -256,7 +256,7 @@ struct HowToPlay: View {
             showGameRules = true
         }) {
             HStack {
-                Text("How to play")
+                Text("Come si gioca")
                     .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding(.horizontal)

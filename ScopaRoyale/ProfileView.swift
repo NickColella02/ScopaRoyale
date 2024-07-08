@@ -12,7 +12,7 @@ struct ProfileView: View {
     @State private var showAlert: Bool = false
     @State private var localUsername: String
     
-    let maxUsernameLength = 14
+    let maxUsernameLength: Int = 14
     let synthesizer = AVSpeechSynthesizer()
     
     init(username: Binding<String>) {
@@ -53,19 +53,19 @@ struct ProfileView: View {
             .padding(.bottom, 10)
             
             VStack {
-                Text("Welcome back, \(username)")
+                Text("Bentornato, \(username)")
                     .font(.system(size: 20, design: .default))
-                    .foregroundColor(.black)
+                    .foregroundStyle(.black)
                     .bold()
                     .padding(.bottom, 10)
                 
                 if localUsername.count > maxUsernameLength {
-                    Text("Username must be \(maxUsernameLength) characters or less.")
+                    Text("L'username può contenere al massimo \(maxUsernameLength) caratteri.")
                         .font(.caption)
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .padding(.horizontal, 25)
                 }
-                TextField("Enter username", text: $localUsername)
+                TextField("Inserisci il nickname", text: $localUsername)
                     .padding()
                     .background(Color(.systemGray6))
                     .clipShape(RoundedRectangle(cornerRadius: 100))
@@ -82,7 +82,7 @@ struct ProfileView: View {
                 }) {
                     Text("Done")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(localUsername.isEmpty || localUsername.count > maxUsernameLength ? Color.gray : Color.black)
@@ -94,9 +94,9 @@ struct ProfileView: View {
                 Button(action: {
                     toggleBlindMode()
                 }) {
-                    Text(peerManager.blindMode ? "Disable Blind Mode" : "Enable Blind Mode")
+                    Text(peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata")
                         .font(.system(size: 20, design: .default))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color(!peerManager.blindMode ? .black : Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255)))
@@ -105,9 +105,9 @@ struct ProfileView: View {
                 }
             }
             .padding(.horizontal)
-            Text("La Blind mode fornisce, ai giocatori non udenti, un ​​supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
+            Text("La Blind mode fornisce, ai giocatori non vedenti, un ​​supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
                 .font(.system(size: 14, design: .default))
-                .foregroundStyle(.gray)
+                .foregroundStyle(.black)
                 .padding(.horizontal, 45)
                 .padding(.top, 10)
             
@@ -117,7 +117,7 @@ struct ProfileView: View {
         .toolbar {
             Text("Fine")
                 .bold()
-                .foregroundColor(.blue)
+                .foregroundStyle(.blue)
                 .onTapGesture {
                     if localUsername.isEmpty {
                         showAlert = true
@@ -148,13 +148,13 @@ struct ProfileView: View {
         }) {
             Image(systemName: "chevron.left")
                 .bold()
-                .foregroundColor(.black)
+                .foregroundStyle(.black)
         })*/
     }
     
     private func toggleBlindMode() {
         peerManager.blindMode.toggle()
-        let message = peerManager.blindMode ? "Blind mode enabled" : "Blind mode disabled"
+        let message = peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata"
         DispatchQueue.main.async {
             speakText(message)
         }
@@ -162,7 +162,7 @@ struct ProfileView: View {
     
     private func speakText(_ text: String) {
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
         synthesizer.speak(utterance)

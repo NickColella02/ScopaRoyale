@@ -262,14 +262,16 @@ actor SpeechRecognizer: ObservableObject {
             if !foundValue.isEmpty && !foundSeed.isEmpty { // se sono riconosciuti un valore e un seme
                 print("Valore riconosciuto: \(foundValue)")
                 print("Seme riconosciuto: \(foundSeed)")
-                if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
-                    await speakText("Gioco la carta \(foundValue) di \(foundSeed)")
-                    peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
-                } else {
-                    await speakText("La carta non è nella tua mano")
-                }
-                DispatchQueue.main.async {
-                    self.peerManager.isRecording = false // fermo la registrazione
+                if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
+                    if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
+                        await speakText("Gioco la carta \(foundValue) di \(foundSeed)")
+                        peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
+                    } else {
+                        await speakText("La carta non è nella tua mano")
+                    }
+                    DispatchQueue.main.async {
+                        self.peerManager.isRecording = false // fermo la registrazione
+                    }
                 }
             } else {
                 print("Valore o seme non riconosciuto")

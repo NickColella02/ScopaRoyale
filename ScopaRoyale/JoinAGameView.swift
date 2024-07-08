@@ -25,7 +25,7 @@ struct JoinAGameView: View {
                 .padding()
             } else {
                 VStack {
-                    Text("Lobby's Name")
+                    Text("Nome della lobby")
                         .font(.title)
                         .fontWeight(.bold)
                         .padding(.horizontal)
@@ -61,9 +61,9 @@ struct JoinAGameView: View {
                     }
                     
                     // Messaggio di attesa
-                    Text("Waiting for the host to start the game...")
+                    Text("In attesa che l'host avvii la partita...")
                         .font(.headline)
-                        .foregroundColor(.gray) // Cambiato da .foregroundStyle a .foregroundColor
+                        .foregroundStyle(.gray) // Cambiato da .foregroundStyle a .foregroundStyle
                         .padding(.top, 20)
                 }
                 .padding()

@@ -250,8 +250,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
 
     private func handleIsRecordingData(_ jsonData: Data) {
         do {
-            let recording = try JSONDecoder().decode(Bool.self, from: jsonData)
-            self.isRecording  = recording
+            _ = try JSONDecoder().decode(Bool.self, from: jsonData)
+            self.isRecording = false
         } catch {
             print("Errore nella decodifica dei dati IsRecording: \(error.localizedDescription)")
         }
@@ -268,26 +268,22 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func startHosting(lobbyName: String, numberOfPlayers: Int, username: String) { // eseguito dall'advertiser
-        DispatchQueue.main.async {
-            self.neededPlayers = numberOfPlayers
-            self.lobbyName = lobbyName
-            self.myUsername = username
-            self.isHost = true // sono l'advertiser
-            self.isClient = false // non sono il browser
-            self.advertiser = MCNearbyServiceAdvertiser(peer: self.peerID, discoveryInfo: nil, serviceType: self.serviceType)
-            self.advertiser?.delegate = self
-            self.advertiser?.startAdvertisingPeer()
-        }
+        self.neededPlayers = numberOfPlayers
+        self.lobbyName = lobbyName
+        self.myUsername = username
+        self.isHost = true // sono l'advertiser
+        self.isClient = false // non sono il browser
+        self.advertiser = MCNearbyServiceAdvertiser(peer: self.peerID, discoveryInfo: nil, serviceType: self.serviceType)
+        self.advertiser?.delegate = self
+        self.advertiser?.startAdvertisingPeer()
     }
 
     func joinSession() { // eseguito dal browser
-        DispatchQueue.main.async {
-            self.browser = MCNearbyServiceBrowser(peer: self.peerID, serviceType: self.serviceType)
-            self.browser?.delegate = self
-            self.isClient = true // sono il browser
-            self.isHost = false // non sono l'advertiser
-            self.browser?.startBrowsingForPeers()
-        }
+        self.browser = MCNearbyServiceBrowser(peer: self.peerID, serviceType: self.serviceType)
+        self.browser?.delegate = self
+        self.isClient = true // sono il browser
+        self.isHost = false // non sono l'advertiser
+        self.browser?.startBrowsingForPeers()
     }
 
     func sendUsername(username: String) { // usato dal browser per inviare il suo username all'advertiser
@@ -406,16 +402,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func giveCardsToPlayers() { // assegna 3 carte ad ogni giocatore
-        for _ in 0..<3 { // mano del giocatore
-            if let card = deck.first {
-                self.playerHand.append(card)
+        for _ in 0..<3 {
+            if let playerCard = deck.first { // mano del giocatore
+                self.playerHand.append(playerCard)
                 self.deck.removeFirst()
             }
-        }
-        
-        for _ in 0..<3 { // mano dell'avversario
-            if let card = deck.first {
-                self.opponentHand.append(card)
+            if let opponentCard = deck.first { // mano dell'avversario
+                self.opponentHand.append(opponentCard)
                 self.deck.removeFirst()
             }
         }
@@ -534,9 +527,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
-                        DispatchQueue.main.async {
-                            self.speakText("Hai fatto scopa")
-                        }
+                        self.speakText("Hai fatto scopa")
                     }
                     sendPlayersPoints()
                 }
@@ -614,9 +605,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     }
                     self.gameOver = true // termina la partita
                     if blindMode {
-                        DispatchQueue.main.async {
-                            self.speakText("Partita terminata")
-                        }
+                        self.speakText("Partita terminata")
                     }
                     sendSettebello()
                     sendPrimera()
@@ -629,7 +618,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     
     private func speakText(_ text: String) {
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
         synthetizer.speak(utterance)
