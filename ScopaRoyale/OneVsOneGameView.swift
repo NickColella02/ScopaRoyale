@@ -1,3 +1,4 @@
+
 import SwiftUI
 import SpriteKit
 
@@ -16,10 +17,9 @@ struct OneVsOneGameView: View {
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
-    @State private var recordingInitiator: String?
 
     var body: some View {
-        ZStack(alignment: .topLeading) { // Align contents to top left
+        ZStack {
             SpriteView(scene: scene)
                 .edgesIgnoringSafeArea(.all)
                 .navigationBarBackButtonHidden(true)
@@ -60,7 +60,7 @@ struct OneVsOneGameView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 90)
                             .zIndex(0)
-                        Text("\(peerManager.playerPoints.count)")
+                        Text("\(peerManager.cardTakenByPlayer.count)")
                             .font(.system(size: 12, design: .default))
                             .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
                             .padding(1)
@@ -103,7 +103,7 @@ struct OneVsOneGameView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 90)
                             .zIndex(0)
-                        Text("\(peerManager.opponentPoints.count)")
+                        Text("\(peerManager.cardTakenByOpponent.count)")
                             .font(.system(size: 12, design: .default))
                             .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
                             .padding(1)
@@ -139,14 +139,14 @@ struct OneVsOneGameView: View {
                     }
                     .position(x: geometry.size.width * 0.8, y: geometry.size.height * 0.1)
 
-                    if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1{
-                        RoundedRectangle(cornerRadius: 50)
+                    if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1 {
+                        RoundedRectangle(cornerRadius: 49)
                             .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 5)
                             .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
                             .edgesIgnoringSafeArea(.all)
                     }
 
-                    /*VStack {
+                    VStack {
                         Text("YOUR POINTS \(peerManager.playerPoints.count)")
                             .font(.system(size: 20, design: .default))
                             .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
@@ -160,7 +160,7 @@ struct OneVsOneGameView: View {
                             .foregroundStyle(Color(red: 191 / 255, green: 191 / 255, blue: 191 / 255))
                             .padding(.bottom, 10)
                     }
-                    .position(x: geometry.size.width * 0.63, y: geometry.size.height * 0.905)*/
+                    .position(x: geometry.size.width * 0.63, y: geometry.size.height * 0.905)
                 }
             }
 
@@ -257,6 +257,21 @@ struct OneVsOneGameView: View {
                     .padding(.bottom, 150)
                 }
             }
+            if peerManager.blindMode {
+                if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1 {
+                    RecordingButton(isRecording: peerManager.isRecording) {
+                        if peerManager.isRecording {
+                            peerManager.isRecording = false
+                            peerManager.sendRecordingStatus(false)
+                            speechRecognizer.stopTranscribing()
+                        } else {
+                            peerManager.isRecording = true
+                            peerManager.sendRecordingStatus(true)
+                            speechRecognizer.startTranscribing()
+                        }
+                    }
+                }
+            }
         }
         .onChange(of: peerManager.currentPlayer) { oldPlayer, newPlayer in
             if peerManager.blindMode && !peerManager.gameOver {
@@ -286,34 +301,18 @@ struct OneVsOneGameView: View {
                 }
             }
         }
-        
-        if peerManager.blindMode {
-                   RecordingButton(isRecording: peerManager.isRecording) {
-                       if peerManager.isRecording {
-                           if recordingInitiator == (peerManager.isClient ? "client" : "host") {
-                               peerManager.isRecording = false
-                               speechRecognizer.stopTranscribing()
-                               recordingInitiator = nil
-                           }
-                       } else {
-                           peerManager.isRecording = true
-                           speechRecognizer.startTranscribing()
-                           recordingInitiator = peerManager.isClient ? "client" : "host"
-                       }
-                   }
-               }
-            }
+    }
 
     private func RecordingButton(isRecording: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(isRecording ? "Chiudi registrazione" : "Avvia registrazione")
-                .font(.headline)
+            Text(isRecording ? "Interrompi registrazione" : "Avvia registrazione")
+                .font(.system(size: 30, weight: .regular))
+                .bold()
                 .padding()
-                .foregroundStyle(.white)
-                .background(Color.blue)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .foregroundColor(.white)
         }
-        .padding(.bottom, 20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.black).opacity(0.8)
     }
     
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {

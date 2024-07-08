@@ -155,7 +155,9 @@ struct ProfileView: View {
     private func toggleBlindMode() {
         peerManager.blindMode.toggle()
         let message = peerManager.blindMode ? "Blind mode enabled" : "Blind mode disabled"
-        speakText(message)
+        DispatchQueue.main.async {
+            speakText(message)
+        }
     }
     
     private func speakText(_ text: String) {

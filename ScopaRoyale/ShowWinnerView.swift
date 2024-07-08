@@ -139,7 +139,9 @@ struct ShowWinnerView: View {
             }
             .padding()
             .onAppear() {
-                speechRecognizer.speakText("Il vincitore è \(peerManager.winner)")
+                DispatchQueue.main.async {
+                    speechRecognizer.speakText("Il vincitore è \(peerManager.winner)")
+                }
             }
             .fullScreenCover(isPresented: $showHomeView) {
                 ContentView().environmentObject(peerManager)

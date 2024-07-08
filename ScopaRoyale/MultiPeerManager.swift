@@ -134,92 +134,126 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
             if let receivedString = String(data: data, encoding: .utf8) {
-                if receivedString == "START_GAME" { // riceve l'informazione relativa all'inizio della partita
+                if receivedString == "START_GAME" {
                     self.startGame = true
                     self.gameOver = false
-                } else if receivedString.starts(with: "Lobby:") { // riceve il nome della lobby
+                } else if receivedString.starts(with: "Lobby:") {
                     self.lobbyName = String(receivedString.dropFirst(6))
-                } else if receivedString.starts(with: "Deck:") { // riceve il deck
+                } else if receivedString.starts(with: "Deck:") {
                     let data = data.dropFirst(5)
                     self.deck = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "PlayersHands:") { // riceve le mani dei giocatori
-                    let jsonData = data.dropFirst(13)
-                    do {
-                        let hands = try JSONDecoder().decode(Hands.self, from: jsonData)
-                        self.playerHand = hands.playerHand
-                        self.opponentHand = hands.opponentHand
-                    } catch {
-                        print("Errore nella decodifica dei dati Hands: \(error.localizedDescription)")
-                    }
-                } else if receivedString.starts(with: "CardsTaken:") { // riceve i mazzi di carte prese dai giocatori
-                    let jsonData = data.dropFirst(11)
-                    do {
-                        let cardsTaken = try JSONDecoder().decode(CardsTaken.self, from: jsonData)
-                        self.cardTakenByPlayer = cardsTaken.playerCards
-                        self.cardTakenByOpponent = cardsTaken.opponentCards
-                    } catch {
-                        print("Errore nella decodifica dei dati CardsTaken: \(error.localizedDescription)")
-                    }
-                } else if receivedString.starts(with: "PlayersPoints:") { // riceve i mazzi di scope dei giocatori
-                    let jsonData = data.dropFirst(14)
-                    do {
-                        let points = try JSONDecoder().decode(Points.self, from: jsonData)
-                        self.playerPoints = points.playerPoints
-                        self.opponentPoints = points.opponentPoints
-                    } catch {
-                        print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
-                    }
-                } else if receivedString.starts(with: "Primera:") { // riceve i mazzi di scope dei giocatori
-                    let jsonData = data.dropFirst(8)
-                    do {
-                        let primera = try JSONDecoder().decode(Primera.self, from: jsonData)
-                        self.playerHasPrimera = primera.playerHasPrimera
-                        self.opponentHasPrimera = primera.opponentHasPrimera
-                    } catch {
-                        print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
-                    }
-                } else if receivedString.starts(with: "Settebello:") { // riceve i mazzi di scope dei giocatori
-                    let jsonData = data.dropFirst(11)
-                    do {
-                        let settebello = try JSONDecoder().decode(Settebello.self, from: jsonData)
-                        self.playerHasSettebello = settebello.playerHasSettebello
-                        self.opponentHasPrimera = settebello.opponentHasSettebello
-                    } catch {
-                        print("Errore nella decodifica dei dati Settebello: \(error.localizedDescription)")
-                    }
+                } else if receivedString.starts(with: "PlayersHands:") {
+                    self.handlePlayersHandsData(data.dropFirst(13))
+                } else if receivedString.starts(with: "CardsTaken:") {
+                    self.handleCardsTakenData(data.dropFirst(11))
+                } else if receivedString.starts(with: "PlayersPoints:") {
+                    self.handlePlayersPointsData(data.dropFirst(14))
+                } else if receivedString.starts(with: "Primera:") {
+                    self.handlePrimeraData(data.dropFirst(8))
+                } else if receivedString.starts(with: "Settebello:") {
+                    self.handleSettebelloData(data.dropFirst(11))
                 } else if receivedString.starts(with: "PlayersCoins:") {
-                    let jsonData = data.dropFirst(13)
-                    do {
-                        let coins = try JSONDecoder().decode(Coins.self, from: jsonData)
-                        self.playerCoinsCount = coins.playerCoins
-                        self.opponentCoinsCount = coins.opponentCoins
-                    } catch {
-                        print("Errore nella decodifica dei dati Coins: \(error.localizedDescription)")
-                    }
-                } else if receivedString.starts(with: "Table:") { // riceve le carte del tavolo
+                    self.handlePlayersCoinsData(data.dropFirst(13))
+                } else if receivedString.starts(with: "Table:") {
                     let data = data.dropFirst(6)
                     self.tableCards = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "CurrentPlayer:") { // Gestisce l'aggiornamento del turno
+                } else if receivedString.starts(with: "CurrentPlayer:") {
                     let data = data.dropFirst(14)
                     let dataString = String(data: data, encoding: .utf8)
                     self.currentPlayer = Int(dataString!)!
-                } else if receivedString.starts(with: "GameOver:") { // Gestisce la ricezione del segnale di fine partita
+                } else if receivedString.starts(with: "GameOver:") {
                     self.gameOver = true
                     self.startGame = false
-                } else if receivedString.starts(with: "PlayersScores:") { // riceve i punteggi dei giocatori e il vincitore
-                    let jsonData = data.dropFirst(14)
-                    do {
-                        let scores = try JSONDecoder().decode(Scores.self, from: jsonData)
-                        self.playerScore = scores.playerScore
-                        self.opponentScore = scores.opponentScore
-                        self.winner = scores.winner
-                    } catch {
-                        print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
-                    }
-                } else { // riceve l'username
+                } else if receivedString.starts(with: "PlayersScores:") {
+                    self.handlePlayersScoresData(data.dropFirst(14))
+                } else if receivedString.starts(with: "IsRecording:") {
+                    self.handleIsRecordingData(data.dropFirst(12))
+                } else {
                     self.opponentName = receivedString
                 }
             }
+        }
+    }
+
+    // Funzioni helper per la decodifica
+
+    private func handlePlayersHandsData(_ jsonData: Data) {
+        do {
+            let hands = try JSONDecoder().decode(Hands.self, from: jsonData)
+            self.playerHand = hands.playerHand
+            self.opponentHand = hands.opponentHand
+        } catch {
+            print("Errore nella decodifica dei dati Hands: \(error.localizedDescription)")
+        }
+    }
+
+    private func handleCardsTakenData(_ jsonData: Data) {
+        do {
+            let cardsTaken = try JSONDecoder().decode(CardsTaken.self, from: jsonData)
+            self.cardTakenByPlayer = cardsTaken.playerCards
+            self.cardTakenByOpponent = cardsTaken.opponentCards
+        } catch {
+            print("Errore nella decodifica dei dati CardsTaken: \(error.localizedDescription)")
+        }
+    }
+
+    private func handlePlayersPointsData(_ jsonData: Data) {
+        do {
+            let points = try JSONDecoder().decode(Points.self, from: jsonData)
+            self.playerPoints = points.playerPoints
+            self.opponentPoints = points.opponentPoints
+        } catch {
+            print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
+        }
+    }
+
+    private func handlePrimeraData(_ jsonData: Data) {
+        do {
+            let primera = try JSONDecoder().decode(Primera.self, from: jsonData)
+            self.playerHasPrimera = primera.playerHasPrimera
+            self.opponentHasPrimera = primera.opponentHasPrimera
+        } catch {
+            print("Errore nella decodifica dei dati Primera: \(error.localizedDescription)")
+        }
+    }
+
+    private func handleSettebelloData(_ jsonData: Data) {
+        do {
+            let settebello = try JSONDecoder().decode(Settebello.self, from: jsonData)
+            self.playerHasSettebello = settebello.playerHasSettebello
+            self.opponentHasPrimera = settebello.opponentHasSettebello
+        } catch {
+            print("Errore nella decodifica dei dati Settebello: \(error.localizedDescription)")
+        }
+    }
+
+    private func handlePlayersCoinsData(_ jsonData: Data) {
+        do {
+            let coins = try JSONDecoder().decode(Coins.self, from: jsonData)
+            self.playerCoinsCount = coins.playerCoins
+            self.opponentCoinsCount = coins.opponentCoins
+        } catch {
+            print("Errore nella decodifica dei dati Coins: \(error.localizedDescription)")
+        }
+    }
+
+    private func handlePlayersScoresData(_ jsonData: Data) {
+        do {
+            let scores = try JSONDecoder().decode(Scores.self, from: jsonData)
+            self.playerScore = scores.playerScore
+            self.opponentScore = scores.opponentScore
+            self.winner = scores.winner
+        } catch {
+            print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
+        }
+    }
+
+    private func handleIsRecordingData(_ jsonData: Data) {
+        do {
+            let recording = try JSONDecoder().decode(Bool.self, from: jsonData)
+            self.isRecording  = recording
+        } catch {
+            print("Errore nella decodifica dei dati IsRecording: \(error.localizedDescription)")
         }
     }
 
@@ -347,10 +381,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque", //"sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe", "spade", "bastoni"
+            "denari", "coppe", //"spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -452,6 +486,16 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
         }
     }
+    
+    func sendRecordingStatus(_ Recording: Bool) {
+        let recording = "IsRecording: \(Recording)".data(using: .utf8)!
+        do{
+            try session.send(recording, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore notifica recording: \(error.localizedDescription)")
+        }
+        
+    }
             
     func playCard(card: Card) { // gestisce la mossa di un giocatore
         DispatchQueue.main.async { [self] in
@@ -490,7 +534,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
-                        speakText("Hai fatto scopa")
+                        DispatchQueue.main.async {
+                            self.speakText("Hai fatto scopa")
+                        }
                     }
                     sendPlayersPoints()
                 }
@@ -568,7 +614,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     }
                     self.gameOver = true // termina la partita
                     if blindMode {
-                        //synthetizer.speakText("Partita terminata")
+                        DispatchQueue.main.async {
+                            self.speakText("Partita terminata")
+                        }
                     }
                     sendSettebello()
                     sendPrimera()
