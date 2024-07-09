@@ -136,6 +136,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 if receivedString == "START_GAME" {
                     self.startGame = true
                     self.gameOver = false
+                    self.speakText("Partita iniziata")
                 } else if receivedString.starts(with: "Lobby:") {
                     self.lobbyName = String(receivedString.dropFirst(6))
                 } else if receivedString.starts(with: "Deck:") {

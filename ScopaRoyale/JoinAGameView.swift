@@ -23,6 +23,11 @@ struct JoinAGameView: View {
                         .frame(width: 40, height: 40)
                 }
                 .padding()
+                .onAppear {
+                    if peerManager.blindMode {
+                        speechRecognizer.speakText("In cerca di una lobby")
+                    }
+                }
             } else {
                 VStack {
                     Text("Nome della lobby")
@@ -56,7 +61,6 @@ struct JoinAGameView: View {
                             .padding(.horizontal, 20)
                         
                         VStack {
-                            
                             // Immagine dell'avatar dell'avversario
                             avatarImage(for: peerManager.opponentAvatarImage)
                                 .resizable()
@@ -69,7 +73,9 @@ struct JoinAGameView: View {
                                 .padding(.top, 10)
                         }
                     }
+                    
                     Spacer()
+                    
                     // Messaggio di attesa con animazione dei puntini
                     Text("In attesa che l'host avvii la partita")
                         .font(.headline)
@@ -95,10 +101,18 @@ struct JoinAGameView: View {
         .navigationBarTitle("", displayMode: .inline)
         .onReceive(peerManager.$startGame) { startGame in
             if startGame {
+                if peerManager.blindMode {
+                    speechRecognizer.speakText("Partita iniziata")
+                }
                 navigateToGame = true
             }
         }
         .preferredColorScheme(.light)
+        .onChange(of: peerManager.connectedPeers){
+            if peerManager.blindMode && peerManager.connectedPeers.count > 0{
+                speechRecognizer.speakText("Lobby trovata, in attesa che l'host avvii la partita")
+            }
+        }
     }
     
     private func startRotating() {

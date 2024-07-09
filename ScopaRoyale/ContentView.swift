@@ -56,6 +56,9 @@ struct ContentView: View {
         .preferredColorScheme(.light)
         .overlay(lobbyFormOverlay)
         .overlay(gameRulesOverlay)
+        .onTapGesture {
+            hideKeyboard()
+        }
     }
     
     @ViewBuilder
@@ -273,5 +276,11 @@ struct HowToPlay: View {
             .clipShape(RoundedRectangle(cornerRadius: 50))
         }
         .padding(.bottom, 70)
+    }
+}
+
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
