@@ -99,6 +99,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             case .connected:
                 if !self.connectedPeers.contains(peerID) {
                     self.connectedPeers.append(peerID)
+                    self.peerDisconnected = false
                     self.sendUsername(username: self.myUsername)
                     self.sendLobbyName()
                     self.sendOpponentAvatarImage(self.myAvatarImage!)
@@ -652,6 +653,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     
     func reset() {
         DispatchQueue.main.async {
+            self.opponentName = ""
+            self.opponentAvatarImage = ""
             self.peerDisconnected = false
             self.gameOver = false
             self.startGame = false

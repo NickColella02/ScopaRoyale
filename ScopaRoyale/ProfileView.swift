@@ -12,7 +12,6 @@ struct ProfileView: View {
     @State private var showAlert: Bool = false
     @State private var localUsername: String
     
-    
     let maxUsernameLength: Int = 14
     let synthesizer = AVSpeechSynthesizer()
     
@@ -114,7 +113,7 @@ struct ProfileView: View {
             
             Spacer()
         }
-        .navigationBarTitle("", displayMode: .inline) // lasciare così
+        .navigationBarTitle("", displayMode: .inline)
         .toolbar {
             Text("Fine")
                 .bold()
@@ -144,22 +143,13 @@ struct ProfileView: View {
                 avatarImage = Image(savedAvatar)
             }
         }
-        /*.navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            presentationMode.wrappedValue.dismiss()
-        }) {
-            Image(systemName: "chevron.left")
-                .bold()
-                .foregroundStyle(.black)
-        })*/
+        .navigationBarBackButtonHidden(true)
     }
     
     private func toggleBlindMode() {
         peerManager.blindMode.toggle()
         let message = peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata"
-        DispatchQueue.main.async {
-            speakText(message)
-        }
+        speakText(message)
     }
     
     private func speakText(_ text: String) {

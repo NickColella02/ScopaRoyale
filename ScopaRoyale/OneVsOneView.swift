@@ -12,7 +12,7 @@ struct OneVsOneView: View {
     
     var body: some View {
         VStack(spacing: 30) {
-            VStack(spacing: 10) {
+            VStack {
                 Text("Nome della lobby")
                     .font(.title)
                     .fontWeight(.bold)
@@ -21,6 +21,7 @@ struct OneVsOneView: View {
                 Text(lobbyName)
                     .font(.largeTitle)
                     .padding(.horizontal)
+                    .padding(.top, 10)
             }
             
             Spacer()
@@ -105,6 +106,11 @@ struct OneVsOneView: View {
         }
         .navigationDestination(isPresented: $navigateToGame) { // navigazione alla modalità 1 vs 1
             OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
+        }
+        .onChange(of: peerManager.peerDisconnected) {
+            if peerManager.peerDisconnected {
+                peerManager.reset()
+            }
         }
         .preferredColorScheme(.light) // forza la light mode
         .onAppear() { // quando la pagina è caricata, da avvio alla connessione

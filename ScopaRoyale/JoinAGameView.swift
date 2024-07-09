@@ -5,11 +5,11 @@ struct JoinAGameView: View {
     @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
     @State private var navigateToGame = false
     @State private var rotationAngle: Double = 0
+    @State private var isAnimatingDots = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     
     var body: some View {
         VStack {
-            Spacer()
             if peerManager.connectedPeers.isEmpty {
                 VStack {
                     RotatingImageView(rotationAngle: $rotationAngle)
@@ -33,6 +33,9 @@ struct JoinAGameView: View {
                     Text(peerManager.lobbyName) // nome della lobby trovata
                         .font(.largeTitle)
                         .padding(.horizontal)
+                        .padding(.top, 10)
+                    
+                    Spacer()
                     
                     HStack {
                         VStack {
@@ -66,16 +69,20 @@ struct JoinAGameView: View {
                                 .padding(.top, 10)
                         }
                     }
-                    
-                    // Messaggio di attesa
-                    Text("In attesa che l'host avvii la partita...")
+                    Spacer()
+                    // Messaggio di attesa con animazione dei puntini
+                    Text("In attesa che l'host avvii la partita")
                         .font(.headline)
-                        .foregroundStyle(.gray) // Cambiato da .foregroundStyle a .foregroundStyle
+                        .foregroundStyle(.gray)
                         .padding(.top, 20)
+                    
+                    AnimatedDotsView(isAnimating: $isAnimatingDots)
+                        .onAppear {
+                            isAnimatingDots = true
+                        }
                 }
                 .padding()
             }
-            Spacer()
         }
         .navigationDestination(isPresented: $navigateToGame) {
             OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
@@ -120,5 +127,25 @@ struct RotatingImageView: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
             .rotationEffect(.degrees(rotationAngle))
+    }
+}
+
+struct AnimatedDotsView: View {
+    @Binding var isAnimating: Bool
+    @State private var scales: [CGFloat] = [0.5, 0.5, 0.5]
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<3) { index in
+                Circle()
+                    .frame(width: 10, height: 10)
+                    .scaleEffect(scales[index])
+                    .onAppear {
+                        withAnimation(Animation.easeInOut(duration: 0.6).repeatForever().delay(Double(index) * 0.2)) {
+                            scales[index] = 1
+                        }
+                    }
+            }
+        }
     }
 }

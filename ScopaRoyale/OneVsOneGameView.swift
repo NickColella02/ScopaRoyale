@@ -276,7 +276,9 @@ struct OneVsOneGameView: View {
         .onChange(of: peerManager.currentPlayer) {
             if peerManager.blindMode && !peerManager.gameOver {
                 if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
-                    speechRecognizer.speakText("È il tuo turno")
+                    DispatchQueue.main.async {
+                        speechRecognizer.speakText("È il tuo turno")
+                    }
                 }
             }
         }
