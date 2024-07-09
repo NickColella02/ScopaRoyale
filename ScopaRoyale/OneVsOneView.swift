@@ -10,9 +10,6 @@ struct OneVsOneView: View {
     @State private var navigateToGame = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     
-    // Avatar dell'utente recuperato dagli UserDefaults
-    @State private var userAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
-    
     var body: some View {
         VStack(spacing: 30) {
             VStack(spacing: 10) {
@@ -44,7 +41,7 @@ struct OneVsOneView: View {
             HStack {
                 VStack {
                     // Immagine dell'avatar dell'utente
-                    avatarImage(for: userAvatar)
+                    avatarImage(for: peerManager.myAvatarImage)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 80, height: 80)
@@ -62,7 +59,7 @@ struct OneVsOneView: View {
                 if !peerManager.opponentName.isEmpty {
                     VStack {
                         // va aggiunto l'avatar dell'avversario
-                        Image("1user")
+                        avatarImage(for: peerManager.opponentAvatarImage)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 80, height: 80)

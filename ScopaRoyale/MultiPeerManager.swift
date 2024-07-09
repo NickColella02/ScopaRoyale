@@ -83,6 +83,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
     @Published var gameOver: Bool = false // true quando la partita finisce
     @Published var winner: String = "" // nome del giocatore che ha vinto
+    @Published var myAvatarImage: String? = UserDefaults.standard.string(forKey: "selectedAvatar") //nome dell avatar che ha scelto l utente
+    @Published var opponentAvatarImage: String = ""//nome dell avatar che ha scelto l opponent
 
     override init() {
         self.blindMode = UserDefaults.standard.bool(forKey: "blindMode")
@@ -99,6 +101,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.connectedPeers.append(peerID)
                     self.sendUsername(username: self.myUsername)
                     self.sendLobbyName()
+                    self.sendOpponentAvatarImage(self.myAvatarImage!)
                 }
             case .notConnected:
                 self.peerDisconnected = true
@@ -167,7 +170,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 } else if receivedString.starts(with: "PlayersScores:") {
                     self.handlePlayersScoresData(data.dropFirst(14))
                 } else if receivedString.starts(with: "IsRecording:") {
-                    self.handleIsRecordingData(data.dropFirst(12))
+                    self.isRecording = false
+                } else if receivedString.starts(with: "IsAvatar:"){
+                    self.opponentAvatarImage = String(receivedString.dropFirst(9))
                 } else {
                     self.opponentName = receivedString
                 }
@@ -247,15 +252,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
         }
     }
-
-    private func handleIsRecordingData(_ jsonData: Data) {
-        do {
-            _ = try JSONDecoder().decode(Bool.self, from: jsonData)
-            self.isRecording = false
-        } catch {
-            print("Errore nella decodifica dei dati IsRecording: \(error.localizedDescription)")
-        }
-    }
+    
 
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
 
@@ -489,6 +486,16 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
         
     }
+    
+     func sendOpponentAvatarImage(_ Image: String){
+        let avatar = "IsAvatar:\(Image)".data(using: .utf8)!
+        do {
+            try session.send(avatar, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore notifica avatar: \(error.localizedDescription)")
+        }
+    }
+
             
     func playCard(card: Card) { // gestisce la mossa di un giocatore
         DispatchQueue.main.async { [self] in
@@ -621,6 +628,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playback, mode: .default, options: [.allowBluetoothA2DP, .defaultToSpeaker])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
+        }
         synthetizer.speak(utterance)
     }
 

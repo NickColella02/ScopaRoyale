@@ -12,6 +12,7 @@ struct ProfileView: View {
     @State private var showAlert: Bool = false
     @State private var localUsername: String
     
+    
     let maxUsernameLength: Int = 14
     let synthesizer = AVSpeechSynthesizer()
     
@@ -133,6 +134,7 @@ struct ProfileView: View {
                 if let selectedAvatar = selectedAvatar {
                     UserDefaults.standard.set(selectedAvatar, forKey: "selectedAvatar")
                     self.selectedAvatar = selectedAvatar
+                    peerManager.myAvatarImage = selectedAvatar
                 }
                 showPicker = false
             }

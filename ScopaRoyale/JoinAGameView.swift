@@ -36,10 +36,13 @@ struct JoinAGameView: View {
                     
                     HStack {
                         VStack {
-                            Image("1user")
+                            // Immagine dell'avatar dell'utente
+                            avatarImage(for: peerManager.myAvatarImage)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 120)
+                                .frame(width: 80, height: 80)
+                                .clipShape(Circle())
+                            
                             Text(username) // nome dell'utente
                                 .font(.title2)
                                 .padding(.top, 10)
@@ -50,10 +53,14 @@ struct JoinAGameView: View {
                             .padding(.horizontal, 20)
                         
                         VStack {
-                            Image("1user")
+                            
+                            // Immagine dell'avatar dell'avversario
+                            avatarImage(for: peerManager.opponentAvatarImage)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 120)
+                                .frame(width: 80, height: 80)
+                                .clipShape(Circle())
+                            
                             Text(peerManager.opponentName) // nome dell'avversario
                                 .font(.title2)
                                 .padding(.top, 10)
@@ -75,6 +82,7 @@ struct JoinAGameView: View {
         }
         .onAppear {
             peerManager.sendUsername(username: username)
+            peerManager.sendOpponentAvatarImage(peerManager.myAvatarImage!)
             peerManager.joinSession()
         }
         .navigationBarTitle("", displayMode: .inline)
@@ -92,6 +100,15 @@ struct JoinAGameView: View {
                 rotationAngle += 360
             }
         }
+    }
+}
+
+// Funzione per recuperare l'immagine dell'avatar dell'utente
+private func avatarImage(for avatarName: String?) -> Image {
+    if let avatarName = avatarName {
+        return Image(avatarName)
+    } else {
+        return Image(systemName: "person.circle")
     }
 }
 

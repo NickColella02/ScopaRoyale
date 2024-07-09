@@ -116,7 +116,7 @@ actor SpeechRecognizer: ObservableObject {
             }
         }
     }
-
+    
     
     @MainActor func startTranscribing() {
         Task {
@@ -163,7 +163,7 @@ actor SpeechRecognizer: ObservableObject {
             self.transcribe(error)
         }
     }
-
+    
     
     /// Reset the speech recognizer.
     private func reset() {
@@ -336,6 +336,15 @@ actor SpeechRecognizer: ObservableObject {
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
+        
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetoothA2DP, .defaultToSpeaker])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
+        }
+        
         synthesizer.speak(utterance)
     }
 }
