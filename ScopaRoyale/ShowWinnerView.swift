@@ -11,14 +11,7 @@ struct ShowWinnerView: View {
     @State private var animateWinner: Bool = false
     
     var body: some View {
-        ZStack {
-            // Background Image
-            Image("background")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea(edges: .all)
-                .blur(radius: 10)
-            
+        ZStack {            
             VStack {
                 Text("Risultato della Partita")
                     .font(.largeTitle)

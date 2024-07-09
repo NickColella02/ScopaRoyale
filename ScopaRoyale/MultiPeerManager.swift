@@ -109,12 +109,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 if let index = self.connectedPeers.firstIndex(of: peerID) {
                     self.connectedPeers.remove(at: index)
                 }
-                if self.connectedPeers.count < self.neededPlayers {
-                    self.browser?.startBrowsingForPeers()
-                    self.advertiser?.startAdvertisingPeer()
-                    self.opponentName = ""
-                    self.startHosting(lobbyName: self.lobbyName, numberOfPlayers: 1, username: self.myUsername)
-                }
+                self.opponentName = ""
             default:
                 break
             }
@@ -304,6 +299,20 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
 
     func sendStartGameSignal() { // segnala l'inizio della partita ai giocatori
+        self.gameOver = false
+        self.startGame = true
+        self.deck = []
+        self.opponentHand = []
+        self.playerHand = []
+        self.tableCards = []
+        self.cardTakenByPlayer = []
+        self.cardTakenByOpponent = []
+        self.playerPoints = []
+        self.opponentPoints = []
+        self.playerScore = 0
+        self.opponentScore = 0
+        self.currentPlayer = 1
+        self.lastPlayer = 1
         createDeck() // crea il mazzo iniziale
         placeTableCards() // posiziona le carte sul tavolo
         giveCardsToPlayers() // assegna le mani ai giocatori
@@ -525,6 +534,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 tableCards.append(card) // aggiungi la carta giocata al tavolo
                 sendTableCards() // notifica l'aggiornamento del tavolo
             } else if let validCombination = shortestCombination { // se ha trovato una combinazione
+                lastPlayer = currentPlayer
                 cardsToTake = validCombination
                 for cardToTake in cardsToTake {
                     if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte dal tavolo
@@ -558,8 +568,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 } else { // altrimenti si controllano i punteggi per decretare il vincitore
                     playerScore = 0 // azzera i punteggi del giocatore
                     opponentScore = 0 // azzera i punteggi dell'avversario
-                    if !tableCards.isEmpty {
-                        cardTakenByPlayer += tableCards // aggiunge tutte le carte del tavolo al mazzo delle sue carte prese
+                    if !tableCards.isEmpty { // aggiunge tutte le carte del tavolo al mazzo delle carte prese del giocatore che ha fatto l'ultima presa
+                        if lastPlayer == 0 {
+                            cardTakenByPlayer += tableCards
+                        } else {
+                            cardTakenByOpponent += tableCards
+                        }
                         tableCards.removeAll() // rimuove tutte le carte dal tavolo in una volta sola
                     }
                     
@@ -644,11 +658,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.advertiser?.stopAdvertisingPeer()
         self.browser?.stopBrowsingForPeers()
         self.session.disconnect()
-        myUsername = ""
-        opponentName = ""
-        lobbyName = ""
-        sendUsername(username: self.myUsername)
+        self.lobbyName = ""
         sendLobbyName()
+        sendUsername(username: "")
+        sendOpponentAvatarImage("")
+        reset()
     }
     
     func reset() {
@@ -656,8 +670,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             self.opponentName = ""
             self.opponentAvatarImage = ""
             self.peerDisconnected = false
-            self.gameOver = false
-            self.startGame = false
             self.playerHasSettebello = false
             self.opponentHasSettebello = false
             self.playerHasPrimera = false
