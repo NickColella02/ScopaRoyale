@@ -87,7 +87,7 @@ struct UsernameFormView: View {
             if username.count > maxUsernameLength {
                 Text("Username must be \(maxUsernameLength) characters or less.")
                     .font(.caption)
-                    .foregroundColor(.red)
+                    .foregroundStyle(.red)
                     .padding(.horizontal, 25)
                     .transition(.opacity)
             }
@@ -101,7 +101,7 @@ struct UsernameFormView: View {
             }) {
                 Text("Done")
                     .font(.system(size: 20, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(username.isEmpty || username.count > maxUsernameLength ? Color.gray : Color.black)
@@ -113,7 +113,7 @@ struct UsernameFormView: View {
             
             Text("You can change your username later in settings.")
                 .font(.system(size: 14, design: .default))
-                .foregroundColor(.gray)
+                .foregroundStyle(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 35)
                 .padding(.top, 10)
