@@ -7,6 +7,7 @@ struct JoinAGameView: View {
     @State private var rotationAngle: Double = 0
     @State private var isAnimatingDots = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack {
@@ -107,6 +108,16 @@ struct JoinAGameView: View {
                 navigateToGame = true
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                }
+            }
+        }
+        .navigationBarBackButtonHidden(true)
         .preferredColorScheme(.light)
         .onChange(of: peerManager.connectedPeers){
             if peerManager.blindMode && peerManager.connectedPeers.count > 0{

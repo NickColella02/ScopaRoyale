@@ -40,10 +40,10 @@ struct ContentView: View {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager)) {
-                            Image(systemName: "person.crop.circle")
+                            Image(systemName: "person.circle.fill")
                                 .font(.system(size: 20, weight: .regular))
                                 .padding(.horizontal, 12)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(.gray)
                         }
                     }
                 }
