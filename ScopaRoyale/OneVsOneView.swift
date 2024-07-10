@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 
 struct OneVsOneView: View {
@@ -9,6 +7,7 @@ struct OneVsOneView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
     @State private var navigateToGame = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(spacing: 30) {
@@ -25,7 +24,6 @@ struct OneVsOneView: View {
             }
             
             Spacer()
-            
             if peerManager.connectedPeers.isEmpty {
                 VStack(spacing: 10) {
                     Text("In attesa di un avversario...")
@@ -116,6 +114,16 @@ struct OneVsOneView: View {
         .onAppear() { // quando la pagina è caricata, da avvio alla connessione
             peerManager.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.numberOfPlayer, username: username)
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                }
+            }
+        }
+        .navigationBarBackButtonHidden(true)
         .navigationTitle("")
     }
     

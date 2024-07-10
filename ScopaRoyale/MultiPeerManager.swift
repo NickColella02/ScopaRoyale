@@ -83,7 +83,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
     @Published var gameOver: Bool = false // true quando la partita finisce
     @Published var winner: String = "" // nome del giocatore che ha vinto
-    @Published var myAvatarImage: String? = UserDefaults.standard.string(forKey: "selectedAvatar") //nome dell avatar che ha scelto l utente
+    @Published var myAvatarImage: String = (UserDefaults.standard.string(forKey: "selectedAvatar")) ?? "defaultAvatarUser" //nome dell avatar che ha scelto l utente
     @Published var opponentAvatarImage: String = ""//nome dell avatar che ha scelto l opponent
 
     override init() {
@@ -102,7 +102,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.peerDisconnected = false
                     self.sendUsername(username: self.myUsername)
                     self.sendLobbyName()
-                    self.sendOpponentAvatarImage(self.myAvatarImage!)
+                    self.sendOpponentAvatarImage(self.myAvatarImage)
                 }
             case .notConnected:
                 self.peerDisconnected = true
