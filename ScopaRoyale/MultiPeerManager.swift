@@ -423,6 +423,14 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         sendCardsToPlayers() // estrae le carte e le inserisce nelle mani dei giocatori
     }
     
+     func avatarImage(for avatarName: String?) -> Image {
+        if let avatarName = avatarName {
+            return Image(avatarName)
+        } else {
+            return Image(systemName: "person.circle")
+        }
+    }
+    
     func sendCardsToPlayers() { // invia le carte delle mani dei giocatori
         let hand = Hands(playerHand: self.opponentHand, opponentHand: self.playerHand)
         do {

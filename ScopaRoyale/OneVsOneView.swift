@@ -42,7 +42,7 @@ struct OneVsOneView: View {
             HStack {
                 VStack {
                     // Immagine dell'avatar dell'utente
-                    avatarImage(for: peerManager.myAvatarImage)
+                    peerManager.avatarImage(for: peerManager.myAvatarImage)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 80, height: 80)
@@ -60,7 +60,7 @@ struct OneVsOneView: View {
                 if !peerManager.opponentName.isEmpty {
                     VStack {
                         // va aggiunto l'avatar dell'avversario
-                        avatarImage(for: peerManager.opponentAvatarImage)
+                        peerManager.avatarImage(for: peerManager.opponentAvatarImage)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 80, height: 80)
@@ -119,12 +119,5 @@ struct OneVsOneView: View {
         .navigationTitle("")
     }
     
-    // Funzione per recuperare l'immagine dell'avatar dell'utente
-    private func avatarImage(for avatarName: String?) -> Image {
-        if let avatarName = avatarName {
-            return Image(avatarName)
-        } else {
-            return Image(systemName: "person.circle")
-        }
-    }
+    
 }
