@@ -27,12 +27,11 @@ struct ProfileView: View {
     
     var body: some View {
         VStack {
-            /*Image("yourProfile")
+            Image("yourProfile")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 40, height: 40)
-                .padding(.top, 20)*/
-            Spacer()
+            //Spacer()
             
             ZStack {
                 avatarImage
@@ -107,7 +106,7 @@ struct ProfileView: View {
             .padding(.horizontal)
             Text("La Blind mode fornisce, ai giocatori non vedenti, un ​​supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
                 .font(.system(size: 14, design: .default))
-                .foregroundStyle(.black)
+                .foregroundStyle(.gray)
                 .padding(.horizontal, 45)
                 .padding(.top, 10)
             
