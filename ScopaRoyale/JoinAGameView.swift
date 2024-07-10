@@ -18,10 +18,13 @@ struct JoinAGameView: View {
                         .onAppear {
                             startRotating()
                         }
-                    Image("searchingALobby")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 40, height: 40)
+                    Text("Ricerca di una lobby")
+                        .font(.headline)
+                    
+                    AnimatedDotsView(isAnimating: $isAnimatingDots)
+                        .onAppear {
+                            isAnimatingDots = true
+                        }
                 }
                 .padding()
                 .onAppear {
@@ -31,56 +34,76 @@ struct JoinAGameView: View {
                 }
             } else {
                 VStack {
-                    Text("Nome della lobby")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.horizontal)
+                    /*Image("lobbysName")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)*/
                     
-                    Text(peerManager.lobbyName) // nome della lobby trovata
-                        .font(.largeTitle)
-                        .padding(.horizontal)
-                        .padding(.top, 10)
+                    Text("Nome della lobby: \(peerManager.lobbyName)") // nome della lobby trovata
+                        .font(.headline)
+                        .padding(.bottom, 20)
                     
                     Spacer()
                     
                     HStack {
                         VStack {
-                            // Immagine dell'avatar dell'utente
-                            peerManager.avatarImage(for: peerManager.myAvatarImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .clipShape(Circle())
+                            ZStack {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 96, height: 96) // Stesso diametro dell'immagine più padding
+                                peerManager.avatarImage(for: peerManager.myAvatarImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 90, height: 90)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.black, lineWidth: 3)
+                                            .scaleEffect(1.1)
+                                            .padding(3)
+                                    )
+                            }
                             
                             Text(username) // nome dell'utente
-                                .font(.title2)
-                                .padding(.top, 10)
+                                .font(.system(size: 20, design: .default))
+                                .bold()
                         }
                         
-                        Text("VS")
-                            .font(.title)
-                            .padding(.horizontal, 20)
+                        Image("vs")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 90, height: 90)
                         
                         VStack {
-                            // Immagine dell'avatar dell'avversario
-                            peerManager.avatarImage(for: peerManager.opponentAvatarImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .clipShape(Circle())
+                            ZStack {
+                                Circle()
+                                    .fill(Color.white)
+                                    .frame(width: 96, height: 96) // Stesso diametro dell'immagine più padding
+                                peerManager.avatarImage(for: peerManager.opponentAvatarImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 90, height: 90)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.black, lineWidth: 3)
+                                            .scaleEffect(1.1)
+                                            .padding(3)
+                                    )
+                            }
                             
                             Text(peerManager.opponentName) // nome dell'avversario
-                                .font(.title2)
-                                .padding(.top, 10)
+                                .font(.system(size: 20, design: .default))
+                                .bold()
                         }
                     }
+
                     
                     Spacer()
                     
                     // Messaggio di attesa con animazione dei puntini
                     Text("In attesa che l'host avvii la partita")
                         .font(.headline)
-                        .foregroundStyle(.gray)
                         .padding(.top, 20)
                     
                     AnimatedDotsView(isAnimating: $isAnimatingDots)

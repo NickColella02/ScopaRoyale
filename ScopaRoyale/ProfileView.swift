@@ -31,7 +31,7 @@ struct ProfileView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 40, height: 40)
-            //Spacer()
+            Spacer()
             
             ZStack {
                 avatarImage
@@ -41,7 +41,7 @@ struct ProfileView: View {
                     .clipShape(Circle())
                     .overlay(
                         Circle()
-                            .stroke(Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255), lineWidth: 3)
+                            .stroke(Color .black, lineWidth: 3)
                             .scaleEffect(1.1)
                             .padding(3)
                     )
@@ -52,11 +52,11 @@ struct ProfileView: View {
             .padding(.bottom, 10)
             
             VStack {
-                Text("Bentornato, \(username)")
+                /*Text("Bentornato, \(username)")
                     .font(.system(size: 20, design: .default))
                     .foregroundStyle(.black)
                     .bold()
-                    .padding(.bottom, 10)
+                    .padding(.bottom, 10)*/
                 
                 if localUsername.count > maxUsernameLength {
                     Text("L'username può contenere al massimo \(maxUsernameLength) caratteri.")
@@ -98,7 +98,7 @@ struct ProfileView: View {
                         .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color(!peerManager.blindMode ? .black : Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255)))
+                        .background(Color(!peerManager.blindMode ? .black : .green))
                         .clipShape(RoundedRectangle(cornerRadius: 50))
                         .padding(.horizontal, 25)
                 }

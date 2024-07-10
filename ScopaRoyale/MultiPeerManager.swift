@@ -40,7 +40,7 @@ struct Settebello: Codable {
 }
 
 class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
-    private let serviceType = "ScopaRoyale3"
+    private let serviceType = "ScopaRoyale"
     private let peerID = MCPeerID(displayName: UIDevice.current.name)
     private var session: MCSession!
     private var advertiser: MCNearbyServiceAdvertiser?
@@ -136,7 +136,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 if receivedString == "START_GAME" {
                     self.startGame = true
                     self.gameOver = false
-                    self.speakText("Partita iniziata")
                 } else if receivedString.starts(with: "Lobby:") {
                     self.lobbyName = String(receivedString.dropFirst(6))
                 } else if receivedString.starts(with: "Deck:") {
@@ -223,7 +222,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         do {
             let settebello = try JSONDecoder().decode(Settebello.self, from: jsonData)
             self.playerHasSettebello = settebello.playerHasSettebello
-            self.opponentHasPrimera = settebello.opponentHasSettebello
+            self.opponentHasSettebello = settebello.opponentHasSettebello
         } catch {
             print("Errore nella decodifica dei dati Settebello: \(error.localizedDescription)")
         }
@@ -302,6 +301,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func sendStartGameSignal() { // segnala l'inizio della partita ai giocatori
         self.gameOver = false
         self.startGame = true
+        self.playerHasSettebello = false
+        self.opponentHasSettebello = false
         self.deck = []
         self.opponentHand = []
         self.playerHand = []
@@ -385,10 +386,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque", //"sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe", //"spade", "bastoni"
+            "denari", "coppe", "spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -518,11 +519,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             
     func playCard(card: Card) { // gestisce la mossa di un giocatore
         DispatchQueue.main.async { [self] in
+            var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
             if let index = self.playerHand.firstIndex(of: card) { // rimuove la carta dalla mano del giocatore
                 playerHand.remove(at: index)
             }
-            
-            var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
             var shortestCombination: [Card]? = nil // combinazione di carte da prendere più breve
             if !tableCards.isEmpty { // controllo che il tavolo non sia vuoto
                 for length in 1...tableCards.count { // cerco, se possibile, la combinazione di carte più breve che il giocatore può prendere
@@ -559,12 +559,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     sendPlayersPoints()
                 }
             }
-            
             if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
+                cardsToTake.append(card)
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
-                if cardsToTake.contains(Card(value: "sette", seed: "denari")) {
-                    playerHasSettebello = true
-                }
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
             }
             sendCardsToPlayers() // invia le carte alle mani dei giocatori
@@ -641,6 +638,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     sendSettebello()
                     sendPrimera()
                     sendPlayersScores() // invio i punteggi ai giocatori
+                    sendPlayersCoins()
+                    sendCardsTaken()
                     sendEndGameSignal() // notifica la fine della partita
                 }
             }
