@@ -126,6 +126,4 @@ struct OneVsOneView: View {
         .navigationBarBackButtonHidden(true)
         .navigationTitle("")
     }
-    
-    
 }
