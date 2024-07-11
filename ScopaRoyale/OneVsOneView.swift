@@ -30,12 +30,6 @@ struct OneVsOneView: View {
                             .scaledToFit()
                             .frame(width: 90, height: 90)
                             .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.black, lineWidth: 3)
-                                    .scaleEffect(1.1)
-                                    .padding(3)
-                            )
                     }
                     
                     Text(username) // nome dell'utente
@@ -59,12 +53,6 @@ struct OneVsOneView: View {
                                 .scaledToFit()
                                 .frame(width: 90, height: 90)
                                 .clipShape(Circle())
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 3)
-                                        .scaleEffect(1.1)
-                                        .padding(3)
-                                )
                         }
                         
                         Text(peerManager.opponentName) // nome dell'avversario

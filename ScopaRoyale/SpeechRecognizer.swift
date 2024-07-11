@@ -36,16 +36,11 @@ actor SpeechRecognizer: ObservableObject {
     public let semi: [String] = [ // possibili parole attribuibili ai semi delle carte (compresi sinonimi)
         "bastoni",
         "denari",
-        "denaro",
         "spade",
-        "spada",
-        "coppe",
-        "coppa",
-        "oro"
+        "coppe"
     ]
     
     public let valori: [String] = [ // possibili parole attribuibili ai valori delle carte (compresi sinonimi)
-        "uno",
         "asso",
         "due",
         "tre",
@@ -54,22 +49,8 @@ actor SpeechRecognizer: ObservableObject {
         "sei",
         "sette",
         "otto",
-        "lotto",
         "nove",
-        "dieci",
-        "re",
-        "cavallo",
-        "fante",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10"
+        "dieci"
     ]
     
     public let oggetti: [String] = [
@@ -244,7 +225,6 @@ actor SpeechRecognizer: ObservableObject {
             }
         }
         if !foundVerb.isEmpty { // se è riconosciuto un verbo di azione
-            print("Verbo riconosciuto: \(foundVerb)")
             var foundValue: String = "" // valore trovato
             var foundSeed: String = "" // seme trovato
             for valore in valori { // controllo se è riconosciuto un valore
@@ -260,11 +240,8 @@ actor SpeechRecognizer: ObservableObject {
                 }
             }
             if !foundValue.isEmpty && !foundSeed.isEmpty { // se sono riconosciuti un valore e un seme
-                print("Valore riconosciuto: \(foundValue)")
-                print("Seme riconosciuto: \(foundSeed)")
                 if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
                     if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
-                        await speakText("Gioco la carta \(foundValue) di \(foundSeed)")
                         peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
                     } else {
                         await speakText("La carta non è nella tua mano")
@@ -273,8 +250,6 @@ actor SpeechRecognizer: ObservableObject {
                         self.peerManager.isRecording = false // fermo la registrazione
                     }
                 }
-            } else {
-                print("Valore o seme non riconosciuto")
             }
         } else {
             for verbo in verbiRipetizione { // controllo se è riconosciuto un verbo di ripetizione
@@ -292,21 +267,17 @@ actor SpeechRecognizer: ObservableObject {
                     }
                 }
                 if !foundObject.isEmpty {
-                    print("Oggetto riconosciuto: \(foundObject)")
                     if foundObject == "tavolo" || foundObject == "banco" {
                         for card in peerManager.tableCards {
                             await speakText("\(card.value) di \(card.seed)")
-                        }
-                        DispatchQueue.main.async {
-                            self.peerManager.isRecording = false
                         }
                     } else if foundObject == "mie" || foundObject == "mano" {
                         for card in peerManager.playerHand {
                             await speakText("\(card.value) di \(card.seed)")
                         }
-                        DispatchQueue.main.async {
-                            self.peerManager.isRecording = false
-                        }
+                    }
+                    DispatchQueue.main.async {
+                        self.peerManager.isRecording = false
                     }
                 }
             }

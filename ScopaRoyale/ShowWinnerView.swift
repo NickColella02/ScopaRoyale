@@ -13,17 +13,33 @@ struct ShowWinnerView: View {
             
             VStack {
                 HStack {
-                    Text(peerManager.myUsername)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.black)
-                        .padding(.horizontal)
+                    VStack (spacing: 10) {
+                        Text(peerManager.myUsername)
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.black)
+                        Image(peerManager.myAvatarImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90, height: 90)
+                            .clipShape(Circle())
+                    }
+                    .padding(.horizontal)
+                    
                     Spacer()
-                    Text(peerManager.opponentName)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.black)
-                        .padding(.horizontal)
+                    
+                    VStack (spacing: 10) {
+                        Text(peerManager.opponentName)
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.black)
+                        Image(peerManager.opponentAvatarImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90, height: 90)
+                            .clipShape(Circle())
+                    }
+                    .padding(.horizontal)
                 }
                 .padding(.top, 20)
                 
@@ -39,21 +55,51 @@ struct ShowWinnerView: View {
                 
                 Spacer()
                 
+                HStack {
+                    VStack (spacing: 10) {
+                        Text("Punti totali")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.black)
+                        Text("\(peerManager.playerScore)")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.black)
+                    }
+                    .padding(.horizontal)
+                    
+                    Spacer()
+                    
+                    VStack (spacing: 10) {
+                        Text("Punti totali")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.black)
+                        Text("\(peerManager.opponentScore)")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.black)
+                    }
+                    .padding(.horizontal)
+                }
+                
+                Spacer()
+                
                 VStack {
                     if peerManager.winner == "Pareggio" {
                         Text("Pareggio")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.black)
+                            .foregroundStyle(.black)
                     } else {
                         Text("Il vincitore è...")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.black)
+                            .foregroundStyle(.black)
                         Text("\(peerManager.winner)")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.black)
+                            .foregroundStyle(.black)
                             .scaleEffect(animateWinner ? 1.2 : 1.0)
                             .animation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: animateWinner)
                             .onAppear {
@@ -73,7 +119,7 @@ struct ShowWinnerView: View {
                 }) {
                     Text("Termina Partita")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.black)
@@ -117,7 +163,7 @@ struct ScoreParameterRowView: View {
             Text(title)
                 .font(.headline)
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundStyle(.black)
                 .frame(width: 150)
             
             Spacer()

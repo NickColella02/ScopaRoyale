@@ -43,7 +43,7 @@ struct ContentView: View {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 20, weight: .regular))
                                 .padding(.horizontal, 12)
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(.black)
                         }
                     }
                 }

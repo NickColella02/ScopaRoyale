@@ -313,10 +313,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.opponentHand = []
         self.playerHand = []
         self.tableCards = []
-        self.cardTakenByPlayer = []
-        self.cardTakenByOpponent = []
-        self.playerPoints = []
-        self.opponentPoints = []
         self.playerScore = 0
         self.opponentScore = 0
         self.currentPlayer = 1
@@ -325,14 +321,18 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         placeTableCards() // posiziona le carte sul tavolo
         giveCardsToPlayers() // assegna le mani ai giocatori
         sendDeck() // aggiorna il mazzo iniziale
-        sendCardsTaken() // invia i mazzi contenenti le carte prese
-        sendPlayersPoints() // invia i mazzi contenenti le scope dei giocatori
         let startData = "START_GAME".data(using: .utf8)
         do {
             try session.send(startData!, toPeers: session.connectedPeers, with: .reliable)
         } catch {
             print("Errore invio segnale inizio partita: \(error.localizedDescription)")
         }
+        self.cardTakenByPlayer = []
+        self.cardTakenByOpponent = []
+        self.playerPoints = []
+        self.opponentPoints = []
+        sendCardsTaken() // invia i mazzi contenenti le carte prese
+        sendPlayersPoints() // invia i mazzi contenenti le scope dei giocatori
     }
     
     func sendCardsTaken() { // invia il mazzo delle carte prese all'avversario
@@ -575,7 +575,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
             }
             sendCardsToPlayers() // invia le carte alle mani dei giocatori
-            sendTurnChange() // aggiorna il turno
             
             if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
                 if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
@@ -649,6 +648,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     sendCardsTaken()
                     sendEndGameSignal() // notifica la fine della partita
                 }
+            } else {
+                sendTurnChange() // aggiorna il turno
             }
         }
     }

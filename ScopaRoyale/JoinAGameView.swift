@@ -34,11 +34,6 @@ struct JoinAGameView: View {
                 }
             } else {
                 VStack {
-                    /*Image("lobbysName")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 40, height: 40)*/
-                    
                     Text("Nome della lobby: \(peerManager.lobbyName)") // nome della lobby trovata
                         .font(.headline)
                         .padding(.bottom, 20)
@@ -56,12 +51,6 @@ struct JoinAGameView: View {
                                     .scaledToFit()
                                     .frame(width: 90, height: 90)
                                     .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.black, lineWidth: 3)
-                                            .scaleEffect(1.1)
-                                            .padding(3)
-                                    )
                             }
                             
                             Text(username) // nome dell'utente
@@ -84,12 +73,6 @@ struct JoinAGameView: View {
                                     .scaledToFit()
                                     .frame(width: 90, height: 90)
                                     .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.black, lineWidth: 3)
-                                            .scaleEffect(1.1)
-                                            .padding(3)
-                                    )
                             }
                             
                             Text(peerManager.opponentName) // nome dell'avversario
@@ -125,9 +108,6 @@ struct JoinAGameView: View {
         .navigationBarTitle("", displayMode: .inline)
         .onReceive(peerManager.$startGame) { startGame in
             if startGame {
-                if peerManager.blindMode {
-                    speechRecognizer.speakText("Partita iniziata")
-                }
                 navigateToGame = true
             }
         }
@@ -142,11 +122,6 @@ struct JoinAGameView: View {
         }
         .navigationBarBackButtonHidden(true)
         .preferredColorScheme(.light)
-        .onChange(of: peerManager.connectedPeers){
-            if peerManager.blindMode && peerManager.connectedPeers.count > 0{
-                speechRecognizer.speakText("Lobby trovata, in attesa che l'host avvii la partita")
-            }
-        }
     }
     
     private func startRotating() {

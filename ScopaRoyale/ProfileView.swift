@@ -69,27 +69,7 @@ struct ProfileView: View {
                     .background(Color(.systemGray6))
                     .clipShape(RoundedRectangle(cornerRadius: 100))
                     .padding(.horizontal, 25)
-                
-                /*Button(action: {
-                    if localUsername.isEmpty {
-                        showAlert = true
-                    } else {
-                        username = localUsername
-                        UserDefaults.standard.set(localUsername, forKey: "username")
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }) {
-                    Text("Done")
-                        .font(.system(size: 20, design: .default))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(localUsername.isEmpty || localUsername.count > maxUsernameLength ? Color.gray : Color.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 25)
-                }
-                .disabled(localUsername.isEmpty || localUsername.count > maxUsernameLength)*/
-                
+                                
                 Button(action: {
                     toggleBlindMode()
                 }) {
@@ -106,7 +86,7 @@ struct ProfileView: View {
             .padding(.horizontal)
             Text("La Blind mode fornisce, ai giocatori non vedenti, un ​​supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
                 .font(.system(size: 14, design: .default))
-                .foregroundStyle(.gray)
+                .foregroundStyle(.black)
                 .padding(.horizontal, 45)
                 .padding(.top, 10)
             
