@@ -154,13 +154,14 @@ struct ContentView: View {
                                 .padding(.top, 20)
                             Text("""
                             Scopa è un tradizionale gioco di carte italiano:
-                            **1. Obiettivo**: l'obiettivo è catturare le carte sul tavolo abbinandole con una carta nella tua mano che ha lo stesso valore o sommando fino a 15.
-                            **2. Svolgimento del gioco**: il gioco si gioca solitamente con un mazzo di carte italiane da 40 carte. A ciascun giocatore vengono distribuite tre carte, e quattro carte vengono messe scoperte sul tavolo. Al tuo turno, puoi catturare le carte dal tavolo che sommano al valore di una carta nella tua mano. Se non puoi catturare alcuna carta, devi mettere una carta dalla tua mano sul tavolo.
-                            **3. Punteggio**: ogni carta catturata vale 1 punto, punti aggiuntivi possono essere guadagnati per:
-                            - Il maggior numero di carte.
-                            - Il maggior numero di carte di 'denari'.
-                            - Il 7 di denari (Settebello).
-                            - Il maggior numero di carte 'prime' (7, 6, assi, ecc.).
+                            **1. Obiettivo**: totalizzare più punti del tuo avversario.
+                            **2. Svolgimento del gioco**: si gioca con un mazzo di carte napoletane da 40 carte. A ciascun giocatore vengono distribuite tre carte, e quattro carte vengono messe scoperte sul tavolo. Al tuo turno, devi lanciare una carta dalla tua mano. Se ci sono carte di ugual valore o carte la cui somma corrisponde al valore della carta lanciata, le prendi e le aggiungi al tuo mazzo delle prese. Se prendi le ultime carte presenti sul tavolo hai fatto scopa. Se non puoi prendere alcuna carta, la carta lanciata resta sul tavolo.
+                            **3. Punteggio**:
+                            - 1 punto per il maggior numero di carte prese.
+                            - 1 punto per il maggior numero di carte di denari prese.
+                            - 1 punto per il 7 di denari (settebello).
+                            - 1 punto per il maggior numero di 7 (primera).
+                            - 1 punto per ogni scopa fatta
                             **4. Vittoria**: il gioco continua fino a quando tutte le carte sono state giocate. Il giocatore con il maggior numero di punti alla fine vince.
                             """)
                             .font(.body)

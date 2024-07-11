@@ -27,21 +27,20 @@ struct ProfileView: View {
     
     var body: some View {
         VStack {
-            Image("yourProfile")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 40, height: 40)
-            Spacer()
-            
-            ZStack {
+            VStack {
+                Text("Avatar")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.top, 30)
+                
                 avatarImage
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 100, height: 100)
+                    .frame(width: 150, height: 150)
                     .clipShape(Circle())
                     .overlay(
                         Circle()
-                            .stroke(Color .black, lineWidth: 3)
+                            .stroke(Color.black, lineWidth: 3)
                             .scaleEffect(1.1)
                             .padding(3)
                     )
@@ -49,14 +48,14 @@ struct ProfileView: View {
                         showPicker = true
                     }
             }
-            .padding(.bottom, 10)
+                      
+            Spacer()
             
             VStack {
-                /*Text("Bentornato, \(username)")
-                    .font(.system(size: 20, design: .default))
-                    .foregroundStyle(.black)
-                    .bold()
-                    .padding(.bottom, 10)*/
+                Text("Username")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.top, 10)
                 
                 if localUsername.count > maxUsernameLength {
                     Text("L'username può contenere al massimo \(maxUsernameLength) caratteri.")
@@ -65,27 +64,38 @@ struct ProfileView: View {
                         .padding(.horizontal, 25)
                 }
                 TextField("Inserisci il nickname", text: $localUsername)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 100))
+                    .padding(.vertical, 20)
                     .padding(.horizontal, 25)
-                                
+                    .frame(width: UIScreen.main.bounds.width * 0.75) // Imposta la larghezza desiderata, ad esempio il 75% della larghezza dello schermo
+                    .background(Color(.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            }
+                   
+            Spacer()
+            
+            VStack {
+                Text("Blind Mode")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.top, 10)
+                
                 Button(action: {
                     toggleBlindMode()
                 }) {
-                    Text(peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata")
-                        .font(.system(size: 20, design: .default))
+                    Text(peerManager.blindMode ? "Abilitata" : "Disabilitata")
+                        .font(.system(size: 20))
                         .foregroundStyle(.white)
                         .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(!peerManager.blindMode ? .black : .green))
+                        .frame(width: UIScreen.main.bounds.width * 0.75)
+                        .background(peerManager.blindMode ? Color.green : Color.black)
                         .clipShape(RoundedRectangle(cornerRadius: 50))
                         .padding(.horizontal, 25)
                 }
             }
             .padding(.horizontal)
-            Text("La Blind mode fornisce, ai giocatori non vedenti, un ​​supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
-                .font(.system(size: 14, design: .default))
+            
+            Text("La Blind mode fornisce, ai giocatori non vedenti, un supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
+                .font(.system(size: 14))
                 .foregroundStyle(.black)
                 .padding(.horizontal, 45)
                 .padding(.top, 10)
@@ -140,7 +150,6 @@ struct ProfileView: View {
     }
 }
 
-
 struct AvatarPickerView: View {
     @Binding var selectedAvatar: String?
     @Binding var avatarImage: Image
@@ -150,11 +159,10 @@ struct AvatarPickerView: View {
     
     var body: some View {
         VStack {
-            Image("chooseAnAvatar")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 40, height: 40)
-                .padding(.top, 20)
+            Text("Scegli un Avatar")
+                .font(.title)
+                .fontWeight(.bold)
+                .padding(.top, 10)
             
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {

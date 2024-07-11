@@ -15,14 +15,16 @@ struct ShowWinnerView: View {
                 HStack {
                     VStack (spacing: 10) {
                         Text(peerManager.myUsername)
-                            .font(.title)
+                            .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundStyle(.black)
+                            .foregroundColor(.black)
+                            .padding()
                         Image(peerManager.myAvatarImage)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 90, height: 90)
                             .clipShape(Circle())
+                            .padding()
                     }
                     .padding(.horizontal)
                     
@@ -30,18 +32,19 @@ struct ShowWinnerView: View {
                     
                     VStack (spacing: 10) {
                         Text(peerManager.opponentName)
-                            .font(.title)
+                            .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundStyle(.black)
+                            .foregroundColor(.black)
+                            .padding()
                         Image(peerManager.opponentAvatarImage)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 90, height: 90)
                             .clipShape(Circle())
+                            .padding()
                     }
                     .padding(.horizontal)
                 }
-                .padding(.top, 20)
                 
                 Spacer()
                 
@@ -56,56 +59,35 @@ struct ShowWinnerView: View {
                 Spacer()
                 
                 HStack {
-                    VStack (spacing: 10) {
+                    VStack (spacing: -20) {
                         Text("Punti totali")
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundStyle(.black)
+                            .foregroundColor(.black) // Colore diverso per vincitore/sconfitto
+                            .padding()
                         Text("\(peerManager.playerScore)")
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .foregroundStyle(.black)
+                            .foregroundColor(peerManager.playerScore > peerManager.opponentScore ? .green : .red)
+                            .padding()
                     }
                     .padding(.horizontal)
                     
                     Spacer()
                     
-                    VStack (spacing: 10) {
+                    VStack (spacing: -20) {
                         Text("Punti totali")
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundStyle(.black)
+                            .foregroundColor(.black)
+                            .padding()
                         Text("\(peerManager.opponentScore)")
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .foregroundStyle(.black)
+                            .foregroundColor(peerManager.opponentScore > peerManager.playerScore ? .green : .red)
+                            .padding()
                     }
                     .padding(.horizontal)
-                }
-                
-                Spacer()
-                
-                VStack {
-                    if peerManager.winner == "Pareggio" {
-                        Text("Pareggio")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.black)
-                    } else {
-                        Text("Il vincitore è...")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.black)
-                        Text("\(peerManager.winner)")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.black)
-                            .scaleEffect(animateWinner ? 1.2 : 1.0)
-                            .animation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: animateWinner)
-                            .onAppear {
-                                animateWinner = true
-                            }
-                    }
                 }
                 
                 Spacer()
@@ -119,7 +101,7 @@ struct ShowWinnerView: View {
                 }) {
                     Text("Termina Partita")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.black)
@@ -165,7 +147,7 @@ struct ScoreParameterRowView: View {
             Text(title)
                 .font(.headline)
                 .fontWeight(.bold)
-                .foregroundStyle(.black)
+                .foregroundColor(.black)
                 .frame(width: 150)
             
             Spacer()
@@ -180,5 +162,16 @@ struct ScoreParameterRowView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
+    }
+}
+
+struct ShowWinnerView_Previews: PreviewProvider {
+    static var previews: some View {
+        let peerManager = MultiPeerManager()
+        let speechRecognizer = SpeechRecognizer(peerManager: MultiPeerManager())
+        
+        ShowWinnerView()
+            .environmentObject(peerManager)
+            .environmentObject(speechRecognizer)
     }
 }

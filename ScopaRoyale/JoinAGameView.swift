@@ -34,28 +34,22 @@ struct JoinAGameView: View {
                 }
             } else {
                 VStack {
-                    Text("Nome della lobby: \(peerManager.lobbyName)") // nome della lobby trovata
-                        .font(.headline)
-                        .padding(.bottom, 20)
+                    Text("Lobby: \(peerManager.lobbyName)") // nome della lobby trovata
+                        .font(.title)
+                        .padding()
+                        .bold()
                     
                     Spacer()
                     
-                    HStack {
-                        VStack {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 96, height: 96) // Stesso diametro dell'immagine più padding
-                                peerManager.avatarImage(for: peerManager.myAvatarImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 90, height: 90)
-                                    .clipShape(Circle())
-                            }
-                            
+                    HStack (spacing: 10) {
+                        VStack (spacing: 10) {
                             Text(username) // nome dell'utente
                                 .font(.system(size: 20, design: .default))
                                 .bold()
+                            peerManager.avatarImage(for: peerManager.myAvatarImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 120, height: 120)
                         }
                         
                         Image("vs")
@@ -63,25 +57,18 @@ struct JoinAGameView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 90, height: 90)
                         
-                        VStack {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 96, height: 96) // Stesso diametro dell'immagine più padding
-                                peerManager.avatarImage(for: peerManager.opponentAvatarImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 90, height: 90)
-                                    .clipShape(Circle())
-                            }
-                            
+                        VStack (spacing: 10) {
                             Text(peerManager.opponentName) // nome dell'avversario
                                 .font(.system(size: 20, design: .default))
                                 .bold()
+                            peerManager.avatarImage(for: peerManager.opponentAvatarImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
                         }
                     }
 
-                    
                     Spacer()
                     
                     // Messaggio di attesa con animazione dei puntini
@@ -162,5 +149,15 @@ struct AnimatedDotsView: View {
                     }
             }
         }
+    }
+}
+
+struct JoinAGameView_Previews: PreviewProvider {
+    static var previews: some View {
+        let peerManager = MultiPeerManager()
+        let speechRecognizer = SpeechRecognizer(peerManager: MultiPeerManager())
+        JoinAGameView(username: "Player123")
+            .environmentObject(peerManager)
+            .environmentObject(speechRecognizer)
     }
 }
