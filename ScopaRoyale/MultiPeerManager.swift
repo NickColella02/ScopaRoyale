@@ -63,7 +63,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             UserDefaults.standard.set(blindMode, forKey: "blindMode")
         }
     }
-    @Published var isRecording: Bool = false // true se l'utente sta registrando
     @Published var deck: [Card] = [] // mazzo di carte iniziale
     @Published var tableCards: [Card] = [] // carte presenti sul tavolo
     @Published var playerHand: [Card] = [] // carte nella mano del giocatore
@@ -171,8 +170,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.startGame = false
                 } else if receivedString.starts(with: "PlayersScores:") {
                     self.handlePlayersScoresData(data.dropFirst(14))
-                } else if receivedString.starts(with: "IsRecording:") {
-                    self.isRecording = false
                 } else if receivedString.starts(with: "IsAvatar:"){
                     self.opponentAvatarImage = String(receivedString.dropFirst(9))
                 } else {
@@ -392,10 +389,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci"
+            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
-            "denari", "coppe", "spade", "bastoni"
+            "denari", "coppe"//, "spade", "bastoni"
         ]
         for seed in seeds { // inserisce ogni carta nel mazzo iniziale
             for value in values {
@@ -498,17 +495,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio punteggi dei giocatori: \(error.localizedDescription)")
         }
     }
-    
-    func sendRecordingStatus(_ Recording: Bool) {
-        let recording = "IsRecording: \(Recording)".data(using: .utf8)!
-        do{
-            try session.send(recording, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore notifica recording: \(error.localizedDescription)")
-        }
         
-    }
-    
      func sendOpponentAvatarImage(_ Image: String){
         let avatar = "IsAvatar:\(Image)".data(using: .utf8)!
         do {
@@ -682,26 +669,24 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func reset() {
-        DispatchQueue.main.async {
-            self.opponentName = ""
-            self.opponentAvatarImage = ""
-            self.peerDisconnected = false
-            self.playerHasSettebello = false
-            self.opponentHasSettebello = false
-            self.playerHasPrimera = false
-            self.opponentHasPrimera = false
-            self.deck = []
-            self.opponentHand = []
-            self.playerHand = []
-            self.tableCards = []
-            self.cardTakenByPlayer = []
-            self.cardTakenByOpponent = []
-            self.playerPoints = []
-            self.opponentPoints = []
-            self.playerScore = 0
-            self.opponentScore = 0
-            self.currentPlayer = 1
-            self.lastPlayer = 1
-        }
+        self.opponentName = ""
+        self.opponentAvatarImage = ""
+        self.peerDisconnected = false
+        self.playerHasSettebello = false
+        self.opponentHasSettebello = false
+        self.playerHasPrimera = false
+        self.opponentHasPrimera = false
+        self.deck = []
+        self.opponentHand = []
+        self.playerHand = []
+        self.tableCards = []
+        self.cardTakenByPlayer = []
+        self.cardTakenByOpponent = []
+        self.playerPoints = []
+        self.opponentPoints = []
+        self.playerScore = 0
+        self.opponentScore = 0
+        self.currentPlayer = 1
+        self.lastPlayer = 1
     }
 }

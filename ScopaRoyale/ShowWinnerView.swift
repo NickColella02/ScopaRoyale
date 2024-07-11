@@ -133,7 +133,9 @@ struct ShowWinnerView: View {
             .padding()
             .onAppear() {
                 if peerManager.blindMode {
-                    speechRecognizer.speakText("Il vincitore è \(peerManager.winner)")
+                    DispatchQueue.main.async {
+                        speechRecognizer.speakText("Il vincitore è \(peerManager.winner)")
+                    }
                 }
             }
         }

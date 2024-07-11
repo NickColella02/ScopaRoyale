@@ -9,15 +9,6 @@ actor SpeechRecognizer: ObservableObject {
         case notAuthorizedToRecognize
         case notPermittedToRecord
         case recognizerIsUnavailable
-        
-        var message: String {
-            switch self {
-            case .nilRecognizer: return "Can't initialize speech recognizer"
-            case .notAuthorizedToRecognize: return "Not authorized to recognize speech"
-            case .notPermittedToRecord: return "Not permitted to record audio"
-            case .recognizerIsUnavailable: return "Recognizer is unavailable"
-            }
-        }
     }
     
     @MainActor var transcript: String = ""
@@ -78,11 +69,7 @@ actor SpeechRecognizer: ObservableObject {
      */
     init(peerManager: MultiPeerManager) {
         self.peerManager = peerManager
-        recognizer = SFSpeechRecognizer(locale: Locale(identifier: "it-IT"))
-        guard recognizer != nil else {
-            transcribe(RecognizerError.nilRecognizer)
-            return
-        }
+        recognizer = SFSpeechRecognizer(locale: Locale(identifier: "it-IT")) ?? nil
         
         Task {
             do {
@@ -92,8 +79,6 @@ actor SpeechRecognizer: ObservableObject {
                 guard await AVAudioApplication.shared.hasPermissionToRecord() else {
                     throw RecognizerError.notPermittedToRecord
                 }
-            } catch {
-                transcribe(error)
             }
         }
     }
@@ -124,24 +109,18 @@ actor SpeechRecognizer: ObservableObject {
      The resulting transcription is continuously written to the published `transcript` property.
      */
     private func transcribe() async {
-        guard let recognizer, recognizer.isAvailable else {
-            self.transcribe(RecognizerError.recognizerIsUnavailable)
-            return
-        }
-        
         do {
             let (audioEngine, request) = try Self.prepareEngine()
             self.audioEngine = audioEngine
             self.request = request
             // Passa una closure sincrona a recognitionTask
-            self.task = recognizer.recognitionTask(with: request, resultHandler: { [weak self] result, error in
+            self.task = recognizer?.recognitionTask(with: request, resultHandler: { [weak self] result, error in
                 Task {
                     await self?.recognitionHandler(audioEngine: audioEngine, result: result, error: error)
                 }
             })
         } catch {
             self.reset()
-            self.transcribe(error)
         }
     }
     
@@ -244,10 +223,9 @@ actor SpeechRecognizer: ObservableObject {
                     if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
                         peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
                     } else {
+                        await stopTranscribing()
                         await speakText("La carta non è nella tua mano")
-                    }
-                    DispatchQueue.main.async {
-                        self.peerManager.isRecording = false // fermo la registrazione
+                        await startTranscribing()
                     }
                 }
             }
@@ -267,6 +245,7 @@ actor SpeechRecognizer: ObservableObject {
                     }
                 }
                 if !foundObject.isEmpty {
+                    await stopTranscribing()
                     if foundObject == "tavolo" || foundObject == "banco" {
                         for card in peerManager.tableCards {
                             await speakText("\(card.value) di \(card.seed)")
@@ -276,9 +255,7 @@ actor SpeechRecognizer: ObservableObject {
                             await speakText("\(card.value) di \(card.seed)")
                         }
                     }
-                    DispatchQueue.main.async {
-                        self.peerManager.isRecording = false
-                    }
+                    await startTranscribing()
                 }
             }
         }
@@ -287,17 +264,6 @@ actor SpeechRecognizer: ObservableObject {
     nonisolated private func transcribe(_ message: String) {
         Task { @MainActor in
             transcript = message
-        }
-    }
-    nonisolated private func transcribe(_ error: Error) {
-        var errorMessage = ""
-        if let error = error as? RecognizerError {
-            errorMessage += error.message
-        } else {
-            errorMessage += error.localizedDescription
-        }
-        Task { @MainActor [errorMessage] in
-            transcript = "<< \(errorMessage) >>"
         }
     }
     

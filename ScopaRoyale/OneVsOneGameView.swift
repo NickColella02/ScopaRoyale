@@ -11,12 +11,13 @@ struct OneVsOneGameView: View {
     @EnvironmentObject private var peerManager: MultiPeerManager
     @Environment(\.presentationMode) var presentationMode
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var backModality = false
-    @State private var showPeerDisconnectedAlert = false
+    @State private var backModality: Bool = false
+    @State private var isRecording: Bool = false
+    @State private var showPeerDisconnectedAlert: Bool = false
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
-    @State private var moveLeft = false
-    @State private var moveOpponentLeft = false
+    @State private var moveLeft: Bool = false
+    @State private var moveOpponentLeft: Bool = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
 
     var body: some View {
@@ -324,17 +325,19 @@ struct OneVsOneGameView: View {
             }
             if peerManager.blindMode {
                 if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1 {
-                    RecordingButton(isRecording: peerManager.isRecording) {
-                        if peerManager.isRecording {
-                            peerManager.isRecording = false
-                            peerManager.sendRecordingStatus(false)
-                            speechRecognizer.stopTranscribing()
-                        } else {
-                            peerManager.isRecording = true
-                            peerManager.sendRecordingStatus(true)
-                            speechRecognizer.startTranscribing()
+                    Button(action: {
+                        if !isRecording {
+                            DispatchQueue.main.async {
+                                speechRecognizer.speakText("Registrazione attiva")
+                                isRecording = true
+                                speechRecognizer.startTranscribing()
+                            }
                         }
+                    }) {
+                        Text("")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
+                    .padding()
                 }
             }
         }
@@ -343,6 +346,8 @@ struct OneVsOneGameView: View {
                 if (peerManager.isHost && peerManager.currentPlayer == 0) {
                     DispatchQueue.main.async {
                         speechRecognizer.speakText("È il tuo turno")
+                        speechRecognizer.stopTranscribing()
+                        isRecording = false
                     }
                 }
             }
@@ -366,18 +371,10 @@ struct OneVsOneGameView: View {
                 }
             }
         }
-    }
-
-    private func RecordingButton(isRecording: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(isRecording ? "Interrompi registrazione" : "Avvia registrazione")
-                .font(.system(size: 30, weight: .regular))
-                .bold()
-                .padding()
-                .foregroundStyle(.white)
+        .onAppear {
+            isRecording = false
+            speechRecognizer.stopTranscribing()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.black).opacity(0.8)
     }
     
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {
