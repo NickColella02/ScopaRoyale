@@ -4,60 +4,85 @@ struct UsernameEntryView: View {
     @State private var username: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var showWelcome: Bool = true
+    
+    var body: some View {
+        VStack {
+            if showWelcome {
+                WelcomeView {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        showWelcome = false
+                    }
+                }
+            } else {
+                UsernameFormView(username: $username, showAlert: $showAlert, alertMessage: $alertMessage)
+                    .transition(.move(edge: .trailing)) // Aggiunto transition per far apparire la UsernameFormView dal lato destro
+            }
+        }
+        .preferredColorScheme(.light) // Forza la light mode
+    }
+}
+
+struct WelcomeView: View {
+    let onContinue: () -> Void
     @State private var showTitle: Bool = false
     @State private var showDescription: Bool = false
-    @State private var showUsernameField: Bool = false
+    @State private var showContinueButton: Bool = false
     
     var body: some View {
         VStack {
             Spacer()
             
-            Image("AppLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(height: showTitle ? 180 : 0)
-                .opacity(showTitle ? 1 : 0)
-                .padding(.bottom, showTitle ? 20 : 0)
-            
-            Text("Immerse yourself in thrilling rounds of Scopa with nearby players!")
-                .font(.system(size: 20, design: .default))
-                .multilineTextAlignment(.center)
-                .opacity(showDescription ? 1 : 0)
-                .padding(.horizontal, 35)
-            
-            Spacer()
-            
-            UsernameFormView(username: $username, showAlert: $showAlert, alertMessage: $alertMessage, showUsernameField: $showUsernameField) {
-                UserDefaults.standard.set(username, forKey: "username")
-                NotificationCenter.default.post(name: .usernameEntered, object: nil)
+            if showTitle {
+                Image("AppLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 180)
+                    .transition(.scale)
+                    .padding(.bottom, 20)
             }
-            .opacity(showUsernameField ? 1 : 0)
-            .padding(.bottom, showUsernameField ? 0 : -100)
+            
+            if showDescription {
+                Text("Immerse yourself in thrilling rounds of Scopa with nearby players!")
+                    .font(.system(size: 20, design: .default))
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity)
+                    .padding(.horizontal, 35)
+            }
             
             Spacer()
+            
+            if showContinueButton {
+                Button(action: onContinue) {
+                    HStack {
+                        Text("Continue")
+                            .font(.system(size: 20, design: .default))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal)
+                    }
+                    .frame(width: 330, height: 60)
+                    .background(Color.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 50))
+                    .padding(.bottom, 50)
+                    .transition(.opacity)
+                }
+            }
         }
         .onAppear {
-            // Animazione del titolo
             withAnimation(.easeInOut(duration: 1.0)) {
                 showTitle = true
             }
-            
-            // Animazione della descrizione dopo un ritardo
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                withAnimation(.easeInOut(duration: 1.0)) {
+                withAnimation(.easeInOut(duration: 0.5)) {
                     showDescription = true
                 }
             }
-            
-            // Animazione del campo username dopo un ulteriore ritardo
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation(.easeInOut(duration: 1.0)) {
-                    showUsernameField = true
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    showContinueButton = true
                 }
             }
         }
-        .background(Color.white.edgesIgnoringSafeArea(.all))
-        .preferredColorScheme(.light)
     }
 }
 
@@ -65,10 +90,8 @@ struct UsernameFormView: View {
     @Binding var username: String
     @Binding var showAlert: Bool
     @Binding var alertMessage: String
-    @Binding var showUsernameField: Bool
-    let onContinue: () -> Void
     
-    let maxUsernameLength = 14
+    let maxUsernameLength = 14 // Limite massimo di caratteri per lo username
     
     var body: some View {
         VStack {
@@ -82,21 +105,21 @@ struct UsernameFormView: View {
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 100))
                 .padding(.horizontal, 25)
-                .opacity(username.isEmpty || username.count > maxUsernameLength ? 0.5 : 1.0)
             
+            // Aggiunta del testo di avviso per il limite di caratteri
             if username.count > maxUsernameLength {
                 Text("Username must be \(maxUsernameLength) characters or less.")
                     .font(.caption)
                     .foregroundStyle(.red)
                     .padding(.horizontal, 25)
-                    .transition(.opacity)
             }
             
             Button(action: {
                 if username.isEmpty {
                     showAlert = true
                 } else {
-                    onContinue()
+                    UserDefaults.standard.set(username, forKey: "username")
+                    NotificationCenter.default.post(name: .usernameEntered, object: nil)
                 }
             }) {
                 Text("Done")
@@ -107,9 +130,8 @@ struct UsernameFormView: View {
                     .background(username.isEmpty || username.count > maxUsernameLength ? Color.gray : Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 25)
-                    .opacity(username.isEmpty || username.count > maxUsernameLength ? 0.5 : 1.0)
             }
-            .disabled(username.isEmpty || username.count > maxUsernameLength)
+            .disabled(username.isEmpty || username.count > maxUsernameLength) // Disabilita il pulsante se lo username è vuoto o troppo lungo
             
             Text("You can change your username later in settings.")
                 .font(.system(size: 14, design: .default))
@@ -117,7 +139,6 @@ struct UsernameFormView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 35)
                 .padding(.top, 10)
-                .opacity(showUsernameField ? 1 : 0)
         }
     }
 }

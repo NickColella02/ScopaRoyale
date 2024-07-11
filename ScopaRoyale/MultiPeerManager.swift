@@ -46,7 +46,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
     var myUsername: String = ""
-    private var synthetizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
+    private let synthetizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
     
     @State var neededPlayers: Int = 0 // numero di giocatori necessari
     @State var lastPlayer: Int = 1 // indice dell'ultimo giocatore che ha preso carte dal tavolo
@@ -83,7 +83,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
     @Published var gameOver: Bool = false // true quando la partita finisce
     @Published var winner: String = "" // nome del giocatore che ha vinto
-    @Published var myAvatarImage: String = (UserDefaults.standard.string(forKey: "selectedAvatar")) ?? "defaultAvatarUser" //nome dell avatar che ha scelto l utente
+    @Published var myAvatarImage: String = (UserDefaults.standard.string(forKey: "selectedAvatar")) ?? "defaultUser" //nome dell avatar che ha scelto l utente
     @Published var opponentAvatarImage: String = ""//nome dell avatar che ha scelto l opponent
 
     override init() {
@@ -136,6 +136,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 if receivedString == "START_GAME" {
                     self.startGame = true
                     self.gameOver = false
+                    if self.blindMode {
+                        self.speakText("È il tuo turno")
+                    }
                 } else if receivedString.starts(with: "Lobby:") {
                     self.lobbyName = String(receivedString.dropFirst(6))
                 } else if receivedString.starts(with: "Deck:") {
@@ -160,6 +163,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     let data = data.dropFirst(14)
                     let dataString = String(data: data, encoding: .utf8)
                     self.currentPlayer = Int(dataString!)!
+                    if self.blindMode {
+                        self.speakText("È il tuo turno")
+                    }
                 } else if receivedString.starts(with: "GameOver:") {
                     self.gameOver = true
                     self.startGame = false
@@ -464,16 +470,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     }
     
     func sendTurnChange() {
-        DispatchQueue.global(qos: .background).async {
-            DispatchQueue.main.async {
-                self.currentPlayer = 1 - self.currentPlayer
-                let turnData = "CurrentPlayer:\(self.currentPlayer)".data(using: .utf8)!
-                do {
-                    try self.session.send(turnData, toPeers: self.session.connectedPeers, with: .reliable)
-                } catch {
-                    print("Errore invio aggiornamento turno: \(error.localizedDescription)")
-                }
-            }
+        self.currentPlayer = 1 - self.currentPlayer
+        let turnData = "CurrentPlayer:\(self.currentPlayer)".data(using: .utf8)!
+        do {
+            try self.session.send(turnData, toPeers: self.session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio aggiornamento turno: \(error.localizedDescription)")
         }
     }
     
@@ -550,6 +552,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         tableCards.remove(at: index)
                         sendTableCards()
                     }
+                    if blindMode {
+                        self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
+                    }
                 }
                 if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
@@ -562,6 +567,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
                 cardsToTake.append(card)
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
+                if blindMode {
+                    if cardsToTake.contains(Card(value: "sette", seed: "denari")) {
+                        self.speakText("Hai preso il settebello")
+                    }
+                }
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
             }
             sendCardsToPlayers() // invia le carte alle mani dei giocatori
@@ -632,9 +642,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         winner = "Pareggio"
                     }
                     self.gameOver = true // termina la partita
-                    if blindMode {
-                        self.speakText("Partita terminata")
-                    }
                     sendSettebello()
                     sendPrimera()
                     sendPlayersScores() // invio i punteggi ai giocatori

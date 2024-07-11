@@ -11,43 +11,58 @@ struct ShowWinnerView: View {
             Color(.systemBackground)
                 .ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                Text("Risultato della Partita")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .padding(.top, 50)
-                
-                VStack(spacing: 20) {
-                    ScoreView(name: peerManager.myUsername,
-                              score: peerManager.playerScore,
-                              cardsTaken: peerManager.cardTakenByPlayer.count,
-                              scopesMade: peerManager.playerPoints.count,
-                              hasSettebello: peerManager.playerHasSettebello,
-                              coinsCount: peerManager.playerCoinsCount,
-                              hasPrimera: peerManager.playerHasPrimera)
-                    
-                    ScoreView(name: peerManager.opponentName,
-                              score: peerManager.opponentScore,
-                              cardsTaken: peerManager.cardTakenByOpponent.count,
-                              scopesMade: peerManager.opponentPoints.count,
-                              hasSettebello: peerManager.opponentHasSettebello,
-                              coinsCount: peerManager.opponentCoinsCount,
-                              hasPrimera: peerManager.opponentHasPrimera)
+            VStack {
+                HStack {
+                    Text(peerManager.myUsername)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+                        .padding(.horizontal)
+                    Spacer()
+                    Text(peerManager.opponentName)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+                        .padding(.horizontal)
                 }
-                .padding()
-                .background(Color.black.opacity(0.7))
-                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .padding(.top, 20)
                 
-                Text("Vincitore: \(peerManager.winner)")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.green)
-                    .scaleEffect(animateWinner ? 1.2 : 1.0)
-                    .animation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: animateWinner)
-                    .onAppear {
-                        animateWinner = true
+                Spacer()
+                
+                VStack(spacing: 10) {
+                    ScoreParameterRowView(title: "Carte prese", myScore: peerManager.cardTakenByPlayer.count, opponentScore: peerManager.cardTakenByOpponent.count)
+                    ScoreParameterRowView(title: "Scope", myScore: peerManager.playerPoints.count, opponentScore: peerManager.opponentPoints.count)
+                    ScoreParameterRowView(title: "Settebello", myScore: peerManager.playerHasSettebello ? 1 : 0, opponentScore: peerManager.opponentHasSettebello ? 1 : 0)
+                    ScoreParameterRowView(title: "Carte oro", myScore: peerManager.playerCoinsCount, opponentScore: peerManager.opponentCoinsCount)
+                    ScoreParameterRowView(title: "Primera", myScore: peerManager.playerHasPrimera ? 1 : 0, opponentScore: peerManager.opponentHasPrimera ? 1 : 0)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    if peerManager.winner == "Pareggio" {
+                        Text("Pareggio")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                    } else {
+                        Text("Il vincitore è...")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                        Text("\(peerManager.winner)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                            .scaleEffect(animateWinner ? 1.2 : 1.0)
+                            .animation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: animateWinner)
+                            .onAppear {
+                                animateWinner = true
+                            }
                     }
+                }
+                
+                Spacer()
                 
                 Button(action: {
                     if peerManager.isHost {
@@ -58,10 +73,10 @@ struct ShowWinnerView: View {
                 }) {
                     Text("Termina Partita")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.red)
+                        .background(Color.black)
                         .clipShape(RoundedRectangle(cornerRadius: 50))
                 }
                 .frame(width: 330, height: 60)
@@ -82,53 +97,40 @@ struct ShowWinnerView: View {
     }
 }
 
-struct ScoreView: View {
-    let name: String
-    let score: Int
-    let cardsTaken: Int
-    let scopesMade: Int
-    let hasSettebello: Bool
-    let coinsCount: Int
-    let hasPrimera: Bool
+struct ScoreParameterRowView: View {
+    let title: String
+    let myScore: Int
+    let opponentScore: Int
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(name)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
+        HStack {
+            Spacer()
             
-            Text("Punteggio: \(score)")
-                .font(.title3)
-                .fontWeight(.bold)
-                .foregroundStyle(.yellow)
-            
-            Text("Carte prese: \(cardsTaken)")
-                .font(.subheadline)
-                .foregroundStyle(.white)
-            
-            Text("Scope fatte: \(scopesMade)")
-                .font(.subheadline)
-                .foregroundStyle(.white)
-            
-            if hasSettebello {
-                Text("Settebello fatto")
-                    .font(.subheadline)
-                    .foregroundStyle(.white)
+            VStack {
+                Circle()
+                    .fill(myScore == opponentScore ? Color.yellow : (myScore > opponentScore ? Color.green : Color.red))
+                    .frame(width: 20, height: 20)
             }
             
-            Text("Carte oro: \(coinsCount)")
-                .font(.subheadline)
-                .foregroundStyle(.white)
+            Spacer()
             
-            if hasPrimera {
-                Text("Primera fatta")
-                    .font(.subheadline)
-                    .foregroundStyle(.white)
+            Text(title)
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
+                .frame(width: 150)
+            
+            Spacer()
+            
+            VStack {
+                Circle()
+                    .fill(opponentScore == myScore ? Color.yellow : (opponentScore > myScore ? Color.green : Color.red))
+                    .frame(width: 20, height: 20)
             }
+            
+            Spacer()
         }
-        .padding(10)
-        .background(Color.black.opacity(0.7))
-        .clipShape(RoundedRectangle(cornerRadius: 15))
+        .padding(.horizontal)
+        .padding(.vertical, 8)
     }
 }

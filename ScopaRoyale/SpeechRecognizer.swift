@@ -9,13 +9,22 @@ actor SpeechRecognizer: ObservableObject {
         case notAuthorizedToRecognize
         case notPermittedToRecord
         case recognizerIsUnavailable
+        
+        var message: String {
+            switch self {
+            case .nilRecognizer: return "Can't initialize speech recognizer"
+            case .notAuthorizedToRecognize: return "Not authorized to recognize speech"
+            case .notPermittedToRecord: return "Not permitted to record audio"
+            case .recognizerIsUnavailable: return "Recognizer is unavailable"
+            }
+        }
     }
     
     @MainActor var transcript: String = ""
     public let verbi: [String] = [ // verbi da riconoscere per il comando vocale del voice over
         "gioca",
         "butta",
-        "lancia"
+        "lancia",
     ]
     
     public let verbiRipetizione: [String] = [
@@ -27,8 +36,12 @@ actor SpeechRecognizer: ObservableObject {
     public let semi: [String] = [ // possibili parole attribuibili ai semi delle carte (compresi sinonimi)
         "bastoni",
         "denari",
+        "denaro",
         "spade",
-        "coppe"
+        "spada",
+        "coppe",
+        "coppa",
+        "oro"
     ]
     
     public let valori: [String] = [ // possibili parole attribuibili ai valori delle carte (compresi sinonimi)
@@ -43,7 +56,20 @@ actor SpeechRecognizer: ObservableObject {
         "otto",
         "lotto",
         "nove",
-        "dieci"
+        "dieci",
+        "re",
+        "cavallo",
+        "fante",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
     ]
     
     public let oggetti: [String] = [
@@ -72,6 +98,10 @@ actor SpeechRecognizer: ObservableObject {
     init(peerManager: MultiPeerManager) {
         self.peerManager = peerManager
         recognizer = SFSpeechRecognizer(locale: Locale(identifier: "it-IT"))
+        guard recognizer != nil else {
+            transcribe(RecognizerError.nilRecognizer)
+            return
+        }
         
         Task {
             do {
@@ -81,6 +111,8 @@ actor SpeechRecognizer: ObservableObject {
                 guard await AVAudioApplication.shared.hasPermissionToRecord() else {
                     throw RecognizerError.notPermittedToRecord
                 }
+            } catch {
+                transcribe(error)
             }
         }
     }
@@ -112,6 +144,7 @@ actor SpeechRecognizer: ObservableObject {
      */
     private func transcribe() async {
         guard let recognizer, recognizer.isAvailable else {
+            self.transcribe(RecognizerError.recognizerIsUnavailable)
             return
         }
         
@@ -119,6 +152,7 @@ actor SpeechRecognizer: ObservableObject {
             let (audioEngine, request) = try Self.prepareEngine()
             self.audioEngine = audioEngine
             self.request = request
+            // Passa una closure sincrona a recognitionTask
             self.task = recognizer.recognitionTask(with: request, resultHandler: { [weak self] result, error in
                 Task {
                     await self?.recognitionHandler(audioEngine: audioEngine, result: result, error: error)
@@ -126,6 +160,7 @@ actor SpeechRecognizer: ObservableObject {
             })
         } catch {
             self.reset()
+            self.transcribe(error)
         }
     }
     
@@ -146,7 +181,7 @@ actor SpeechRecognizer: ObservableObject {
         request.shouldReportPartialResults = true
         
         let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .mixWithOthers)
+        try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .duckOthers)
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         let inputNode = audioEngine.inputNode
         
@@ -283,6 +318,17 @@ actor SpeechRecognizer: ObservableObject {
             transcript = message
         }
     }
+    nonisolated private func transcribe(_ error: Error) {
+        var errorMessage = ""
+        if let error = error as? RecognizerError {
+            errorMessage += error.message
+        } else {
+            errorMessage += error.localizedDescription
+        }
+        Task { @MainActor [errorMessage] in
+            transcript = "<< \(errorMessage) >>"
+        }
+    }
     
     @MainActor
     public func speakText(_ testo: String) {
@@ -293,7 +339,7 @@ actor SpeechRecognizer: ObservableObject {
         
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetoothA2DP, .defaultToSpeaker, .interruptSpokenAudioAndMixWithOthers])
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetoothA2DP, .defaultToSpeaker])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")

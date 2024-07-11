@@ -6,73 +6,88 @@ struct OneVsOneView: View {
     let lobbyName: String // nome della lobby
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
     @State private var navigateToGame = false
+    @State private var isAnimatingDots = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        VStack(spacing: 30) {
-            VStack {
-                Text("Nome della lobby")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.horizontal)
-                
-                Text(lobbyName)
-                    .font(.largeTitle)
-                    .padding(.horizontal)
-                    .padding(.top, 10)
-            }
+        VStack {
+            Text("Nome della lobby: \(lobbyName)") // nome della lobby trovata
+                .font(.headline)
+                .padding(.bottom, 20)
             
             Spacer()
-            if peerManager.connectedPeers.isEmpty {
-                VStack(spacing: 10) {
-                    Text("In attesa di un avversario...")
-                        .font(.headline)
-                        .foregroundStyle(.gray)
-                        .padding()
-                    
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                }
-                .padding()
-            }
             
             HStack {
                 VStack {
                     // Immagine dell'avatar dell'utente
-                    peerManager.avatarImage(for: peerManager.myAvatarImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-                        .clipShape(Circle())
-                    
-                    Text(username) // nome dell'avversario
-                        .font(.title2)
-                        .padding(.top, 10)
-                }
-                
-                Text("VS")
-                    .font(.title)
-                    .padding(.horizontal, 20)
-                
-                if !peerManager.opponentName.isEmpty {
-                    VStack {
-                        // va aggiunto l'avatar dell'avversario
-                        peerManager.avatarImage(for: peerManager.opponentAvatarImage)
+                    ZStack {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 96, height: 96) // Stesso diametro dell'immagine più padding
+                        peerManager.avatarImage(for: peerManager.myAvatarImage)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 80, height: 80)
+                            .frame(width: 90, height: 90)
                             .clipShape(Circle())
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.black, lineWidth: 3)
+                                    .scaleEffect(1.1)
+                                    .padding(3)
+                            )
+                    }
+                    
+                    Text(username) // nome dell'utente
+                        .font(.system(size: 20, design: .default))
+                        .bold()
+                }
+                
+                if !peerManager.opponentName.isEmpty {
+                    Image("vs")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 90, height: 90)
+                    
+                    VStack {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 96, height: 96) // Stesso diametro dell'immagine più padding
+                            peerManager.avatarImage(for: peerManager.opponentAvatarImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 90, height: 90)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 3)
+                                        .scaleEffect(1.1)
+                                        .padding(3)
+                                )
+                        }
                         
                         Text(peerManager.opponentName) // nome dell'avversario
-                            .font(.title2)
-                            .padding(.top, 10)
+                            .font(.system(size: 20, design: .default))
+                            .bold()
                     }
                 }
             }
-            .padding(.horizontal, 35)
-                        
+            
             Spacer()
+            
+            if peerManager.connectedPeers.isEmpty {
+                VStack {
+                    Text("In attesa di un avversario...")
+                        .font(.headline)
+                    
+                    AnimatedDotsView(isAnimating: $isAnimatingDots)
+                        .onAppear {
+                            isAnimatingDots = true
+                        }
+                }
+                .padding()
+            }
             
             Button(action: { // bottone per avviare la partita
                 if !peerManager.connectedPeers.isEmpty {
