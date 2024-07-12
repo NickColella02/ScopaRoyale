@@ -84,6 +84,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var winner: String = "" // nome del giocatore che ha vinto
     @Published var myAvatarImage: String = (UserDefaults.standard.string(forKey: "selectedAvatar")) ?? "defaultUser" //nome dell avatar che ha scelto l utente
     @Published var opponentAvatarImage: String = ""//nome dell avatar che ha scelto l opponent
+    @Published var showScopaAnimation: Bool = false
+    @Published var showOpponentScopaAnimation: Bool = false
+    @Published var showSettebelloAnimation: Bool = false
+    @Published var showOpponentSettebelloAnimation: Bool = false
 
     override init() {
         self.blindMode = UserDefaults.standard.bool(forKey: "blindMode")
@@ -149,7 +153,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.handleCardsTakenData(data.dropFirst(11))
                 } else if receivedString.starts(with: "PlayersPoints:") {
                     self.handlePlayersPointsData(data.dropFirst(14))
-                } else if receivedString.starts(with: "Primera:") {
+                } else if receivedString.starts(with: "Scopa:") {
+                    self.showOpponentScopaAnimation = true
+                } else if receivedString.starts(with: "Settebello:") {
+                    self.showOpponentSettebelloAnimation = true
+                }
+                else if receivedString.starts(with: "Primera:") {
                     self.handlePrimeraData(data.dropFirst(8))
                 } else if receivedString.starts(with: "Settebello:") {
                     self.handleSettebelloData(data.dropFirst(11))
@@ -354,6 +363,24 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
     
+    func sendScopaMessage() {
+        let data = "Scopa:\(showScopaAnimation)".data(using: .utf8)
+        do {
+            try session.send(data!, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio showScopaAnimation: \(error.localizedDescription)")
+        }
+    }
+    
+    func sendSettebelloMessage() {
+        let data = "Settebello:\(showSettebelloAnimation)".data(using: .utf8)
+        do {
+            try session.send(data!, toPeers: session.connectedPeers, with: .reliable)
+        } catch {
+            print("Errore invio showSettebelloAnimation: \(error.localizedDescription)")
+        }
+    }
+    
     func sendPlayersCoins() {
         let coins = Coins(playerCoins: opponentCoinsCount, opponentCoins: playerCoinsCount)
         do {
@@ -537,16 +564,19 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 for cardToTake in cardsToTake {
                     if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte dal tavolo
                         tableCards.remove(at: index)
-                        sendTableCards()
                     }
+                    sendTableCards()
                     if blindMode {
                         self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
                     }
                 }
-                if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
+                if tableCards.isEmpty && !deck.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
                         self.speakText("Hai fatto scopa")
+                    } else {
+                        self.showScopaAnimation = true
+                        sendScopaMessage()
                     }
                     sendPlayersPoints()
                 }
@@ -554,9 +584,12 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
                 cardsToTake.append(card)
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
-                if blindMode {
-                    if cardsToTake.contains(Card(value: "sette", seed: "denari")) {
+                if cardsToTake.contains(Card(value: "sette", seed: "denari")) {
+                    if blindMode {
                         self.speakText("Hai preso il settebello")
+                    } else {
+                        self.showSettebelloAnimation = true
+                        sendSettebelloMessage()
                     }
                 }
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese

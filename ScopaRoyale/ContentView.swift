@@ -19,10 +19,10 @@ struct ContentView: View {
     }
     
     init() {
-            if username.isEmpty {
-                _showUsernameEntry = State(initialValue: true)
-            }
+        if username.isEmpty {
+            _showUsernameEntry = State(initialValue: true)
         }
+    }
     
     var body: some View {
         NavigationStack {
@@ -39,7 +39,9 @@ struct ContentView: View {
             .toolbar {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink(destination: ProfileView(username: $username).environmentObject(peerManager)) {
+                        Button(action: {
+                            showSettings = true
+                        }) {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 20, weight: .regular))
                                 .padding(.horizontal, 12)
@@ -56,6 +58,7 @@ struct ContentView: View {
         .preferredColorScheme(.light)
         .overlay(lobbyFormOverlay)
         .overlay(gameRulesOverlay)
+        .overlay(settingsOverlay)
         .onTapGesture {
             hideKeyboard()
         }
@@ -97,13 +100,10 @@ struct ContentView: View {
                         showLobbyForm = false
                     }
                 VStack {
-                    HStack {
-                        Image("lobbyName")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 40, height: 40)
-                            .padding(.top, 20)
-                    }
+                    Image("lobbyName")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
                     TextField("Inserisci il nome della lobby", text: $lobbyName)
                         .padding()
                         .background(Color(.systemGray6))
@@ -123,11 +123,12 @@ struct ContentView: View {
                             .background(lobbyName.isEmpty ? Color.gray : Color.black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
                             .padding(.horizontal, 25)
-                            .padding(.bottom, 20)
                     }
                     .disabled(lobbyName.isEmpty)
                 }
-                .frame(width: 370, height: 215)
+                .frame(width: 370)
+                .padding(.top, 20)
+                .padding(.bottom, 20)
                 .background(Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .shadow(radius: 20)
@@ -145,28 +146,25 @@ struct ContentView: View {
                         showGameRules = false
                     }
                 VStack {
+                    Image("rules")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
                     ScrollView {
-                        VStack {
-                            Image("rules")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 40, height: 40)
-                                .padding(.top, 20)
-                            Text("""
-                            Scopa è un tradizionale gioco di carte italiano:
-                            **1. Obiettivo**: totalizzare più punti del tuo avversario.
-                            **2. Svolgimento del gioco**: si gioca con un mazzo di carte napoletane da 40 carte. A ciascun giocatore vengono distribuite tre carte, e quattro carte vengono messe scoperte sul tavolo. Al tuo turno, devi lanciare una carta dalla tua mano. Se ci sono carte di ugual valore o carte la cui somma corrisponde al valore della carta lanciata, le prendi e le aggiungi al tuo mazzo delle prese. Se prendi le ultime carte presenti sul tavolo hai fatto scopa. Se non puoi prendere alcuna carta, la carta lanciata resta sul tavolo.
-                            **3. Punteggio**:
-                            - 1 punto per il maggior numero di carte prese.
-                            - 1 punto per il maggior numero di carte di denari prese.
-                            - 1 punto per il 7 di denari (settebello).
-                            - 1 punto per il maggior numero di 7 (primera).
-                            - 1 punto per ogni scopa fatta
-                            **4. Vittoria**: il gioco continua fino a quando tutte le carte sono state giocate. Il giocatore con il maggior numero di punti alla fine vince.
-                            """)
-                            .font(.body)
-                            .padding(.horizontal, 20)
-                        }
+                        Text("""
+                        Scopa è un tradizionale gioco di carte italiano:
+                        **1. Obiettivo**: totalizzare più punti del tuo avversario.
+                        **2. Svolgimento del gioco**: si gioca con un mazzo di carte napoletane da 40 carte. A ciascun giocatore vengono distribuite tre carte, e quattro carte vengono messe scoperte sul tavolo. Al tuo turno, devi lanciare una carta dalla tua mano. Se ci sono carte di ugual valore o carte la cui somma corrisponde al valore della carta lanciata, le prendi e le aggiungi al tuo mazzo delle prese. Se prendi le ultime carte presenti sul tavolo hai fatto scopa. Se non puoi prendere alcuna carta, la carta lanciata resta sul tavolo.
+                        **3. Punteggio**:
+                        - 1 punto per il maggior numero di carte prese.
+                        - 1 punto per il maggior numero di carte di denari prese.
+                        - 1 punto per il 7 di denari (settebello).
+                        - 1 punto per il maggior numero di 7 (primera).
+                        - 1 punto per ogni scopa fatta
+                        **4. Vittoria**: il gioco continua fino a quando tutte le carte sono state giocate. Il giocatore con il maggior numero di punti alla fine vince.
+                        """)
+                        .font(.body)
+                        .padding(.horizontal, 20)
                     }
                     Spacer()
                     Button(action: {
@@ -180,11 +178,35 @@ struct ContentView: View {
                             .background(.black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
                             .padding(.horizontal, 25)
+                            .padding(.top, 10)
                     }
-                    .frame(width: 330, height: 60)
-                    .padding(.bottom, 20)
                 }
-                .frame(width: 370, height: 700)
+                .frame(width: 370)
+                .padding(.top, 20)
+                .padding(.bottom, 20)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(radius: 20)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var settingsOverlay: some View {
+        if showSettings {
+            ZStack {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        showSettings = false
+                    }
+                VStack {
+                    ProfileView(username: $username)
+                        .environmentObject(peerManager)
+                }
+                .frame(width: 370)
+                .padding(.top, 20)
+                .padding(.bottom, 20)
                 .background(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .shadow(radius: 20)

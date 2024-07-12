@@ -250,6 +250,70 @@ struct OneVsOneGameView: View {
                     return draggedCard != nil ? 143 : 150
                 }
                 
+                if peerManager.showScopaAnimation {
+                    Text("Scopa!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(.yellow)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    peerManager.showScopaAnimation = false
+                                }
+                            }
+                        }
+                } else if peerManager.showOpponentScopaAnimation {
+                    Text("Scopa!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(.red)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    peerManager.showOpponentScopaAnimation = false
+                                }
+                            }
+                        }
+                }
+                    
+                if peerManager.showSettebelloAnimation {
+                    Text("Settebello!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(.yellow)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    peerManager.showSettebelloAnimation = false
+                                }
+                            }
+                        }
+                } else if peerManager.showOpponentSettebelloAnimation {
+                    Text("Settebello!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(.red)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    peerManager.showOpponentSettebelloAnimation = false
+                                }
+                            }
+                        }
+                }
+                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
                         Image(card.imageName)
@@ -337,6 +401,7 @@ struct OneVsOneGameView: View {
                                             }
                                         }
                                 )
+                                .disabled((peerManager.currentPlayer == 1 && peerManager.isHost) || (peerManager.currentPlayer == 0 && peerManager.isClient))
                                 .offset(draggedCard == card ? cardOffset : .zero)
                         }
                     }
@@ -344,8 +409,6 @@ struct OneVsOneGameView: View {
                     .padding(.bottom, bottomPaddingHand) // Padding inferiore per le carte nella mano
                 }
             }
-
-
 
             if peerManager.blindMode {
                 if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1 {
@@ -385,9 +448,6 @@ struct OneVsOneGameView: View {
         .fullScreenCover(isPresented: $backModality) {
             ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
-        .fullScreenCover(isPresented: $peerManager.gameOver) {
-            ShowWinnerView().environmentObject(peerManager).environmentObject(speechRecognizer)
-        }
         .onChange(of: peerManager.peerDisconnected) {
             if peerManager.peerDisconnected {
                 DispatchQueue.main.async {
@@ -399,6 +459,10 @@ struct OneVsOneGameView: View {
             isRecording = false
             speechRecognizer.stopTranscribing()
         }
+        .overlay(ShowWinnerView()
+            .transition(.scale)
+            .zIndex(10)
+        )
     }
     
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {

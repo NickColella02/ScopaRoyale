@@ -27,80 +27,57 @@ struct ProfileView: View {
     
     var body: some View {
         VStack {
-            VStack {
-                Text("Avatar")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.top, 30)
-                
-                avatarImage
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150, height: 150)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Color.black, lineWidth: 3)
-                            .scaleEffect(1.1)
-                            .padding(3)
-                    )
-                    .onTapGesture {
-                        showPicker = true
-                    }
-            }
-                      
-            Spacer()
-            
-            VStack {
-                Text("Username")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.top, 10)
-                
-                if localUsername.count > maxUsernameLength {
-                    Text("L'username può contenere al massimo \(maxUsernameLength) caratteri.")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, 25)
+            Image("yourProfile")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 40, height: 40)
+            avatarImage
+                .resizable()
+                .scaledToFit()
+                .frame(width: 110, height: 110)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(Color.black, lineWidth: 3)
+                        .scaleEffect(1.1)
+                        .padding(3)
+                )
+                .onTapGesture {
+                    showPicker = true
                 }
-                TextField("Inserisci il nickname", text: $localUsername)
-                    .padding(.vertical, 20)
+                .padding(.bottom, 20)
+            
+            if localUsername.count > maxUsernameLength {
+                Text("L'username può contenere al massimo \(maxUsernameLength) caratteri.")
+                    .font(.caption)
+                    .foregroundStyle(.red)
                     .padding(.horizontal, 25)
-                    .frame(width: UIScreen.main.bounds.width * 0.75) // Imposta la larghezza desiderata, ad esempio il 75% della larghezza dello schermo
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
             }
-                   
-            Spacer()
             
-            VStack {
-                Text("Blind Mode")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.top, 10)
-                
-                Button(action: {
-                    toggleBlindMode()
-                }) {
-                    Text(peerManager.blindMode ? "Abilitata" : "Disabilitata")
-                        .font(.system(size: 20))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .frame(width: UIScreen.main.bounds.width * 0.75)
-                        .background(peerManager.blindMode ? Color.green : Color.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 50))
-                        .padding(.horizontal, 25)
-                }
+            TextField("Inserisci il nickname", text: $localUsername)
+                .padding()
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 100))
+                .padding(.horizontal, 25)
+            
+            Button(action: {
+                toggleBlindMode()
+            }) {
+                Text(peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(peerManager.blindMode ? Color.green : Color.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 50))
+                    .padding(.horizontal, 25)
             }
-            .padding(.horizontal)
             
             Text("La Blind mode fornisce, ai giocatori non vedenti, un supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
-                .font(.system(size: 14))
+                .font(.system(size: 14, design: .default))
                 .foregroundStyle(.black)
-                .padding(.horizontal, 45)
+                .padding(.horizontal, 35)
                 .padding(.top, 10)
-            
-            Spacer()
         }
         .navigationBarTitle("", displayMode: .inline)
         .toolbar {
@@ -159,10 +136,10 @@ struct AvatarPickerView: View {
     
     var body: some View {
         VStack {
-            Text("Scegli un Avatar")
-                .font(.title)
-                .fontWeight(.bold)
-                .padding(.top, 10)
+            Image("chooseAnAvatar")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 40, height: 40)
             
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))]) {
@@ -182,9 +159,9 @@ struct AvatarPickerView: View {
                     }
                 }
             }
-            
-            Spacer()
         }
+        .padding(.top, 20)
+        .padding(.bottom, 20)
     }
 }
 

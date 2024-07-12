@@ -66,10 +66,10 @@ struct UsernameFormView: View {
     
     var body: some View {
         VStack {
-            Image("username")
+            /*Image("username")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 40, height: 40)
+                .frame(width: 40, height: 40)*/
             
             TextField("Inserisci il tuo nickname", text: $username)
                 .padding()

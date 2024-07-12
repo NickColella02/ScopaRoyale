@@ -107,7 +107,7 @@ struct OneVsOneView: View {
         .navigationTitle("")
     }
 }
-
+/*
 struct OneVsOneView_Previews: PreviewProvider {
     static var previews: some View {
         let peerManager = MultiPeerManager()
@@ -117,4 +117,4 @@ struct OneVsOneView_Previews: PreviewProvider {
             .environmentObject(speechRecognizer)
     }
 }
-
+*/
