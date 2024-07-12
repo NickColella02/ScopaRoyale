@@ -73,7 +73,7 @@ struct OneVsOneView: View {
             }) {
                 Text("Gioca")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(peerManager.connectedPeers.isEmpty ? Color.gray : Color.black)

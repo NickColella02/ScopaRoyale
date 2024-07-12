@@ -2,12 +2,13 @@ import SwiftUI
 import SpriteKit
 
 struct OneVsOneGameView: View {
+    
     var scene: SKScene {
         let scene = OneVsOneGameScene(size: UIScreen.main.bounds.size)
         scene.scaleMode = .aspectFill
         return scene
     }
-
+    
     @EnvironmentObject private var peerManager: MultiPeerManager
     @Environment(\.presentationMode) var presentationMode
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
@@ -19,7 +20,7 @@ struct OneVsOneGameView: View {
     @State private var moveLeft: Bool = false
     @State private var moveOpponentLeft: Bool = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
-
+    
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
@@ -184,7 +185,7 @@ struct OneVsOneGameView: View {
                             moveOpponentLeft = true
                         }
                     }
-
+                    
                     VStack {
                         if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
                             VStack {
@@ -199,10 +200,12 @@ struct OneVsOneGameView: View {
                     .position(x: geometry.size.width * 0.63, y: geometry.size.height * 0.9)
                 }
             }
-
-
+            
+            
             VStack {
+                // Sezione per il nome dell'avversario e le carte dell'avversario
                 VStack {
+                    // Nome dell'avversario
                     Text(peerManager.opponentName)
                         .font(.system(size: 15, design: .default))
                         .foregroundStyle(.white)
@@ -212,6 +215,8 @@ struct OneVsOneGameView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 5))
                         .shadow(radius: 5)
                         .zIndex(2)
+
+                    // Carte dell'avversario
                     HStack(spacing: 4) {
                         ZStack {
                             ForEach(0..<peerManager.opponentHand.count, id: \.self) { index in
@@ -235,7 +240,7 @@ struct OneVsOneGameView: View {
                 }
                 
                 Spacer()
-
+                
                 // Sezione per le carte sul tavolo
                 var bottomPaddingTable: CGFloat {
                     return draggedCard != nil ? -5 : 5
@@ -244,7 +249,7 @@ struct OneVsOneGameView: View {
                 var bottomPaddingHand: CGFloat {
                     return draggedCard != nil ? 143 : 150
                 }
-
+                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
                         Image(card.imageName)
@@ -258,14 +263,14 @@ struct OneVsOneGameView: View {
                     }
                 }
                 .padding(.horizontal, 40)
-                .padding(.bottom, bottomPaddingTable) // Usa la proprietà bottomPadding per il padding inferiore
-
+                .padding(.bottom, bottomPaddingTable) // Padding inferiore per le carte sul tavolo
+                
                 Spacer()
                 
                 VStack {
                     HStack(spacing: 4) {
                         ForEach(peerManager.playerHand.indices, id: \.self) { index in
-                            let card = peerManager.playerHand[index] // Salva la carta in una costante
+                            let card = peerManager.playerHand[index]
                             
                             // Calcolo degli zIndex in base alla selezione
                             var zIndex: Double {
@@ -276,10 +281,10 @@ struct OneVsOneGameView: View {
                                 } else if index == 1 && draggedCard == peerManager.playerHand[0] {
                                     return 0.25 // Carta centrale se selezionata, in terzo piano
                                 } else {
-                                    return 0 // Altrimenti, carta normale
+                                    return 0 // Carta normale
                                 }
                             }
-
+                            
                             Image(card.imageName) // Utilizza direttamente la proprietà imageName della carta
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
@@ -291,7 +296,6 @@ struct OneVsOneGameView: View {
                                 .rotationEffect(peerManager.playerHand.count >= 3 ? (index == 0 ? Angle(degrees: -10) : (index == 2 ? Angle(degrees: 10) : Angle(degrees: 0))) : (peerManager.playerHand.count == 2 ? (index == 0 ? Angle(degrees: -5) : Angle(degrees: 5)) : Angle(degrees: 0)))
                                 .zIndex(zIndex)
                                 .offset(x: peerManager.playerHand.count == 3 ? (index == 0 ? 20 : (index == 2 ? -20 : 0)) : (peerManager.playerHand.count == 2 ? (index == 0 ? 10 : -10) : 0), y: peerManager.playerHand.count < 3 ? -10 : (index == 1 ? -10 : 0))
-                                .offset(draggedCard == card ? cardOffset : .zero)
                                 .gesture(
                                     TapGesture()
                                         .onEnded {
@@ -301,28 +305,48 @@ struct OneVsOneGameView: View {
                                         }
                                 )
                                 .gesture(
-                                    DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                                    DragGesture(minimumDistance: 0, coordinateSpace: .local) // Imposta a 0 il minimumDistance per captare anche piccoli spostamenti
                                         .onChanged { gesture in
-                                            if draggedCard == card && gesture.translation.height < 0 {
-                                                cardOffset = gesture.translation
+                                            if draggedCard == card {
+                                                // Limitiamo il movimento della carta
+                                                if gesture.translation.height < 0 {
+                                                    cardOffset = gesture.translation
+                                                }
                                             }
                                         }
                                         .onEnded { gesture in
                                             if draggedCard == card && gesture.translation.height < -50 {
-                                                if peerManager.currentPlayer == 0 && peerManager.isHost || peerManager.currentPlayer == 1 && peerManager.isClient {
-                                                    peerManager.playCard(card: card) // Gioca la carta
+                                                // Solo se il gesto è verso l'alto e abbastanza lungo
+                                                withAnimation(.easeInOut(duration: 0.3)) {
+                                                    cardOffset = CGSize(width: 0, height: -200) // Sposta la carta verso l'alto fuori dallo schermo
                                                 }
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                    if peerManager.currentPlayer == 0 && peerManager.isHost || peerManager.currentPlayer == 1 && peerManager.isClient {
+                                                        peerManager.playCard(card: card) // Gioca la carta
+                                                    }
+                                                    // Resetta stato dopo l'animazione
+                                                    draggedCard = nil
+                                                    cardOffset = .zero
+                                                }
+                                            } else {
+                                                // Se il gesto non è valido, annulla l'animazione e resetta la posizione
+                                                withAnimation(.easeInOut(duration: 0.3)) {
+                                                    cardOffset = .zero
+                                                }
+                                                draggedCard = nil
                                             }
-                                            draggedCard = nil
-                                            cardOffset = .zero
                                         }
                                 )
+                                .offset(draggedCard == card ? cardOffset : .zero)
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, bottomPaddingHand)
+                    .padding(.bottom, bottomPaddingHand) // Padding inferiore per le carte nella mano
                 }
             }
+
+
+
             if peerManager.blindMode {
                 if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1 {
                     Button(action: {
@@ -383,3 +407,4 @@ struct OneVsOneGameView: View {
         }
     }
 }
+    
