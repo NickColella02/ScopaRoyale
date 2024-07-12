@@ -179,8 +179,10 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.startGame = false
                 } else if receivedString.starts(with: "PlayersScores:") {
                     self.handlePlayersScoresData(data.dropFirst(14))
-                } else if receivedString.starts(with: "IsAvatar:"){
-                    self.opponentAvatarImage = String(receivedString.dropFirst(9))
+                } else if receivedString.starts(with: "IsAvatar:") {
+                    if String(receivedString.dropFirst(9)) != "" {
+                        self.opponentAvatarImage = String(receivedString.dropFirst(9))
+                    }
                 } else {
                     self.opponentName = receivedString
                 }
@@ -319,8 +321,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.opponentHand = []
         self.playerHand = []
         self.tableCards = []
-        self.playerScore = 0
-        self.opponentScore = 0
         self.currentPlayer = 1
         self.lastPlayer = 1
         createDeck() // crea il mazzo iniziale
