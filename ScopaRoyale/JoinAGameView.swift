@@ -50,12 +50,6 @@ struct JoinAGameView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 120, height: 120)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 3)
-                                        .scaleEffect(1.1)
-                                        .padding(3)
-                                )
                         }
                         
                         Image("vs")
@@ -71,12 +65,6 @@ struct JoinAGameView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 120, height: 120)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 3)
-                                        .scaleEffect(1.1)
-                                        .padding(3)
-                                )
                         }
                     }
 

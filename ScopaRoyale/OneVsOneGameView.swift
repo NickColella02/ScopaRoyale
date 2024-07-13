@@ -251,51 +251,51 @@ struct OneVsOneGameView: View {
                 }
                 
                 if peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation {
-                                    Text("Scopa!")
-                                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                                        .foregroundStyle(peerManager.showScopaAnimation ? Color.yellow : Color.red)
-                                        .padding()
-                                        .background(
-                                            Capsule()
-                                                .fill(Color.black.opacity(0.7))
-                                                .shadow(color: .gray, radius: 10, x: 5, y: 5)
-                                        )
-                                        .scaleEffect(peerManager.showScopaAnimation ? 1.2 : 1.0)
-                                        .transition(.scale)
-                                        .animation(.easeInOut(duration: 0.3), value: peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation)
-                                        .onAppear {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                withAnimation {
-                                                    if peerManager.showScopaAnimation {
-                                                        peerManager.showScopaAnimation = false
-                                                    } else if peerManager.showOpponentScopaAnimation {
-                                                        peerManager.showOpponentScopaAnimation = false
-                                                    }
-                                                }
-                                            }
-                                        }
+                    Text("Scopa!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(peerManager.showScopaAnimation ? Color.yellow : Color.red)
+                        .padding()
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.7))
+                                .shadow(color: .gray, radius: 10, x: 5, y: 5)
+                        )
+                        .scaleEffect(peerManager.showScopaAnimation ? 1.2 : 1.0)
+                        .transition(.scale)
+                        .animation(.easeInOut(duration: 0.3), value: peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    if peerManager.showScopaAnimation {
+                                        peerManager.showScopaAnimation = false
+                                    } else if peerManager.showOpponentScopaAnimation {
+                                        peerManager.showOpponentScopaAnimation = false
+                                    }
                                 }
-                                    
-                                if peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation {
-                                    Text("Settebello!")
-                                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                                        .foregroundStyle(peerManager.showSettebelloAnimation ? Color.yellow : Color.red)
-                                        .padding()
-                                        .background(Color.black.opacity(0.7))
-                                        .clipShape(Capsule())
-                                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
-                                        .onAppear {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                withAnimation {
-                                                    if peerManager.showSettebelloAnimation {
-                                                        peerManager.showSettebelloAnimation = false
-                                                    } else if peerManager.showOpponentSettebelloAnimation {
-                                                        peerManager.showOpponentSettebelloAnimation = false
-                                                    }
-                                                }
-                                            }
-                                        }
+                            }
+                        }
+                }
+                    
+                if peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation {
+                    Text("Settebello!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(peerManager.showSettebelloAnimation ? Color.yellow : Color.red)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    if peerManager.showSettebelloAnimation {
+                                        peerManager.showSettebelloAnimation = false
+                                    } else if peerManager.showOpponentSettebelloAnimation {
+                                        peerManager.showOpponentSettebelloAnimation = false
+                                    }
                                 }
+                            }
+                        }
+                }
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
                         Image(card.imageName)
@@ -411,11 +411,20 @@ struct OneVsOneGameView: View {
                 }
             }
         }
-        .alert(isPresented: $showPeerDisconnectedAlert) {
-            Alert(title: Text("Disconnessione"), message: Text("Il giocatore ha abbandonato la partita."), dismissButton: .default(Text("OK")) {
-                peerManager.reset()
-                backModality = true
-            })
+        .alert(isPresented: Binding(
+            get: {
+                return showPeerDisconnectedAlert && !peerManager.gameOver
+            },
+            set: { _ in }
+        )) {
+            Alert(
+                title: Text("Disconnessione"),
+                message: Text("Il giocatore ha abbandonato la partita."),
+                dismissButton: .default(Text("OK")) {
+                    peerManager.reset()
+                    backModality = true
+                }
+            )
         }
         .fullScreenCover(isPresented: $backModality) {
             ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)

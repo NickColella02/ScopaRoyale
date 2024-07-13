@@ -317,6 +317,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.startGame = true
         self.playerHasSettebello = false
         self.opponentHasSettebello = false
+        self.playerHasPrimera = false
+        self.opponentHasPrimera = false
         self.deck = []
         self.opponentHand = []
         self.playerHand = []
@@ -416,7 +418,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         
     func createDeck() { // crea il deck e lo mescola
         let values: [String] = [ // possibili valori per le carte
-            "asso", "due", "tre", "quattro", "cinque"//, "sei", "sette", "otto", "nove", "dieci"
+            /*"asso", "due", "tre", "quattro", "cinque",*/ "sei", "sette", "otto", "nove", "dieci"
         ]
         let seeds: [String] = [ // possibili semi per le carte
             "denari", "coppe"//, "spade", "bastoni"
@@ -570,7 +572,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
                     }
                 }
-                if tableCards.isEmpty && !deck.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
+                if tableCards.isEmpty && !deck.isEmpty && !playerHand.isEmpty && !opponentHand.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
                         self.speakText("Hai fatto scopa")
@@ -595,6 +597,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
             }
             sendCardsToPlayers() // invia le carte alle mani dei giocatori
+            sendTurnChange() // aggiorna il turno
             
             if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
                 if !deck.isEmpty { // se nel mazzo iniziale ci sono altre carte, i due giocatori pescano
@@ -624,7 +627,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     opponentScore += opponentPoints.count
                     
                     // assegno un punto a chi ha il 7 denari
-                    if cardTakenByPlayer.contains(where: { $0.value == "sette" && $0.seed == "denari" }) || playerPoints.contains(where: { $0.value == "sette" && $0.seed == "denari" }) {
+                    if cardTakenByPlayer.contains(Card(value: "sette", seed: "denari")) || playerPoints.contains(Card(value: "sette", seed: "denari")) {
                         playerHasSettebello = true
                         playerScore += 1
                     } else {
@@ -660,16 +663,14 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     } else {
                         winner = "Pareggio"
                     }
-                    self.gameOver = true // termina la partita
                     sendSettebello()
                     sendPrimera()
                     sendPlayersScores() // invio i punteggi ai giocatori
                     sendPlayersCoins()
                     sendCardsTaken()
+                    self.gameOver = true // termina la partita
                     sendEndGameSignal() // notifica la fine della partita
                 }
-            } else {
-                sendTurnChange() // aggiorna il turno
             }
         }
     }

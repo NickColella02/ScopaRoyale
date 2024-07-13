@@ -10,17 +10,24 @@ struct ShowWinnerView: View {
             ZStack {
                 Color(.systemBackground)
                     .ignoresSafeArea()
-                
                 VStack {
+                    Image("results")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
                     HStack {
-                        showWinnerAvatar(username: peerManager.winner, avatarImage: peerManager.myAvatarImage)
+                        showWinnerAvatar(username: peerManager.myUsername, avatarImage: peerManager.myAvatarImage, isWinner: peerManager.winner == peerManager.myUsername)
+                        
+                        Spacer()
+                        
+                        showWinnerAvatar(username: peerManager.opponentName, avatarImage: peerManager.opponentAvatarImage, isWinner: peerManager.winner == peerManager.opponentName)
                     }
                     .padding()
                     
                     HStack {
-                        TotalPointsView(title: "I tuoi punti", score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
+                        TotalPointsView(title: "Punti totali", score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
                         Spacer()
-                        TotalPointsView(title: "I punti di \(peerManager.opponentName)", score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
+                        TotalPointsView(title: "Punti totali", score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
                     }
                     .padding(.horizontal)
                     
@@ -39,14 +46,12 @@ struct ShowWinnerView: View {
                             .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color .black)
+                            .background(Color.black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
                             .padding(.horizontal, 25)
                     }
-                    .frame(width: 330, height: 60)
                     .padding(.horizontal, 35)
                 }
-                .padding()
                 .onAppear {
                     if peerManager.blindMode {
                         DispatchQueue.main.async {
@@ -65,21 +70,24 @@ struct ShowWinnerView: View {
 struct showWinnerAvatar: View {
     let username: String
     let avatarImage: String
+    let isWinner: Bool
     
     var body: some View {
         VStack {
             ZStack {
-                Image("winnerCrown")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 95, height: 95)
-                    .clipShape(Circle())
+                if isWinner {
+                    Image("winnerCrown")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 140, height: 140)
+                        .clipShape(Circle())
+                }
                 Image(avatarImage)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 63, height: 63)
+                    .frame(width: 93, height: 93)
                     .clipShape(Circle())
-                    .padding(.top, 26)
+                    .padding(.top, isWinner ? 39 : 0)
             }
             
             Text(username)
@@ -87,7 +95,6 @@ struct showWinnerAvatar: View {
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
         }
-        .padding()
     }
 }
 
@@ -97,23 +104,23 @@ struct ScoreGridView: View {
     var body: some View {
         Grid {
             GridRow {
-                ScoreParameterCellView(title: "Scope", myScore: peerManager.playerPoints.count, opponentScore: peerManager.opponentPoints.count)
+                ScoreParameterCellView(title: "Scope", myScore: "\(peerManager.playerPoints.count)", opponentScore: "\(peerManager.opponentPoints.count)")
             }
             Divider()
             GridRow {
-                ScoreParameterCellView(title: "Carte prese", myScore: peerManager.cardTakenByPlayer.count, opponentScore: peerManager.cardTakenByOpponent.count)
+                ScoreParameterCellView(title: "Carte prese", myScore: "\(peerManager.cardTakenByPlayer.count)", opponentScore: "\(peerManager.cardTakenByOpponent.count)")
             }
             Divider()
             GridRow {
-                ScoreParameterCellView(title: "Settebello", myScore: peerManager.playerHasSettebello ? 1 : 0, opponentScore: peerManager.opponentHasSettebello ? 1 : 0)
+                ScoreParameterCellView(title: "Settebello", myScore: peerManager.playerHasSettebello ? "Sì" : "No", opponentScore: peerManager.opponentHasSettebello ? "Sì" : "No")
             }
             Divider()
             GridRow {
-                ScoreParameterCellView(title: "Carte oro", myScore: peerManager.playerCoinsCount, opponentScore: peerManager.opponentCoinsCount)
+                ScoreParameterCellView(title: "Carte oro", myScore: "\(peerManager.playerCoinsCount)", opponentScore: "\(peerManager.opponentCoinsCount)")
             }
             Divider()
             GridRow {
-                ScoreParameterCellView(title: "Primera", myScore: peerManager.playerHasPrimera ? 1 : 0, opponentScore: peerManager.opponentHasPrimera ? 1 : 0)
+                ScoreParameterCellView(title: "Primera", myScore: peerManager.playerHasPrimera ? "Sì" : "No", opponentScore: peerManager.opponentHasPrimera ? "Sì" : "No")
             }
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
@@ -125,38 +132,38 @@ struct ScoreGridView: View {
 
 struct ScoreParameterCellView: View {
     let title: String
-    let myScore: Int
-    let opponentScore: Int
+    let myScore: String
+    let opponentScore: String
     
     var body: some View {
         HStack {
             VStack {
-                Text("\(myScore)")
+                Text(myScore)
                     .font(.system(size: 20, design: .default))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
-                    //.padding()
-                    //.background(myScore > opponentScore ? Color.green : Color.clear)
+                    .padding(8)
+                    .background((myScore > opponentScore || (myScore == "Sì" && opponentScore == "No")) ? Color.green.opacity(0.8) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             
             Spacer()
             
             Text(title)
-                .font(.subheadline) // Ridotto rispetto a .headline
+                .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
-                .frame(width: 120) // Regolato per adattarsi al testo più piccolo
+                .frame(width: 120)
             
             Spacer()
             
             VStack {
-                Text("\(opponentScore)")
+                Text(opponentScore)
                     .font(.system(size: 20, design: .default))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
-                    //.padding() // Ridotto padding
-                    //.background(opponentScore > myScore ? Color.green : Color.clear)
+                    .padding(8)
+                    .background((opponentScore > myScore || (opponentScore == "Sì" && myScore == "No")) ? Color.green.opacity(0.8) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
@@ -169,15 +176,17 @@ struct TotalPointsView: View {
     let isWinner: Bool
     
     var body: some View {
-        VStack(spacing: 4) { // Aumentato spacing per migliorare leggibilità
+        VStack(spacing: 4) {
             Text(title)
-                .font(.title3) // Aumentato rispetto a .headline
+                .font(.title3)
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
             Text("\(score)")
-                .font(.title3) // Aumentato rispetto a .headline
+                .font(.title3)
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
+                .padding(8)
+                .background(isWinner ? Color.green.opacity(0.8) : Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .padding(.horizontal, 15)
@@ -191,6 +200,6 @@ struct ShowWinnerView_Previews: PreviewProvider {
         ShowWinnerView()
             .environmentObject(peerManager)
             .environmentObject(speechRecognizer)
-            .previewLayout(.sizeThatFits) // Regola il layout della preview
+            .previewLayout(.sizeThatFits)
     }
 }
