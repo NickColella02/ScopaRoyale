@@ -250,70 +250,52 @@ struct OneVsOneGameView: View {
                     return draggedCard != nil ? 143 : 150
                 }
                 
-                if peerManager.showScopaAnimation {
-                    Text("Scopa!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(.yellow)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Capsule())
-                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation {
-                                    peerManager.showScopaAnimation = false
+                if peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation {
+                                    Text("Scopa!")
+                                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                                        .foregroundStyle(peerManager.showScopaAnimation ? Color.yellow : Color.red)
+                                        .padding()
+                                        .background(
+                                            Capsule()
+                                                .fill(Color.black.opacity(0.7))
+                                                .shadow(color: .gray, radius: 10, x: 5, y: 5)
+                                        )
+                                        .scaleEffect(peerManager.showScopaAnimation ? 1.2 : 1.0)
+                                        .transition(.scale)
+                                        .animation(.easeInOut(duration: 0.3), value: peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation)
+                                        .onAppear {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                withAnimation {
+                                                    if peerManager.showScopaAnimation {
+                                                        peerManager.showScopaAnimation = false
+                                                    } else if peerManager.showOpponentScopaAnimation {
+                                                        peerManager.showOpponentScopaAnimation = false
+                                                    }
+                                                }
+                                            }
+                                        }
                                 }
-                            }
-                        }
-                } else if peerManager.showOpponentScopaAnimation {
-                    Text("Scopa!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(.red)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Capsule())
-                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation {
-                                    peerManager.showOpponentScopaAnimation = false
+                                    
+                                if peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation {
+                                    Text("Settebello!")
+                                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                                        .foregroundStyle(peerManager.showSettebelloAnimation ? Color.yellow : Color.red)
+                                        .padding()
+                                        .background(Color.black.opacity(0.7))
+                                        .clipShape(Capsule())
+                                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                                        .onAppear {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                withAnimation {
+                                                    if peerManager.showSettebelloAnimation {
+                                                        peerManager.showSettebelloAnimation = false
+                                                    } else if peerManager.showOpponentSettebelloAnimation {
+                                                        peerManager.showOpponentSettebelloAnimation = false
+                                                    }
+                                                }
+                                            }
+                                        }
                                 }
-                            }
-                        }
-                }
-                    
-                if peerManager.showSettebelloAnimation {
-                    Text("Settebello!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(.yellow)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Capsule())
-                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation {
-                                    peerManager.showSettebelloAnimation = false
-                                }
-                            }
-                        }
-                } else if peerManager.showOpponentSettebelloAnimation {
-                    Text("Settebello!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(.red)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Capsule())
-                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation {
-                                    peerManager.showOpponentSettebelloAnimation = false
-                                }
-                            }
-                        }
-                }
-                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
                         Image(card.imageName)
@@ -348,7 +330,7 @@ struct OneVsOneGameView: View {
                                     return 0 // Carta normale
                                 }
                             }
-                            
+
                             Image(card.imageName) // Utilizza direttamente la proprietà imageName della carta
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
@@ -361,25 +343,15 @@ struct OneVsOneGameView: View {
                                 .zIndex(zIndex)
                                 .offset(x: peerManager.playerHand.count == 3 ? (index == 0 ? 20 : (index == 2 ? -20 : 0)) : (peerManager.playerHand.count == 2 ? (index == 0 ? 10 : -10) : 0), y: peerManager.playerHand.count < 3 ? -10 : (index == 1 ? -10 : 0))
                                 .gesture(
-                                    TapGesture()
-                                        .onEnded {
-                                            withAnimation(.easeInOut(duration: 0.1)) {
-                                                draggedCard = card // Seleziona la carta
-                                            }
-                                        }
-                                )
-                                .gesture(
-                                    DragGesture(minimumDistance: 0, coordinateSpace: .local) // Imposta a 0 il minimumDistance per captare anche piccoli spostamenti
+                                    DragGesture(minimumDistance: 0, coordinateSpace: .global) // Utilizza il coordinateSpace globale per un movimento fluido
                                         .onChanged { gesture in
-                                            if draggedCard == card {
-                                                // Limitiamo il movimento della carta
-                                                if gesture.translation.height < 0 {
-                                                    cardOffset = gesture.translation
-                                                }
+                                            if draggedCard == nil {
+                                                draggedCard = card
                                             }
+                                            cardOffset = gesture.translation
                                         }
                                         .onEnded { gesture in
-                                            if draggedCard == card && gesture.translation.height < -50 {
+                                            if gesture.translation.height < -50 {
                                                 // Solo se il gesto è verso l'alto e abbastanza lungo
                                                 withAnimation(.easeInOut(duration: 0.3)) {
                                                     cardOffset = CGSize(width: 0, height: -200) // Sposta la carta verso l'alto fuori dallo schermo

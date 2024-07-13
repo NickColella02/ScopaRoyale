@@ -6,28 +6,26 @@ struct ShowWinnerView: View {
     @State private var showHomeView: Bool = false
     
     var body: some View {
-        if !peerManager.gameOver {
+        if peerManager.gameOver {
             ZStack {
                 Color(.systemBackground)
                     .ignoresSafeArea()
                 
                 VStack {
                     HStack {
-                        PlayerInfoView(username: peerManager.myUsername, avatarImage: peerManager.myAvatarImage)
-                        Spacer()
-                        PlayerInfoView(username: peerManager.opponentName, avatarImage: peerManager.opponentAvatarImage)
+                        showWinnerAvatar(username: peerManager.winner, avatarImage: peerManager.myAvatarImage)
                     }
                     .padding()
                     
-                    ScoreGridView(peerManager: peerManager)
-                        .padding(.horizontal)
-                    
                     HStack {
-                        TotalPointsView(title: "Punti totali", score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
+                        TotalPointsView(title: "I tuoi punti", score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
                         Spacer()
-                        TotalPointsView(title: "Punti totali", score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
+                        TotalPointsView(title: "I punti di \(peerManager.opponentName)", score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
                     }
                     .padding(.horizontal)
+                    
+                    ScoreGridView(peerManager: peerManager)
+                        .padding(.horizontal)
                     
                     Button(action: {
                         if peerManager.isHost {
@@ -37,12 +35,13 @@ struct ShowWinnerView: View {
                         showHomeView = true
                     }) {
                         Text("Termina Partita")
-                            .font(.headline)
+                            .font(.system(size: 20, design: .default))
                             .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.black)
+                            .background(Color .black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
+                            .padding(.horizontal, 25)
                     }
                     .frame(width: 330, height: 60)
                     .padding(.horizontal, 35)
@@ -63,21 +62,30 @@ struct ShowWinnerView: View {
     }
 }
 
-struct PlayerInfoView: View {
+struct showWinnerAvatar: View {
     let username: String
     let avatarImage: String
     
     var body: some View {
         VStack {
+            ZStack {
+                Image("winnerCrown")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 95, height: 95)
+                    .clipShape(Circle())
+                Image(avatarImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 63, height: 63)
+                    .clipShape(Circle())
+                    .padding(.top, 26)
+            }
+            
             Text(username)
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
-            Image(avatarImage)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 90, height: 90)
-                .clipShape(Circle())
         }
         .padding()
     }
@@ -109,6 +117,9 @@ struct ScoreGridView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+        .padding(.horizontal, 15)
+        .padding(.top, 10)
+        .padding(.bottom, 10)
     }
 }
 
@@ -121,11 +132,11 @@ struct ScoreParameterCellView: View {
         HStack {
             VStack {
                 Text("\(myScore)")
-                    .font(.title3) // Ridotto rispetto a .headline
+                    .font(.system(size: 20, design: .default))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
-                    .padding()
-                    .background(myScore > opponentScore ? Color.green : Color.clear)
+                    //.padding()
+                    //.background(myScore > opponentScore ? Color.green : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             
@@ -141,15 +152,14 @@ struct ScoreParameterCellView: View {
             
             VStack {
                 Text("\(opponentScore)")
-                    .font(.title3) // Ridotto rispetto a .headline
+                    .font(.system(size: 20, design: .default))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
-                    .padding(8) // Ridotto padding
-                    .background(opponentScore > myScore ? Color.green : Color.clear)
+                    //.padding() // Ridotto padding
+                    //.background(opponentScore > myScore ? Color.green : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
-        .padding(.vertical, 4) // Ridotto padding verticale
     }
 }
 
@@ -161,18 +171,16 @@ struct TotalPointsView: View {
     var body: some View {
         VStack(spacing: 4) { // Aumentato spacing per migliorare leggibilità
             Text(title)
-                .font(.title) // Aumentato rispetto a .headline
+                .font(.title3) // Aumentato rispetto a .headline
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
-                .padding(8) // Aumentato padding
             Text("\(score)")
-                .font(.title) // Aumentato rispetto a .headline
+                .font(.title3) // Aumentato rispetto a .headline
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
-                .padding(12) // Aumentato padding
-                .background(isWinner ? Color.green : Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+        .padding(.horizontal, 15)
     }
 }
 

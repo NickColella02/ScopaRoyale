@@ -51,9 +51,6 @@ struct OneVsOneView: View {
                 
                 if peerManager.connectedPeers.isEmpty {
                     VStack {
-                        Text("In attesa di un avversario...")
-                            .font(.headline)
-                        
                         AnimatedDotsView(isAnimating: $isAnimatingDots)
                             .onAppear {
                                 isAnimatingDots = true
