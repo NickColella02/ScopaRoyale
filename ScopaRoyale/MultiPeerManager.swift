@@ -18,9 +18,9 @@ struct Points: Codable { // struttura dati contenente i mazzi di scope fatte dai
     let opponentPoints: [Card] // scope fatte dell'avversario
 }
 
-struct Coins: Codable {
-    let playerCoins: Int
-    let opponentCoins: Int
+struct Coins: Codable { // struttura dati contenente il numero di carte oro prese dai giocatori
+    let playerCoins: Int // carte oro del giocatore
+    let opponentCoins: Int // carte oro dell'avversario
 }
 
 struct Scores: Codable { // struttura dati contenente i punteggi dei giocatori
@@ -29,14 +29,14 @@ struct Scores: Codable { // struttura dati contenente i punteggi dei giocatori
     let winner: String // vincitore della partita
 }
 
-struct Primera: Codable {
-    let playerHasPrimera: Bool
-    let opponentHasPrimera: Bool
+struct Primera: Codable { // struttura dati per indicare quale giocatore ha fatto la primera (più sette)
+    let playerHasPrimera: Bool // true se il giocatore ha la primera
+    let opponentHasPrimera: Bool // true se l'avversario ha la primera
 }
 
-struct Settebello: Codable {
-    let playerHasSettebello: Bool
-    let opponentHasSettebello: Bool
+struct Settebello: Codable { // struttura dati per indicare quale giocatore ha preso il settebello (sette denari)
+    let playerHasSettebello: Bool // true se il giocatore ha il settebello
+    let opponentHasSettebello: Bool // true se l'avversario ha il settebello
 }
 
 class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
@@ -73,21 +73,21 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var opponentPoints: [Card] = [] // scope dell'avversario
     @Published var playerScore: Int = 0 // punteggio del giocatore
     @Published var opponentScore: Int = 0 // punteggio dell'avversario
-    @Published var playerHasSettebello: Bool = false // true se il giocatore ha il 7 bello tra le carte prese
-    @Published var opponentHasSettebello: Bool = false // true se l'avversario ha il 7 bello tra le carte prese
-    @Published var playerHasPrimera: Bool = false
-    @Published var opponentHasPrimera: Bool = false
+    @Published var playerHasSettebello: Bool = false // true se il giocatore ha il settebello tra le carte prese
+    @Published var opponentHasSettebello: Bool = false // true se l'avversario ha il settebello tra le carte prese
+    @Published var playerHasPrimera: Bool = false // true se il giocatore ha fatto la primera
+    @Published var opponentHasPrimera: Bool = false // true se l'avversario ha fatto la primera
     @Published var playerCoinsCount: Int = 0 // numero di carte oro prese dal giocatore
     @Published var opponentCoinsCount: Int = 0 // numero di carte oro prese dall'avversario
     @Published var currentPlayer: Int = 1 // indice del giocatore corrente (0 per l'advertiser e 1 per il browser)
     @Published var gameOver: Bool = false // true quando la partita finisce
     @Published var winner: String = "" // nome del giocatore che ha vinto
-    @Published var myAvatarImage: String = (UserDefaults.standard.string(forKey: "selectedAvatar")) ?? "defaultUser" //nome dell avatar che ha scelto l utente
+    @Published var myAvatarImage: String = (UserDefaults.standard.string(forKey: "selectedAvatar")) ?? "defaultUser" // nome dell avatar che ha scelto l'utente
     @Published var opponentAvatarImage: String = ""//nome dell avatar che ha scelto l opponent
-    @Published var showScopaAnimation: Bool = false
-    @Published var showOpponentScopaAnimation: Bool = false
-    @Published var showSettebelloAnimation: Bool = false
-    @Published var showOpponentSettebelloAnimation: Bool = false
+    @Published var showScopaAnimation: Bool = false // true se il giocatore ha fatto scopa e va mostrata l'animazione
+    @Published var showOpponentScopaAnimation: Bool = false // true se l'avversario ha fatto scopa e va mostrata l'animazione
+    @Published var showSettebelloAnimation: Bool = false // true se il giocatore ha preso il settebello e va mostrata l'animazione
+    @Published var showOpponentSettebelloAnimation: Bool = false // true se l'avversario ha preso il settebello e va mostrata l'animazione
 
     override init() {
         self.blindMode = UserDefaults.standard.bool(forKey: "blindMode")
@@ -136,54 +136,51 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
             if let receivedString = String(data: data, encoding: .utf8) {
-                if receivedString == "START_GAME" {
+                if receivedString == "START_GAME" { // riceve il segnale di inizio partita
                     self.startGame = true
                     self.gameOver = false
                     if self.blindMode {
                         self.speakText("È il tuo turno")
                     }
-                } else if receivedString.starts(with: "Lobby:") {
+                } else if receivedString.starts(with: "Lobby:") { // riceve il nome della lobby
                     self.lobbyName = String(receivedString.dropFirst(6))
-                } else if receivedString.starts(with: "Deck:") {
+                } else if receivedString.starts(with: "Deck:") { // riceve il mazzo di carte iniziali
                     let data = data.dropFirst(5)
                     self.deck = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "PlayersHands:") {
+                } else if receivedString.starts(with: "PlayersHands:") { // riceve le mani dei giocatori
                     self.handlePlayersHandsData(data.dropFirst(13))
-                } else if receivedString.starts(with: "CardsTaken:") {
+                } else if receivedString.starts(with: "CardsTaken:") { // riceve i mazzi di carte prese dai giocatori
                     self.handleCardsTakenData(data.dropFirst(11))
-                } else if receivedString.starts(with: "PlayersPoints:") {
+                } else if receivedString.starts(with: "PlayersPoints:") { // riceve le scope fatte dai giocatori
                     self.handlePlayersPointsData(data.dropFirst(14))
-                } else if receivedString.starts(with: "Scopa:") {
+                } else if receivedString.starts(with: "Scopa:") { // riceve la notifica che l'avversario ha fatto scopa
                     self.showOpponentScopaAnimation = true
-                } else if receivedString.starts(with: "Settebello:") {
-                    self.showOpponentSettebelloAnimation = true
-                }
-                else if receivedString.starts(with: "Primera:") {
-                    self.handlePrimeraData(data.dropFirst(8))
-                } else if receivedString.starts(with: "Settebello:") {
+                } else if receivedString.starts(with: "Settebello:") { // riceve la notifica che l'avversario ha preso il settebello
                     self.handleSettebelloData(data.dropFirst(11))
-                } else if receivedString.starts(with: "PlayersCoins:") {
+                } else if receivedString.starts(with: "Primera:") { // riceve chi ha fatto la primera
+                    self.handlePrimeraData(data.dropFirst(8))
+                } else if receivedString.starts(with: "PlayersCoins:") { // riceve le carte oro prese dai giocatori
                     self.handlePlayersCoinsData(data.dropFirst(13))
-                } else if receivedString.starts(with: "Table:") {
+                } else if receivedString.starts(with: "Table:") { // riceve le carte del tavolo
                     let data = data.dropFirst(6)
                     self.tableCards = [Card].fromJSON(data)!
-                } else if receivedString.starts(with: "CurrentPlayer:") {
+                } else if receivedString.starts(with: "CurrentPlayer:") { // riceve la notifica del cambio turno
                     let data = data.dropFirst(14)
                     let dataString = String(data: data, encoding: .utf8)
                     self.currentPlayer = Int(dataString!)!
                     if self.blindMode {
                         self.speakText("È il tuo turno")
                     }
-                } else if receivedString.starts(with: "GameOver:") {
+                } else if receivedString.starts(with: "GameOver:") { // riceve il segnale di fine partita
                     self.gameOver = true
                     self.startGame = false
-                } else if receivedString.starts(with: "PlayersScores:") {
+                } else if receivedString.starts(with: "PlayersScores:") { // riceve i punteggi dei giocatori
                     self.handlePlayersScoresData(data.dropFirst(14))
-                } else if receivedString.starts(with: "IsAvatar:") {
+                } else if receivedString.starts(with: "IsAvatar:") { // riceve gli avatar dei giocatori
                     if String(receivedString.dropFirst(9)) != "" {
                         self.opponentAvatarImage = String(receivedString.dropFirst(9))
                     }
-                } else {
+                } else { // riceve l'username dell'avversario
                     self.opponentName = receivedString
                 }
             }
@@ -237,6 +234,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             let settebello = try JSONDecoder().decode(Settebello.self, from: jsonData)
             self.playerHasSettebello = settebello.playerHasSettebello
             self.opponentHasSettebello = settebello.opponentHasSettebello
+            self.showOpponentSettebelloAnimation = true
         } catch {
             print("Errore nella decodifica dei dati Settebello: \(error.localizedDescription)")
         }
@@ -262,7 +260,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore nella decodifica dei dati Points: \(error.localizedDescription)")
         }
     }
-    
 
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
 
@@ -373,16 +370,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             print("Errore invio showScopaAnimation: \(error.localizedDescription)")
         }
     }
-    
-    func sendSettebelloMessage() {
-        let data = "Settebello:\(showSettebelloAnimation)".data(using: .utf8)
-        do {
-            try session.send(data!, toPeers: session.connectedPeers, with: .reliable)
-        } catch {
-            print("Errore invio showSettebelloAnimation: \(error.localizedDescription)")
-        }
-    }
-    
+        
     func sendPlayersCoins() {
         let coins = Coins(playerCoins: opponentCoinsCount, opponentCoins: playerCoinsCount)
         do {
@@ -456,7 +444,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         sendCardsToPlayers() // estrae le carte e le inserisce nelle mani dei giocatori
     }
     
-     func avatarImage(for avatarName: String?) -> Image {
+     func avatarImage(for avatarName: String?) -> Image { // usata per visualizzare l'avatar dell'utente o uno di default se non è stato scelto
         if let avatarName = avatarName {
             return Image(avatarName)
         } else {
@@ -495,7 +483,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
     
-    func sendTurnChange() {
+    func sendTurnChange() { // notifica il cambio del turno
         self.currentPlayer = 1 - self.currentPlayer
         let turnData = "CurrentPlayer:\(self.currentPlayer)".data(using: .utf8)!
         do {
@@ -525,7 +513,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
         
-     func sendOpponentAvatarImage(_ Image: String){
+     func sendOpponentAvatarImage(_ Image: String) { // invia l'avatar dell'avversario
         let avatar = "IsAvatar:\(Image)".data(using: .utf8)!
         do {
             try session.send(avatar, toPeers: session.connectedPeers, with: .reliable)
@@ -534,7 +522,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         }
     }
 
-            
     func playCard(card: Card) { // gestisce la mossa di un giocatore
         DispatchQueue.main.async { [self] in
             var cardsToTake: [Card] = [] // carte prese dal giocatore con una mossa
@@ -559,15 +546,13 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             
             if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
                 tableCards.append(card) // aggiungi la carta giocata al tavolo
-                sendTableCards() // notifica l'aggiornamento del tavolo
-            } else if let validCombination = shortestCombination { // se ha trovato una combinazione
-                lastPlayer = currentPlayer
-                cardsToTake = validCombination
+            } else if let validCombination = shortestCombination { // se ha trovato una combinazione di carte da prendere
+                lastPlayer = currentPlayer // aggiorno l'ultimo giocatore che ha effettuato una presa
+                cardsToTake = validCombination // salvo la combinazione
                 for cardToTake in cardsToTake {
-                    if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte dal tavolo
+                    if let index = tableCards.firstIndex(of: cardToTake) { // rimuove le carte prese dal tavolo
                         tableCards.remove(at: index)
                     }
-                    sendTableCards()
                     if blindMode {
                         self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
                     }
@@ -583,6 +568,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     sendPlayersPoints()
                 }
             }
+            sendTableCards() // notifico l'aggiornamento del tavolo
             if !cardsToTake.isEmpty { // aggiunge le carte prese al mazzo delle carte prese dal giocatore
                 cardsToTake.append(card)
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
@@ -591,8 +577,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         self.speakText("Hai preso il settebello")
                     } else {
                         self.showSettebelloAnimation = true
-                        sendSettebelloMessage()
                     }
+                    sendSettebello()
                 }
                 sendCardsTaken() // notifica l'aggiornamento dei mazzi delle prese
             }

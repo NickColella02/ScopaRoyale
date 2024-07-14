@@ -402,7 +402,7 @@ struct OneVsOneGameView: View {
         }
         .onChange(of: peerManager.currentPlayer) {
             if peerManager.blindMode && !peerManager.gameOver {
-                if (peerManager.isHost && peerManager.currentPlayer == 0) {
+                if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
                     DispatchQueue.main.async {
                         speechRecognizer.speakText("È il tuo turno")
                         speechRecognizer.stopTranscribing()
@@ -435,10 +435,6 @@ struct OneVsOneGameView: View {
                     showPeerDisconnectedAlert = true
                 }
             }
-        }
-        .onAppear {
-            isRecording = false
-            speechRecognizer.stopTranscribing()
         }
         .overlay(ShowWinnerView()
             .transition(.scale)

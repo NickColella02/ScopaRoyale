@@ -122,7 +122,6 @@ struct ScoreGridView: View {
             GridRow {
                 ScoreParameterCellView(title: "Primera", myScore: peerManager.playerHasPrimera ? "Sì" : "No", opponentScore: peerManager.opponentHasPrimera ? "Sì" : "No")
             }
-            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
