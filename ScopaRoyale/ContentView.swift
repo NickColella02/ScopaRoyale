@@ -50,6 +50,11 @@ struct ContentView: View {
                     }
                 }
             }
+            .onAppear() {
+                if peerManager.isHost {
+                    peerManager.closeConnection()
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .usernameEntered)) { _ in
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
                 self.showUsernameEntry = false

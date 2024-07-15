@@ -62,7 +62,7 @@ func numericValue(for stringValue: String) -> Int? {
     case "sette": return 7
     case "otto": return 8
     case "nove": return 9
-    case "dieci": return 10
+    case "re": return 10
     default: return nil
     }
 }

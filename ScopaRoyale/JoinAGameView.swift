@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFAudio
 
 struct JoinAGameView: View {
     let username: String
@@ -8,6 +9,7 @@ struct JoinAGameView: View {
     @State private var isAnimatingDots = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     @Environment(\.presentationMode) var presentationMode
+    private let synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
     
     var body: some View {
         VStack {
@@ -29,7 +31,7 @@ struct JoinAGameView: View {
                 .padding()
                 .onAppear {
                     if peerManager.blindMode {
-                        speechRecognizer.speakText("In cerca di una lobby")
+                        speakText("In cerca di una lobby")
                     }
                 }
             } else {
@@ -116,6 +118,23 @@ struct JoinAGameView: View {
                 rotationAngle += 360
             }
         }
+    }
+    
+    public func speakText(_ testo: String) {
+        let utterance = AVSpeechUtterance(string: testo)
+        utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
+        utterance.pitchMultiplier = 1.0
+        utterance.rate = 0.5
+        
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playback, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
+        }
+        
+        synthesizer.speak(utterance)
     }
 }
 

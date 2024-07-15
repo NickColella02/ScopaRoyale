@@ -12,6 +12,7 @@ actor SpeechRecognizer: ObservableObject {
     }
     
     @MainActor var transcript: String = ""
+    @Published var text: String = ""
     public let verbi: [String] = [ // verbi da riconoscere per il comando vocale del voice over
         "gioca",
         "butta",
@@ -41,7 +42,7 @@ actor SpeechRecognizer: ObservableObject {
         "sette",
         "otto",
         "nove",
-        "dieci"
+        "re"
     ]
     
     public let oggetti: [String] = [
@@ -70,7 +71,6 @@ actor SpeechRecognizer: ObservableObject {
     init(peerManager: MultiPeerManager) {
         self.peerManager = peerManager
         recognizer = SFSpeechRecognizer(locale: Locale(identifier: "it-IT")) ?? nil
-        
         Task {
             do {
                 guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
@@ -141,7 +141,7 @@ actor SpeechRecognizer: ObservableObject {
         request.shouldReportPartialResults = true
         
         let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .allowBluetooth])
+        try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.mixWithOthers, .allowBluetooth])
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         let inputNode = audioEngine.inputNode
         
@@ -273,15 +273,6 @@ actor SpeechRecognizer: ObservableObject {
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
-        
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
-        }
-        
         synthesizer.speak(utterance)
     }
 }

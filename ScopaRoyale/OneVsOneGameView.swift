@@ -266,11 +266,8 @@ struct OneVsOneGameView: View {
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 withAnimation {
-                                    if peerManager.showScopaAnimation {
-                                        peerManager.showScopaAnimation = false
-                                    } else if peerManager.showOpponentScopaAnimation {
-                                        peerManager.showOpponentScopaAnimation = false
-                                    }
+                                    peerManager.showScopaAnimation = false
+                                    peerManager.showOpponentScopaAnimation = false
                                 }
                             }
                         }
@@ -287,15 +284,23 @@ struct OneVsOneGameView: View {
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 withAnimation {
-                                    if peerManager.showSettebelloAnimation {
-                                        peerManager.showSettebelloAnimation = false
-                                    } else if peerManager.showOpponentSettebelloAnimation {
-                                        peerManager.showOpponentSettebelloAnimation = false
-                                    }
+                                    peerManager.showSettebelloAnimation = false
+                                    peerManager.showOpponentSettebelloAnimation = false
                                 }
                             }
                         }
                 }
+                
+                if peerManager.showGameOverAnimation {
+                    Text("Partita terminata!")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Capsule())
+                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                }
+                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
                     ForEach(peerManager.tableCards, id: \.self) { card in
                         Image(card.imageName)
@@ -306,10 +311,32 @@ struct OneVsOneGameView: View {
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                             .shadow(radius: 3)
+                            .transition(.scale(scale: 0.5, anchor: .center)) // Scala la transizione per l'apparizione
+                            /*.onDisappear {
+                                if peerManager.isHost {                 // host
+                                    if peerManager.currentPlayer == 0 { // host
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                        }
+                                    } else if peerManager.currentPlayer == 1 { // client
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                        }
+                                    }
+                                } else if peerManager.isClient {        // client
+                                    if peerManager.currentPlayer == 0 { // host
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                        }
+                                    } else if peerManager.currentPlayer == 1 { // client
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                        }
+                                    }
+                                }
+                            }*/
                     }
                 }
+                .animation(.easeInOut(duration: 0.3), value: peerManager.tableCards)
                 .padding(.horizontal, 40)
-                .padding(.bottom, bottomPaddingTable) // Padding inferiore per le carte sul tavolo
+                .padding(.bottom, bottomPaddingTable)
+
                 
                 Spacer()
                 
@@ -436,10 +463,26 @@ struct OneVsOneGameView: View {
                 }
             }
         }
-        .overlay(ShowWinnerView()
-            .transition(.scale)
-            .zIndex(10)
-        )
+        .overlay(winnerOverlay)
+    }
+    
+    @ViewBuilder
+    private var winnerOverlay: some View {
+        if peerManager.gameOver{
+            ZStack {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                VStack {
+                    ShowWinnerView()
+                }
+                .frame(width: 370, height: 610)
+                .padding(.top, 20)
+                .padding(.bottom, 20)
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(radius: 20)
+            }
+        }
     }
     
     private func chunkedArray<T>(array: [T], chunkSize: Int) -> [[T]] {
@@ -448,4 +491,3 @@ struct OneVsOneGameView: View {
         }
     }
 }
-    

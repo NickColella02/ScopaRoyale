@@ -17,9 +17,7 @@ struct UsernameEntryView: View {
                 .scaledToFit()
                 .frame(height: showTitle ? 180 : 0)
                 .opacity(showTitle ? 1 : 0)
-                .padding(.bottom, showTitle ? 20 : 0)
-            
-            Spacer()
+                .padding(.bottom, 50)
             
             UsernameFormView(username: $username, showAlert: $showAlert, alertMessage: $alertMessage, showUsernameField: $showUsernameField) {
                 UserDefaults.standard.set(username, forKey: "username")
