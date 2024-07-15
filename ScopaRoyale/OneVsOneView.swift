@@ -29,6 +29,12 @@ struct OneVsOneView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 120, height: 120)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.black, lineWidth: 3)
+                                .scaleEffect(1.1)
+                                .padding(3)
+                        )
                 }
                 
                 Image("vs")
@@ -46,6 +52,12 @@ struct OneVsOneView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 120, height: 120)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.black, lineWidth: 3)
+                                    .scaleEffect(1.1)
+                                    .padding(3)
+                            )
                     }
                 }
                 
@@ -69,7 +81,7 @@ struct OneVsOneView: View {
                 }
             }) {
                 Text("Gioca")
-                    .font(.title2)
+                    .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)

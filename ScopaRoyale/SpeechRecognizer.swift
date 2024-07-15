@@ -60,7 +60,6 @@ actor SpeechRecognizer: ObservableObject {
     private var task: SFSpeechRecognitionTask?
     private let recognizer: SFSpeechRecognizer?
     private let synthesizer = AVSpeechSynthesizer()
-    
     private var messageQueue: [String] = []
     private var isProcessingMessage: Bool = false
     
@@ -123,8 +122,7 @@ actor SpeechRecognizer: ObservableObject {
             self.reset()
         }
     }
-    
-    
+        
     /// Reset the speech recognizer.
     private func reset() {
         task?.cancel()
@@ -273,7 +271,17 @@ actor SpeechRecognizer: ObservableObject {
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
-        synthesizer.speak(utterance)
+        do {
+            // Configura l'AVAudioSession per la riproduzione audio
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            
+            // Riproduci l'utterance tramite il synthesizer
+            synthesizer.speak(utterance)
+        } catch {
+            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
+        }
     }
 }
 
@@ -287,7 +295,6 @@ extension SFSpeechRecognizer {
         }
     }
 }
-
 
 extension AVAudioApplication {
     func hasPermissionToRecord() async -> Bool {

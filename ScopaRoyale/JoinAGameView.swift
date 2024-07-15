@@ -21,7 +21,7 @@ struct JoinAGameView: View {
                             startRotating()
                         }
                     Text("Ricerca di una lobby")
-                        .font(.headline)
+                        .font(.system(size: 20, design: .default))
                     
                     AnimatedDotsView(isAnimating: $isAnimatingDots)
                         .onAppear {
@@ -52,6 +52,12 @@ struct JoinAGameView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 120, height: 120)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 3)
+                                        .scaleEffect(1.1)
+                                        .padding(3)
+                                )
                         }
                         
                         Image("vs")
@@ -67,6 +73,12 @@ struct JoinAGameView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 120, height: 120)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 3)
+                                        .scaleEffect(1.1)
+                                        .padding(3)
+                                )
                         }
                     }
 
@@ -74,7 +86,7 @@ struct JoinAGameView: View {
                     
                     // Messaggio di attesa con animazione dei puntini
                     Text("In attesa che l'host avvii la partita")
-                        .font(.headline)
+                        .font(.system(size: 20, design: .default))
                         .padding(.top, 20)
                     
                     AnimatedDotsView(isAnimating: $isAnimatingDots)

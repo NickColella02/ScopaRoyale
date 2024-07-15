@@ -50,14 +50,14 @@ struct SettebelloAnimation: Codable { // struttura dati per indicare chi ha pres
 }
 
 class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
-    private let serviceType = "ScopaRoyale2"
+    private let serviceType = "ScopaRoyale"
     private let peerID = MCPeerID(displayName: UIDevice.current.name)
     private var session: MCSession!
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
-    var myUsername: String = ""
     private let synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
     
+    var myUsername: String = ""
     var neededPlayers: Int = 0 // numero di giocatori necessari
     var lastPlayer: Int = 1 // indice dell'ultimo giocatore che ha preso carte dal tavolo
     var isHost: Bool = false // true se è l'advertiser
@@ -322,14 +322,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.isClient = true // sono il browser
         self.isHost = false // non sono l'advertiser
         self.browser?.startBrowsingForPeers()
-    }
-    
-    func stopAdvertising() {
-        advertiser?.stopAdvertisingPeer()
-    }
-    
-    func stopBrowsing() {
-        browser?.stopBrowsingForPeers()
     }
 
     func sendUsername(username: String) { // usato dal browser per inviare il suo username all'advertiser
@@ -741,7 +733,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         utterance.rate = 0.5
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playback, mode: .default, options: [.allowBluetoothA2DP, .defaultToSpeaker])
+            try audioSession.setCategory(.playback, mode: .default, options: [.allowBluetooth, .defaultToSpeaker, .mixWithOthers])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")

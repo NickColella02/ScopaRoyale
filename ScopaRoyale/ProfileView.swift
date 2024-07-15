@@ -64,7 +64,7 @@ struct ProfileView: View {
                 toggleBlindMode()
             }) {
                 Text(peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata")
-                    .font(.system(size: 20))
+                    .font(.system(size: 20, design: .default))
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)

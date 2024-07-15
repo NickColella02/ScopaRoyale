@@ -1,5 +1,7 @@
-import SwiftUI
-import SpriteKit
+
+ 
+ import SwiftUI
+ import SpriteKit
 
 struct OneVsOneGameView: View {
     
@@ -215,7 +217,7 @@ struct OneVsOneGameView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 5))
                         .shadow(radius: 5)
                         .zIndex(2)
-
+                    
                     // Carte dell'avversario
                     HStack(spacing: 4) {
                         ZStack {
@@ -252,7 +254,7 @@ struct OneVsOneGameView: View {
                 
                 if peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation {
                     Text("Scopa!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .font(.system(size: 40, weight: .bold, design: .default))
                         .foregroundStyle(peerManager.showScopaAnimation ? Color.yellow : Color.red)
                         .padding()
                         .background(
@@ -272,10 +274,10 @@ struct OneVsOneGameView: View {
                             }
                         }
                 }
-                    
+                
                 if peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation {
                     Text("Settebello!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .font(.system(size: 40, weight: .bold, design: .default))
                         .foregroundStyle(peerManager.showSettebelloAnimation ? Color.yellow : Color.red)
                         .padding()
                         .background(Color.black.opacity(0.7))
@@ -292,13 +294,17 @@ struct OneVsOneGameView: View {
                 }
                 
                 if peerManager.showGameOverAnimation {
-                    Text("Partita terminata!")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Capsule())
-                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                    VStack {
+                        Spacer()
+                        Text("Partita terminata!")
+                            .font(.system(size: 40, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.4))
+                            .clipShape(Capsule())
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        Spacer()
+                    }
                 }
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 4), spacing: 20) {
@@ -312,31 +318,31 @@ struct OneVsOneGameView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                             .shadow(radius: 3)
                             .transition(.scale(scale: 0.5, anchor: .center)) // Scala la transizione per l'apparizione
-                            /*.onDisappear {
-                                if peerManager.isHost {                 // host
-                                    if peerManager.currentPlayer == 0 { // host
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                        }
-                                    } else if peerManager.currentPlayer == 1 { // client
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                        }
-                                    }
-                                } else if peerManager.isClient {        // client
-                                    if peerManager.currentPlayer == 0 { // host
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                        }
-                                    } else if peerManager.currentPlayer == 1 { // client
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                        }
-                                    }
-                                }
-                            }*/
+                        /*.onDisappear {
+                         if peerManager.isHost {                 // host
+                         if peerManager.currentPlayer == 0 { // host
+                         withAnimation(.easeInOut(duration: 0.3)) {
+                         }
+                         } else if peerManager.currentPlayer == 1 { // client
+                         withAnimation(.easeInOut(duration: 0.3)) {
+                         }
+                         }
+                         } else if peerManager.isClient {        // client
+                         if peerManager.currentPlayer == 0 { // host
+                         withAnimation(.easeInOut(duration: 0.3)) {
+                         }
+                         } else if peerManager.currentPlayer == 1 { // client
+                         withAnimation(.easeInOut(duration: 0.3)) {
+                         }
+                         }
+                         }
+                         }*/
                     }
                 }
                 .animation(.easeInOut(duration: 0.3), value: peerManager.tableCards)
                 .padding(.horizontal, 40)
                 .padding(.bottom, bottomPaddingTable)
-
+                
                 
                 Spacer()
                 
@@ -357,7 +363,7 @@ struct OneVsOneGameView: View {
                                     return 0 // Carta normale
                                 }
                             }
-
+                            
                             Image(card.imageName) // Utilizza direttamente la proprietà imageName della carta
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
@@ -408,13 +414,13 @@ struct OneVsOneGameView: View {
                     .padding(.bottom, bottomPaddingHand) // Padding inferiore per le carte nella mano
                 }
             }
-
-            if peerManager.blindMode {
+            
+            if peerManager.blindMode && !peerManager.gameOver {
                 if peerManager.isHost && peerManager.currentPlayer == 0 || peerManager.isClient && peerManager.currentPlayer == 1 {
                     Button(action: {
                         if !isRecording {
-                            DispatchQueue.main.async {
-                                speechRecognizer.speakText("Registrazione attiva")
+                            speechRecognizer.speakText("Registrazione attiva")
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 isRecording = true
                                 speechRecognizer.startTranscribing()
                             }
@@ -429,18 +435,16 @@ struct OneVsOneGameView: View {
         }
         .onChange(of: peerManager.currentPlayer) {
             if peerManager.blindMode && !peerManager.gameOver {
-                if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
-                    DispatchQueue.main.async {
-                        speechRecognizer.speakText("È il tuo turno")
-                        speechRecognizer.stopTranscribing()
-                        isRecording = false
-                    }
+                if peerManager.isHost && peerManager.currentPlayer == 0 {
+                    speechRecognizer.speakText("È il tuo turno")
+                    speechRecognizer.stopTranscribing()
+                    isRecording = false
                 }
             }
         }
         .alert(isPresented: Binding(
             get: {
-                return showPeerDisconnectedAlert && !peerManager.gameOver
+                return showPeerDisconnectedAlert && !peerManager.gameOver && !peerManager.blindMode
             },
             set: { _ in }
         )) {
@@ -453,12 +457,19 @@ struct OneVsOneGameView: View {
                 }
             )
         }
+        
         .fullScreenCover(isPresented: $backModality) {
             ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
         .onChange(of: peerManager.peerDisconnected) {
             if peerManager.peerDisconnected {
-                DispatchQueue.main.async {
+                speechRecognizer.stopTranscribing()
+                if peerManager.blindMode {
+                    speechRecognizer.speakText("Utente disconnesso")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        backModality = true
+                    }
+                } else {
                     showPeerDisconnectedAlert = true
                 }
             }
@@ -475,7 +486,7 @@ struct OneVsOneGameView: View {
                 VStack {
                     ShowWinnerView()
                 }
-                .frame(width: 370, height: 610)
+                .frame(width: 370, height: 560)
                 .padding(.top, 20)
                 .padding(.bottom, 20)
                 .background(.white)
