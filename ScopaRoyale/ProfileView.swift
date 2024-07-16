@@ -2,19 +2,15 @@ import SwiftUI
 import AVFoundation
 
 struct ProfileView: View {
-    @Binding var username: String
-    @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject private var peerManager: MultiPeerManager
+    @Binding var username: String // username inserito dall'utente
+    @EnvironmentObject private var peerManager: MultiPeerManager // riferimento al peer manager
+    @State private var avatarImage: Image // avatar dell'utente
+    @State private var showPicker: Bool = false // true se l'utente clicca sull'avatar per cambiarlo
+    @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar") // avatar selezionato dall'utente nel picker
+    @State private var localUsername: String // username memorizzato dell'utente
+    let synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer() // sintetizzatore vocale
     
-    @State private var avatarImage: Image
-    @State private var showPicker: Bool = false
-    @State private var selectedAvatar: String? = UserDefaults.standard.string(forKey: "selectedAvatar")
-    @State private var showAlert: Bool = false
-    @State private var localUsername: String
-    
-    let synthesizer = AVSpeechSynthesizer()
-    
-    init(username: Binding<String>) {
+    init(username: Binding<String>) { // costruttore: prende username e avatar del giocatore dalla UserDefault
         self._username = username
         self._localUsername = State(initialValue: username.wrappedValue)
         if let selectedAvatar = UserDefaults.standard.string(forKey: "selectedAvatar") {
@@ -45,14 +41,12 @@ struct ProfileView: View {
                     showPicker = true
                 }
                 .padding(.bottom, 20)
-            
-            TextField("Inserisci il nickname", text: $localUsername)
+            TextField("Inserisci il tuo username", text: $localUsername)
                 .padding()
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 100))
                 .padding(.horizontal, 25)
-            
-            Button(action: {
+            Button(action: { // bottone per abilitare/disabilitare la blind mode
                 toggleBlindMode()
             }) {
                 Text(peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata")
@@ -64,7 +58,6 @@ struct ProfileView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 25)
             }
-            
             Text("La Blind mode fornisce, ai giocatori non vedenti, un supporto vocale che esegue l'azione richiesta (si consigliano le cuffie).")
                 .font(.system(size: 14, design: .default))
                 .foregroundStyle(.black)
@@ -72,7 +65,7 @@ struct ProfileView: View {
                 .padding(.top, 10)
         }
         .navigationBarTitle("", displayMode: .inline)
-        .sheet(isPresented: $showPicker) {
+        .sheet(isPresented: $showPicker) { // sheet per la selezione del nuovo avatar
             AvatarPickerView(selectedAvatar: $selectedAvatar, avatarImage: $avatarImage) {
                 if let selectedAvatar = selectedAvatar {
                     UserDefaults.standard.set(selectedAvatar, forKey: "selectedAvatar")
@@ -82,12 +75,12 @@ struct ProfileView: View {
                 showPicker = false
             }
         }
-        .onAppear {
+        .onAppear { // visualizzazione dell'avatar al caricamento della pagina
             if let savedAvatar = UserDefaults.standard.string(forKey: "selectedAvatar") {
                 avatarImage = Image(savedAvatar)
             }
         }
-        .onDisappear {
+        .onDisappear { // salvataggio dell'username nella UserDefault alla chiusura della pagina
             UserDefaults.standard.set(localUsername, forKey: "username")
             username = localUsername
         }
@@ -95,12 +88,12 @@ struct ProfileView: View {
     }
     
     private func toggleBlindMode() {
-        peerManager.blindMode.toggle()
-        let message = peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata"
-        speakText(message)
+        peerManager.blindMode.toggle() // modifica l'impostazione corrente circa la blind mode
+        let message = peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata" // visualizza un messaggio
+        speakText(message) // pronuncia se la blind mode è abilitata o disabilitata
     }
     
-    private func speakText(_ text: String) {
+    private func speakText(_ text: String) { // pronuncia un audio
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0

@@ -1,16 +1,13 @@
 import Foundation
 
 // Definizione della struttura Card
-struct Card: CustomStringConvertible, Equatable, Hashable, Codable {
+struct Card: Equatable, Hashable, Codable {
     let value: String
     let seed: String
     var imageName: String { "\(value.lowercased())\(seed.lowercased())" }
     init(value: String, seed: String) {
         self.value = value
         self.seed = seed
-    }
-    var description: String {
-        return "\(value) di \(seed)"
     }
 }
 
@@ -53,17 +50,17 @@ extension Card {
 // Funzione di utilità per convertire il valore stringa della carta in un valore numerico
 func numericValue(for stringValue: String) -> Int? {
     switch stringValue {
-    case "asso": return 1
-    case "due": return 2
-    case "tre": return 3
-    case "quattro": return 4
-    case "cinque": return 5
-    case "sei": return 6
-    case "sette": return 7
-    case "otto": return 8
-    case "nove": return 9
-    case "re": return 10
-    default: return nil
+        case "asso": return 1
+        case "due": return 2
+        case "tre": return 3
+        case "quattro": return 4
+        case "cinque": return 5
+        case "sei": return 6
+        case "sette": return 7
+        case "otto": return 8
+        case "nove": return 9
+        case "re": return 10
+        default: return nil
     }
 }
 

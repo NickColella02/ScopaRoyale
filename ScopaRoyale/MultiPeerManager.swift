@@ -1,7 +1,6 @@
-import Foundation
+import SwiftUI
 import AVFAudio
 import MultipeerConnectivity
-import SwiftUI
 
 struct Hands: Codable { // struttura dati contenente le mani dei giocatori
     let playerHand: [Card] // mano del giocatore
@@ -613,7 +612,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
                     }
                 }
-                if tableCards.isEmpty && !deck.isEmpty && !playerHand.isEmpty && !opponentHand.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
+                if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
                         self.speakText("Hai fatto scopa")
@@ -642,7 +641,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             sendTurnChange() // aggiorna il turno
             
             if playerHand.isEmpty && opponentHand.isEmpty { // controlla se entrambi i giocatori hanno terminato le carte in mano
-                if !deck.isEmpty {
+                if !deck.isEmpty { // se ci sono altre carte
                     giveCardsToPlayers() // invia le carte alle mani dei giocatori
                     sendDeck() // invia il mazzo iniziale aggiornato
                 } else { // altrimenti si controllano i punteggi per decretare il vincitore

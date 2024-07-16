@@ -1,18 +1,13 @@
-
- 
- import SwiftUI
- import SpriteKit
+import SwiftUI
+import SpriteKit
 
 struct OneVsOneGameView: View {
-    
     var scene: SKScene {
         let scene = OneVsOneGameScene(size: UIScreen.main.bounds.size)
         scene.scaleMode = .aspectFill
         return scene
     }
-    
     @EnvironmentObject private var peerManager: MultiPeerManager
-    @Environment(\.presentationMode) var presentationMode
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     @State private var backModality: Bool = false
     @State private var isRecording: Bool = false
@@ -457,7 +452,6 @@ struct OneVsOneGameView: View {
                 }
             )
         }
-        
         .fullScreenCover(isPresented: $backModality) {
             ContentView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }

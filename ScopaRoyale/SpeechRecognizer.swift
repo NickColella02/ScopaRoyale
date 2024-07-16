@@ -1,4 +1,3 @@
-import Foundation
 import AVFoundation
 import Speech
 import SwiftUI
@@ -12,11 +11,10 @@ actor SpeechRecognizer: ObservableObject {
     }
     
     @MainActor var transcript: String = ""
-    @Published var text: String = ""
     public let verbi: [String] = [ // verbi da riconoscere per il comando vocale del voice over
         "gioca",
         "butta",
-        "lancia",
+        "lancia"
     ]
     
     public let verbiRipetizione: [String] = [

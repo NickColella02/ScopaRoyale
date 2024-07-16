@@ -2,8 +2,6 @@ import SwiftUI
 
 struct UsernameEntryView: View {
     @State private var username: String = ""
-    @State private var showAlert: Bool = false
-    @State private var alertMessage: String = ""
     @State private var showTitle: Bool = false
     @State private var showDescription: Bool = false
     @State private var showUsernameField: Bool = false
@@ -19,7 +17,7 @@ struct UsernameEntryView: View {
                 .opacity(showTitle ? 1 : 0)
                 .padding(.bottom, 50)
             
-            UsernameFormView(username: $username, showAlert: $showAlert, alertMessage: $alertMessage, showUsernameField: $showUsernameField) {
+            UsernameFormView(username: $username, showUsernameField: $showUsernameField) {
                 UserDefaults.standard.set(username, forKey: "username")
                 NotificationCenter.default.post(name: .usernameEntered, object: nil)
             }
@@ -55,26 +53,19 @@ struct UsernameEntryView: View {
 
 struct UsernameFormView: View {
     @Binding var username: String
-    @Binding var showAlert: Bool
-    @Binding var alertMessage: String
     @Binding var showUsernameField: Bool
     let onContinue: () -> Void
         
     var body: some View {
         VStack {            
-            TextField("Inserisci il tuo nickname", text: $username)
+            TextField("Inserisci il tuo username", text: $username)
                 .padding()
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 100))
                 .padding(.horizontal, 25)
                 .opacity(username.isEmpty ? 0.5 : 1.0)
-                        
             Button(action: {
-                if username.isEmpty {
-                    showAlert = true
-                } else {
-                    onContinue()
-                }
+                onContinue()
             }) {
                 Text("Fine")
                     .font(.system(size: 20, design: .default))
@@ -88,7 +79,7 @@ struct UsernameFormView: View {
             }
             .disabled(username.isEmpty)
             
-            Text("Puoi modificare il tuo nickname nelle impostazioni del profilo")
+            Text("Puoi modificare il tuo username nelle impostazioni del profilo")
                 .font(.system(size: 14, design: .default))
                 .foregroundStyle(.black)
                 .multilineTextAlignment(.center)

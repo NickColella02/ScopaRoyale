@@ -3,38 +3,37 @@ import AVFAudio
 
 struct JoinAGameView: View {
     let username: String
-    @EnvironmentObject private var peerManager: MultiPeerManager // Accesso al MultiPeerManager dall'ambiente
-    @State private var navigateToGame = false
+    @EnvironmentObject private var peerManager: MultiPeerManager // riferimento al peer manager
+    @State private var navigateToGame: Bool = false // true se la partita inizia
     @State private var rotationAngle: Double = 0
-    @State private var isAnimatingDots = false
-    @EnvironmentObject var speechRecognizer: SpeechRecognizer
-    @Environment(\.presentationMode) var presentationMode
-    private let synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
+    @State private var isAnimatingDots: Bool = false // true se non è stato trovato ancora un avversario
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer // riferimento allo speech recognizer
+    @Environment(\.presentationMode) var presentationMode // freccia per tornare alla ContentView
+    private let synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer() // sintetizzatore vocale
     
     var body: some View {
         VStack {
-            if peerManager.connectedPeers.isEmpty {
+            if peerManager.connectedPeers.isEmpty { // se non ha ancora trovato un avversario
                 VStack {
-                    RotatingImageView(rotationAngle: $rotationAngle)
+                    RotatingImageView(rotationAngle: $rotationAngle) // mostra un'animazione di ricerca
                         .frame(width: 120, height: 120)
                         .onAppear {
                             startRotating()
                         }
                     Text("Ricerca di una lobby")
                         .font(.system(size: 20, design: .default))
-                    
                     AnimatedDotsView(isAnimating: $isAnimatingDots)
                         .onAppear {
                             isAnimatingDots = true
                         }
                 }
                 .padding()
-                .onAppear {
-                    if peerManager.blindMode {
-                        speakText("In cerca di una lobby")
+                .onAppear { // al caricamento della pagina
+                    if peerManager.blindMode { // se è abilitata la blind mode
+                        speakText("In cerca di una lobby") // fa capire all'utente che sta cercando una lobby
                     }
                 }
-            } else {
+            } else { // se ha trovato l'avversario
                 VStack {
                     Text("Lobby: \(peerManager.lobbyName)") // nome della lobby trovata
                         .font(.title)
@@ -48,7 +47,7 @@ struct JoinAGameView: View {
                             Text(username) // nome dell'utente
                                 .font(.system(size: 20, design: .default))
                                 .bold()
-                            peerManager.avatarImage(for: peerManager.myAvatarImage)
+                            peerManager.avatarImage(for: peerManager.myAvatarImage) // avatar dell'utente
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 120, height: 120)
@@ -69,7 +68,7 @@ struct JoinAGameView: View {
                             Text(peerManager.opponentName) // nome dell'avversario
                                 .font(.system(size: 20, design: .default))
                                 .bold()
-                            peerManager.avatarImage(for: peerManager.opponentAvatarImage)
+                            peerManager.avatarImage(for: peerManager.opponentAvatarImage) // avatar dell'avversario
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 120, height: 120)
@@ -97,13 +96,13 @@ struct JoinAGameView: View {
                 .padding()
             }
         }
-        .navigationDestination(isPresented: $navigateToGame) {
+        .navigationDestination(isPresented: $navigateToGame) { // porta alla OneVsOneGameView se la partita è iniziata
             OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
-        .onAppear {
+        .onAppear { // al caricamento della pagina, invia all'avversario il proprio username e il proprio avatar
             peerManager.sendUsername(username: username)
             peerManager.sendOpponentAvatarImage(peerManager.myAvatarImage)
-            peerManager.joinSession()
+            peerManager.joinSession() // cerca di connettersi ad una lobby
         }
         .navigationBarTitle("", displayMode: .inline)
         .onReceive(peerManager.$startGame) { startGame in
@@ -111,7 +110,7 @@ struct JoinAGameView: View {
                 navigateToGame = true
             }
         }
-        .toolbar {
+        .toolbar { // freccia per tornare alla ContentView
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
@@ -120,8 +119,8 @@ struct JoinAGameView: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .preferredColorScheme(.light)
+        .navigationBarBackButtonHidden(true) // nasconde la freccia di default della NavigationStack
+        .preferredColorScheme(.light) // forza la light mode
     }
     
     private func startRotating() {
@@ -136,16 +135,7 @@ struct JoinAGameView: View {
         let utterance = AVSpeechUtterance(string: testo)
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
-        utterance.rate = 0.5
-        
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playback, mode: .default, options: [.allowBluetooth, .defaultToSpeaker])
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
-        }
-        
+        utterance.rate = 0.5        
         synthesizer.speak(utterance)
     }
 }

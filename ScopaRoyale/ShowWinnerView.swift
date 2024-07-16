@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct ShowWinnerView: View {
-    @EnvironmentObject private var peerManager: MultiPeerManager
-    @EnvironmentObject var speechRecognizer: SpeechRecognizer
-    @State private var showHomeView: Bool = false
+    @EnvironmentObject private var peerManager: MultiPeerManager // riferimento al peer manager
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer // riferimento allo speech recognizer
+    @State private var showHomeView: Bool = false // true se l'utente clicca su termina partita e torna alla ContentView
     
     var body: some View {
-        if peerManager.gameOver {
+        if peerManager.gameOver { // se la partita è terminata
             ZStack {
                 Color(.systemBackground)
                     .ignoresSafeArea()
@@ -15,7 +15,7 @@ struct ShowWinnerView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 40, height: 40)
-                    HStack {
+                    HStack { // mostra username e avatar del vincitore o un'avatar di default per il pareggio
                         if peerManager.winner == peerManager.myUsername {
                             showWinnerAvatar(username: peerManager.myUsername, avatarImage: peerManager.myAvatarImage, isWinner: peerManager.winner == peerManager.myUsername)
                         } else if peerManager.winner == peerManager.opponentName {
@@ -24,23 +24,21 @@ struct ShowWinnerView: View {
                             showDrawAvatar(playerImage: peerManager.myAvatarImage, opponentImage: peerManager.opponentAvatarImage)
                         }
                     }
-                    
-                    HStack {
+                    HStack { // mostra i punti totali dei 2 giocatori
                         TotalPointsView(title: peerManager.myUsername, score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
                         Spacer()
                         TotalPointsView(title: peerManager.opponentName, score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
                     }
                     .padding(.horizontal)
-                    
                     ScoreGridView(peerManager: peerManager)
                         .padding(.horizontal)
                     
-                    Button(action: {
-                        if peerManager.isHost {
-                            peerManager.sendEndGameSignal()
-                            peerManager.closeConnection()
+                    Button(action: { // bottone per terminare la partita e tornare alla ContentView
+                        if peerManager.isHost { // se il server clicca su termina partita
+                            peerManager.sendEndGameSignal() // invia un segnale notificando al client la fine della partita
+                            peerManager.closeConnection() // chiude la connessione
                         }
-                        showHomeView = true
+                        showHomeView = true // ritorna alla ContentView
                     }) {
                         Text("Termina Partita")
                             .font(.system(size: 20, design: .default))
@@ -52,15 +50,13 @@ struct ShowWinnerView: View {
                             .padding(.horizontal, 25)
                     }
                 }
-                .onAppear {
-                    if peerManager.blindMode {
-                        DispatchQueue.main.async {
-                            speechRecognizer.speakText("Il vincitore è \(peerManager.winner)")
-                        }
+                .onAppear { // al caricamento della pagina
+                    if peerManager.blindMode { // se è abilitata la blind mode
+                        speechRecognizer.speakText("Il vincitore è \(peerManager.winner)") // pronuncia il vincitore
                     }
                 }
             }
-            .fullScreenCover(isPresented: $showHomeView) {
+            .fullScreenCover(isPresented: $showHomeView) { // naviga alla ContentView quando si clicca su termina partita
                 ContentView().environmentObject(peerManager)
             }
         }
@@ -68,8 +64,8 @@ struct ShowWinnerView: View {
 }
 
 struct showWinnerAvatar: View {
-    let username: String
-    let avatarImage: String
+    let username: String // username del vincitore
+    let avatarImage: String // avatar del vincitore
     let isWinner: Bool
     
     var body: some View {
@@ -130,8 +126,8 @@ struct showDrawAvatar: View {
     }
 }
 
-struct ScoreGridView: View {
-    let peerManager: MultiPeerManager
+struct ScoreGridView: View { // visualizza la descrizione dei punti fatti dai giocatori
+    let peerManager: MultiPeerManager // riferimento al peer manager
     
     var body: some View {
         Grid {
@@ -193,7 +189,6 @@ struct ScoreParameterCellView: View {
         }
     }
 }
-
 
 struct TotalPointsView: View {
     let title: String

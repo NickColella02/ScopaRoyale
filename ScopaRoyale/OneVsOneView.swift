@@ -5,8 +5,8 @@ struct OneVsOneView: View {
     private let numberOfPlayer: Int = 2
     let lobbyName: String
     @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var navigateToGame = false
-    @State private var isAnimatingDots = false
+    @State private var navigateToGame: Bool = false
+    @State private var isAnimatingDots: Bool = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer
     @Environment(\.presentationMode) var presentationMode
     
@@ -74,11 +74,9 @@ struct OneVsOneView: View {
             
             Spacer()
             
-            Button(action: {
-                if !peerManager.connectedPeers.isEmpty {
-                    peerManager.sendStartGameSignal()
-                    navigateToGame = true
-                }
+            Button(action: { // bottone per iniziare la partita
+                peerManager.sendStartGameSignal()
+                navigateToGame = true
             }) {
                 Text("Gioca")
                     .font(.system(size: 20, design: .default))
@@ -90,20 +88,21 @@ struct OneVsOneView: View {
                     .padding(.horizontal, 35)
             }
             .padding(.bottom, 20)
+            .disabled(peerManager.connectedPeers.isEmpty)
         }
-        .navigationDestination(isPresented: $navigateToGame) {
+        .navigationDestination(isPresented: $navigateToGame) { // naviga alla OneVsOneGameView se la partita è iniziata
             OneVsOneGameView().environmentObject(peerManager).environmentObject(speechRecognizer)
         }
-        .onChange(of: peerManager.peerDisconnected) {
+        .onChange(of: peerManager.peerDisconnected) { // se l'avversario si disconnette, chiude la connessione
             if peerManager.peerDisconnected {
                 peerManager.reset()
             }
         }
         .preferredColorScheme(.light)
-        .onAppear {
+        .onAppear { // al caricamento della pagina, inizia la ricerca di avversari
             peerManager.startHosting(lobbyName: self.lobbyName, numberOfPlayers: self.numberOfPlayer, username: username)
         }
-        .toolbar {
+        .toolbar { // freccia per tornare alla ContentView
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
@@ -112,11 +111,11 @@ struct OneVsOneView: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden(true) // nasconde la freccia di default della NavigationStack
         .navigationTitle("")
     }
 }
-/*
+
 struct OneVsOneView_Previews: PreviewProvider {
     static var previews: some View {
         let peerManager = MultiPeerManager()
@@ -126,4 +125,4 @@ struct OneVsOneView_Previews: PreviewProvider {
             .environmentObject(speechRecognizer)
     }
 }
-*/
+

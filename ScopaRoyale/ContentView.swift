@@ -1,20 +1,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var showJoinGame: Bool = false
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username del giocatore
+    @State private var showJoinGame: Bool = false // true se l'utente sceglie di entrare in una lobby esistente
     @State private var showUsernameEntry: Bool = false
-    @State private var createLobby: Bool = false
-    @State private var lobbyName: String = ""
-    @State private var showLobbyForm: Bool = false
-    @State private var showGameRules: Bool = false
-    @State private var showSettings: Bool = false
-    @State private var newUsername: String = ""
-    @State private var showEmptyUsernameAlert = false
-    @State private var showChangeUsernameForm = false
-    @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject private var peerManager: MultiPeerManager
-    private var speechRecognizer: SpeechRecognizer {
+    @State private var createdLobby: Bool = false // true se l'utente ha creato una lobby
+    @State private var lobbyName: String = "" // nome della lobby
+    @State private var showLobbyForm: Bool = false // true se l'utente sceglie di creare una lobby e visualizza il corrispondente overlay
+    @State private var showGameRules: Bool = false // true se l'utente ha aperto le regole del gioco
+    @State private var showSettings: Bool = false // true se l'utente ha aperto le impostazioni
+    @EnvironmentObject private var peerManager: MultiPeerManager // riferimento al peer manager
+    private var speechRecognizer: SpeechRecognizer { // dichiarazione dello speech recognizer
         SpeechRecognizer(peerManager: peerManager)
     }
     
@@ -28,15 +24,15 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 Spacer()
-                if showUsernameEntry {
-                    UsernameEntryView()
-                } else {
+                if showUsernameEntry { // se l'utente non ha ancora inserito l'username
+                    UsernameEntryView() // mostra la relativa view
+                } else { // altrimenti resta sulla ContentView
                     content
                 }
                 Spacer()
             }
             .navigationTitle("")
-            .toolbar {
+            .toolbar { // pulsante per le impostazioni
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
@@ -50,7 +46,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .onAppear() {
+            .onAppear() { // al caricamento della pagina, chiude la connessione con eventuali peer connessi
                 if peerManager.isHost {
                     peerManager.closeConnection()
                 }
@@ -60,11 +56,11 @@ struct ContentView: View {
                 self.showUsernameEntry = false
             }
         }
-        .preferredColorScheme(.light)
-        .overlay(lobbyFormOverlay)
-        .overlay(gameRulesOverlay)
-        .overlay(settingsOverlay)
-        .onTapGesture {
+        .preferredColorScheme(.light) // forza la light mode
+        .overlay(lobbyFormOverlay) // overlay per la creazione della lobby
+        .overlay(gameRulesOverlay) // overlay per la visualizzazione delle regole
+        .overlay(settingsOverlay) // overlay per le impostazioni
+        .onTapGesture { // chiude la tastiera quando si preme sullo schermo
             hideKeyboard()
         }
     }
@@ -77,20 +73,17 @@ struct ContentView: View {
                 .scaledToFit()
                 .frame(height: 180)
                 .padding(.bottom, 20)
-                .navigationDestination(isPresented: $showJoinGame) {
+                .navigationDestination(isPresented: $showJoinGame) { // va alla JoinAGameView se l'utente entra in una lobby esistente
                     JoinAGameView(username: username).environmentObject(peerManager).environmentObject(speechRecognizer)
                 }
-                .navigationDestination(isPresented: $createLobby) {
+                .navigationDestination(isPresented: $createdLobby) { // va alla OneVsOneView se l'utente ha creato una lobby
                     OneVsOneView(lobbyName: self.lobbyName).environmentObject(peerManager).environmentObject(speechRecognizer)
                 }
-            
-            CreateNewLobby(showLobbyForm: $showLobbyForm)
+            CreateNewLobby(showLobbyForm: $showLobbyForm) // mostra l'overlay per l'inserimento del nome della lobby
                 .onTapGesture {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
-            
             JoinExistentLobby(showJoinGame: $showJoinGame)
-            
             HowToPlay(showGameRules: $showGameRules)
         }
     }
@@ -114,9 +107,9 @@ struct ContentView: View {
                         .background(Color(.systemGray6))
                         .clipShape(RoundedRectangle(cornerRadius: 100))
                         .padding(.horizontal, 25)
-                    Button(action: {
+                    Button(action: { // bottone per confermare il nome della lobby e crearla
                         if !lobbyName.isEmpty {
-                            createLobby = true
+                            createdLobby = true
                             showLobbyForm = false
                         }
                     }) {
@@ -129,7 +122,7 @@ struct ContentView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 50))
                             .padding(.horizontal, 25)
                     }
-                    .disabled(lobbyName.isEmpty)
+                    .disabled(lobbyName.isEmpty) // disabilita il tasto se l'utente non ha inserito un username
                 }
                 .frame(width: 370)
                 .padding(.top, 20)
@@ -172,7 +165,7 @@ struct ContentView: View {
                         .padding(.horizontal, 20)
                     }
                     Spacer()
-                    Button(action: {
+                    Button(action: { // bottone per chiudere l'overlay delle regole
                         showGameRules = false
                     }) {
                         Text("Chiudi")
@@ -202,7 +195,7 @@ struct ContentView: View {
             ZStack {
                 Color.black.opacity(0.4)
                     .edgesIgnoringSafeArea(.all)
-                    .onTapGesture {
+                    .onTapGesture { // chiude la pagina delle impostazioni se si clicca sullo schermo
                         showSettings = false
                     }
                 VStack {
