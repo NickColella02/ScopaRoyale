@@ -18,19 +18,17 @@ struct ShowWinnerView: View {
                     HStack {
                         if peerManager.winner == peerManager.myUsername {
                             showWinnerAvatar(username: peerManager.myUsername, avatarImage: peerManager.myAvatarImage, isWinner: peerManager.winner == peerManager.myUsername)
-                        }
-                        else if peerManager.winner == peerManager.opponentName {
-                            showWinnerAvatar(username: peerManager.opponentName, avatarImage: peerManager.opponentAvatarImage, isWinner: peerManager.winner == peerManager.myUsername)
-                        } else if peerManager.winner == "Pareggio"{
-                            showWinnerAvatar(username: peerManager.opponentName, avatarImage: peerManager.opponentAvatarImage, isWinner: false)
+                        } else if peerManager.winner == peerManager.opponentName {
+                            showWinnerAvatar(username: peerManager.opponentName, avatarImage: peerManager.opponentAvatarImage, isWinner: peerManager.winner == peerManager.opponentName)
+                        } else if peerManager.winner == "Pareggio" {
+                            showDrawAvatar(playerImage: peerManager.myAvatarImage, opponentImage: peerManager.opponentAvatarImage)
                         }
                     }
-                    .padding()
                     
                     HStack {
-                        TotalPointsView(title: "I tuoi punti", score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
+                        TotalPointsView(title: peerManager.myUsername, score: peerManager.playerScore, isWinner: peerManager.playerScore > peerManager.opponentScore)
                         Spacer()
-                        TotalPointsView(title: "I punti di \(peerManager.opponentName)", score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
+                        TotalPointsView(title: peerManager.opponentName, score: peerManager.opponentScore, isWinner: peerManager.opponentScore > peerManager.playerScore)
                     }
                     .padding(.horizontal)
                     
@@ -49,11 +47,10 @@ struct ShowWinnerView: View {
                             .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color .black)
+                            .background(.black)
                             .clipShape(RoundedRectangle(cornerRadius: 50))
                             .padding(.horizontal, 25)
                     }
-                    .padding(.horizontal, 35)
                 }
                 .onAppear {
                     if peerManager.blindMode {
@@ -77,28 +74,59 @@ struct showWinnerAvatar: View {
     
     var body: some View {
         VStack {
+            Text(username)
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundStyle(.black)
             ZStack {
                 if isWinner {
                     Image("winnerCrown")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 140, height: 140)
-                        .clipShape(Circle())
-                    
+                        .frame(width: 170, height: 170)
                     Image(avatarImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 93, height: 93)
+                        .frame(width: 87, height: 87)
                         .clipShape(Circle())
-                        .padding(.top, 39)
                 }
             }
-            
-            Text(username)
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundStyle(.black)
         }
+    }
+}
+
+struct showDrawAvatar: View {
+    let playerImage: String
+    let opponentImage: String
+    
+    var body: some View {
+        VStack {
+            ZStack {
+                Image(playerImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .clipShape(Circle())
+                    .offset(x: -32, y: -41)
+                    .zIndex(1)
+                Image("draw")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 170, height: 170)
+                    .zIndex(0)
+                Image(opponentImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .clipShape(Circle())
+                    .offset(x: 33, y: -9)
+                    .zIndex(1)
+            }
+        }
+        Text("")
+            .font(.headline)
+            .fontWeight(.bold)
+            .foregroundStyle(.black)
     }
 }
 
@@ -107,26 +135,15 @@ struct ScoreGridView: View {
     
     var body: some View {
         Grid {
-            GridRow {
-                ScoreParameterCellView(title: "Scope", myScore: peerManager.playerPoints.count, opponentScore: peerManager.opponentPoints.count)
+            ForEach([
+                ("Scope", peerManager.playerPoints.count, peerManager.opponentPoints.count, false),
+                ("Carte prese", peerManager.cardTakenByPlayer.count, peerManager.cardTakenByOpponent.count, false),
+                ("Settebello", peerManager.playerHasSettebello ? 1 : 0, peerManager.opponentHasSettebello ? 1 : 0, true),
+                ("Carte oro", peerManager.playerCoinsCount, peerManager.opponentCoinsCount, false),
+                ("Primera", peerManager.playerHasPrimera ? 1 : 0, peerManager.opponentHasPrimera ? 1 : 0, true)
+            ], id: \.0) { (title, myScore, opponentScore, isBoolean) in
+                ScoreParameterCellView(title: title, myScore: myScore, opponentScore: opponentScore, isBoolean: isBoolean)
             }
-            Divider()
-            GridRow {
-                ScoreParameterCellView(title: "Carte prese", myScore: peerManager.cardTakenByPlayer.count, opponentScore: peerManager.cardTakenByOpponent.count)
-            }
-            Divider()
-            GridRow {
-                ScoreParameterCellView(title: "Settebello", myScore: peerManager.playerHasSettebello ? 1 : 0, opponentScore: peerManager.opponentHasSettebello ? 1 : 0)
-            }
-            Divider()
-            GridRow {
-                ScoreParameterCellView(title: "Carte oro", myScore: peerManager.playerCoinsCount, opponentScore: peerManager.opponentCoinsCount)
-            }
-            Divider()
-            GridRow {
-                ScoreParameterCellView(title: "Primera", myScore: peerManager.playerHasPrimera ? 1 : 0, opponentScore: peerManager.opponentHasPrimera ? 1 : 0)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .padding(.horizontal, 15)
         .padding(.top, 10)
@@ -138,41 +155,45 @@ struct ScoreParameterCellView: View {
     let title: String
     let myScore: Int
     let opponentScore: Int
+    let isBoolean: Bool
     
     var body: some View {
         HStack {
             VStack {
-                Text("\(myScore)")
+                Text(isBoolean ? (myScore == 1 ? "Sì" : "No") : "\(myScore)")
                     .font(.system(size: 20, design: .default))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
                     .padding(3)
-                    .background(myScore > opponentScore ? Color.green : Color.clear)
+                    .frame(width: 50)
+                    .background(myScore > opponentScore ? Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255).opacity(0.8) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             
             Spacer()
             
             Text(title)
-                .font(.subheadline) // Ridotto rispetto a .headline
+                .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
-                .frame(width: 120) // Regolato per adattarsi al testo più piccolo
+                .frame(width: 120)
             
             Spacer()
             
             VStack {
-                Text("\(opponentScore)")
+                Text(isBoolean ? (opponentScore == 1 ? "Sì" : "No") : "\(opponentScore)")
                     .font(.system(size: 20, design: .default))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
                     .padding(3)
-                    .background(opponentScore > myScore ? Color.green : Color.clear)
+                    .frame(width: 50)
+                    .background(opponentScore > myScore ? Color(red: 254 / 255, green: 189 / 255, blue: 2 / 255).opacity(0.8) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
     }
 }
+
 
 struct TotalPointsView: View {
     let title: String
@@ -181,17 +202,12 @@ struct TotalPointsView: View {
     
     var body: some View {
         VStack(spacing: 4) { // Aumentato spacing per migliorare leggibilità
-            Text(title)
+            Text("\(title): \(score)")
                 .font(.title3) // Aumentato rispetto a .headline
                 .fontWeight(.bold)
                 .foregroundStyle(.black)
-            Text("\(score)")
-                .font(.title3) // Aumentato rispetto a .headline
-                .fontWeight(.bold)
-                .foregroundStyle(.black)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
         }
-        .padding(.horizontal, 15)
+        .padding(.horizontal, 20)
     }
 }
 

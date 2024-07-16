@@ -59,31 +59,16 @@ struct UsernameFormView: View {
     @Binding var alertMessage: String
     @Binding var showUsernameField: Bool
     let onContinue: () -> Void
-    
-    let maxUsernameLength = 14
-    
+        
     var body: some View {
-        VStack {
-            /*Image("username")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 40, height: 40)*/
-            
+        VStack {            
             TextField("Inserisci il tuo nickname", text: $username)
                 .padding()
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 100))
                 .padding(.horizontal, 25)
-                .opacity(username.isEmpty || username.count > maxUsernameLength ? 0.5 : 1.0)
-            
-            if username.count > maxUsernameLength {
-                Text("Il nickname può contenere al massimo \(maxUsernameLength) caratteri")
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .padding(.horizontal, 25)
-                    .transition(.opacity)
-            }
-            
+                .opacity(username.isEmpty ? 0.5 : 1.0)
+                        
             Button(action: {
                 if username.isEmpty {
                     showAlert = true
@@ -96,12 +81,12 @@ struct UsernameFormView: View {
                     .foregroundStyle(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(username.isEmpty || username.count > maxUsernameLength ? Color.gray : Color.black)
+                    .background(username.isEmpty ? Color.gray : Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 50))
                     .padding(.horizontal, 25)
-                    .opacity(username.isEmpty || username.count > maxUsernameLength ? 0.5 : 1.0)
+                    .opacity(username.isEmpty ? 0.5 : 1.0)
             }
-            .disabled(username.isEmpty || username.count > maxUsernameLength)
+            .disabled(username.isEmpty)
             
             Text("Puoi modificare il tuo nickname nelle impostazioni del profilo")
                 .font(.system(size: 14, design: .default))

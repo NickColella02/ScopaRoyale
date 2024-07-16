@@ -298,7 +298,7 @@ struct OneVsOneGameView: View {
                         Spacer()
                         Text("Partita terminata!")
                             .font(.system(size: 40, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .padding()
                             .background(Color.black.opacity(0.4))
                             .clipShape(Capsule())
@@ -479,7 +479,7 @@ struct OneVsOneGameView: View {
     
     @ViewBuilder
     private var winnerOverlay: some View {
-        if peerManager.gameOver{
+        if peerManager.gameOver {
             ZStack {
                 Color.black.opacity(0.4)
                     .edgesIgnoringSafeArea(.all)

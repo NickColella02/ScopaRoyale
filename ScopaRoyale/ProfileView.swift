@@ -12,7 +12,6 @@ struct ProfileView: View {
     @State private var showAlert: Bool = false
     @State private var localUsername: String
     
-    let maxUsernameLength: Int = 14
     let synthesizer = AVSpeechSynthesizer()
     
     init(username: Binding<String>) {
@@ -47,13 +46,6 @@ struct ProfileView: View {
                 }
                 .padding(.bottom, 20)
             
-            if localUsername.count > maxUsernameLength {
-                Text("L'username può contenere al massimo \(maxUsernameLength) caratteri.")
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .padding(.horizontal, 25)
-            }
-            
             TextField("Inserisci il nickname", text: $localUsername)
                 .padding()
                 .background(Color(.systemGray6))
@@ -80,20 +72,6 @@ struct ProfileView: View {
                 .padding(.top, 10)
         }
         .navigationBarTitle("", displayMode: .inline)
-        .toolbar {
-            Text("Fine")
-                .bold()
-                .foregroundStyle(.blue)
-                .onTapGesture {
-                    if localUsername.isEmpty {
-                        showAlert = true
-                    } else {
-                        username = localUsername
-                        UserDefaults.standard.set(localUsername, forKey: "username")
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-        }
         .sheet(isPresented: $showPicker) {
             AvatarPickerView(selectedAvatar: $selectedAvatar, avatarImage: $avatarImage) {
                 if let selectedAvatar = selectedAvatar {
@@ -108,6 +86,10 @@ struct ProfileView: View {
             if let savedAvatar = UserDefaults.standard.string(forKey: "selectedAvatar") {
                 avatarImage = Image(savedAvatar)
             }
+        }
+        .onDisappear {
+            UserDefaults.standard.set(localUsername, forKey: "username")
+            username = localUsername
         }
         .navigationBarBackButtonHidden(true)
     }

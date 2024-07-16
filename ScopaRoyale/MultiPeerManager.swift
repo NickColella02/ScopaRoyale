@@ -613,7 +613,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
                     }
                 }
-                if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
+                if tableCards.isEmpty && !deck.isEmpty && !playerHand.isEmpty && !opponentHand.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
                         self.speakText("Hai fatto scopa")
@@ -655,6 +655,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                             cardTakenByOpponent += tableCards
                         }
                         tableCards.removeAll() // rimuove tutte le carte dal tavolo in una volta sola
+                        sendTableCards() // notifico il liberamento del tavolo
                     }
                     
                     // assegno un punto a chi ha preso più carte
