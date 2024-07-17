@@ -135,7 +135,14 @@ struct JoinAGameView: View {
         let utterance = AVSpeechUtterance(string: testo)
         utterance.voice = AVSpeechSynthesisVoice(language: "it-IT")
         utterance.pitchMultiplier = 1.0
-        utterance.rate = 0.5        
+        utterance.rate = 0.5    
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
+        }
         synthesizer.speak(utterance)
     }
 }

@@ -192,67 +192,82 @@ actor SpeechRecognizer: ObservableObject {
         for separatore in separatori { // rimuovo i separatori
             command = command.replacingOccurrences(of: separatore, with: "")
         }
-        var foundVerb: String = "" // verbo trovato
-        for verbo in verbi { // controllo se è riconosciuto un verbo di azione
-            if command.contains(verbo) {
-                foundVerb = verbo
-                break
-            }
-        }
-        if !foundVerb.isEmpty { // se è riconosciuto un verbo di azione
-            var foundValue: String = "" // valore trovato
-            var foundSeed: String = "" // seme trovato
-            for valore in valori { // controllo se è riconosciuto un valore
-                if command.contains(valore) {
-                    foundValue = valore
-                    break
-                }
-            }
-            for seme in semi { // controllo se è riconosciuto un seme
-                if command.contains(seme) {
-                    foundSeed = seme
-                    break
-                }
-            }
-            if !foundValue.isEmpty && !foundSeed.isEmpty { // se sono riconosciuti un valore e un seme
-                if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
-                    if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
-                        peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
-                    } else {
-                        await stopTranscribing()
-                        await speakText("La carta non è nella tua mano")
-                        await startTranscribing()
-                    }
-                }
-            }
-        } else {
-            for verbo in verbiRipetizione { // controllo se è riconosciuto un verbo di ripetizione
+        if peerManager.startGame {
+            var foundVerb: String = "" // verbo trovato
+            for verbo in verbi { // controllo se è riconosciuto un verbo di azione
                 if command.contains(verbo) {
                     foundVerb = verbo
                     break
                 }
             }
-            if !foundVerb.isEmpty {
-                var foundObject: String = ""
-                for oggetto in oggetti {
-                    if command.contains(oggetto) {
-                        foundObject = oggetto
+            if !foundVerb.isEmpty { // se è riconosciuto un verbo di azione
+                var foundValue: String = "" // valore trovato
+                var foundSeed: String = "" // seme trovato
+                for valore in valori { // controllo se è riconosciuto un valore
+                    if command.contains(valore) {
+                        foundValue = valore
                         break
                     }
                 }
-                if !foundObject.isEmpty {
-                    await stopTranscribing()
-                    if foundObject == "tavolo" || foundObject == "banco" {
-                        for card in peerManager.tableCards {
-                            await speakText("\(card.value) di \(card.seed)")
-                        }
-                    } else if foundObject == "mie" || foundObject == "mano" {
-                        for card in peerManager.playerHand {
-                            await speakText("\(card.value) di \(card.seed)")
+                for seme in semi { // controllo se è riconosciuto un seme
+                    if command.contains(seme) {
+                        foundSeed = seme
+                        break
+                    }
+                }
+                if !foundValue.isEmpty && !foundSeed.isEmpty { // se sono riconosciuti un valore e un seme
+                    if (peerManager.isHost && peerManager.currentPlayer == 0) || (peerManager.isClient && peerManager.currentPlayer == 1) {
+                        if peerManager.playerHand.contains(Card(value: foundValue, seed: foundSeed)) { // se la carta è nella sua mano
+                            peerManager.playCard(card: Card(value: foundValue, seed: foundSeed)) // la gioca
+                        } else {
+                            await stopTranscribing()
+                            await speakText("La carta non è nella tua mano")
+                            await startTranscribing()
                         }
                     }
-                    await startTranscribing()
                 }
+            } else {
+                for verbo in verbiRipetizione { // controllo se è riconosciuto un verbo di ripetizione
+                    if command.contains(verbo) {
+                        foundVerb = verbo
+                        break
+                    }
+                }
+                if !foundVerb.isEmpty {
+                    var foundObject: String = ""
+                    for oggetto in oggetti {
+                        if command.contains(oggetto) {
+                            foundObject = oggetto
+                            break
+                        }
+                    }
+                    if !foundObject.isEmpty {
+                        await stopTranscribing()
+                        if foundObject == "tavolo" || foundObject == "banco" {
+                            for card in peerManager.tableCards {
+                                await speakText("\(card.value) di \(card.seed)")
+                            }
+                        } else if foundObject == "mie" || foundObject == "mano" {
+                            for card in peerManager.playerHand {
+                                await speakText("\(card.value) di \(card.seed)")
+                            }
+                        }
+                        await startTranscribing()
+                    }
+                }
+            }
+        } else {
+            await stopTranscribing()
+            if command == "sì" {
+                DispatchQueue.main.async {
+                    self.peerManager.blindMode = true
+                }
+                await speakText("Blind mode abilitata")
+            } else if command == "no" {
+                DispatchQueue.main.async {
+                    self.peerManager.blindMode = false
+                }
+                await speakText("Blind mode disabilitata")
             }
         }
     }
@@ -270,19 +285,15 @@ actor SpeechRecognizer: ObservableObject {
         utterance.pitchMultiplier = 1.0
         utterance.rate = 0.5
         do {
-            // Configura l'AVAudioSession per la riproduzione audio
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
+            try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-            
-            // Riproduci l'utterance tramite il synthesizer
-            synthesizer.speak(utterance)
         } catch {
             print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
         }
+        synthesizer.speak(utterance)
     }
 }
-
 
 extension SFSpeechRecognizer {
     static func hasAuthorizationToRecognize() async -> Bool {

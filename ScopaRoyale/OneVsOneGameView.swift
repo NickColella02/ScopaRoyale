@@ -7,16 +7,16 @@ struct OneVsOneGameView: View {
         scene.scaleMode = .aspectFill
         return scene
     }
-    @EnvironmentObject private var peerManager: MultiPeerManager
-    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
-    @State private var backModality: Bool = false
-    @State private var isRecording: Bool = false
-    @State private var showPeerDisconnectedAlert: Bool = false
+    @EnvironmentObject private var peerManager: MultiPeerManager // riferimento al peer manager
+    @State private var username: String = UserDefaults.standard.string(forKey: "username") ?? "" // username dell'utente
+    @State private var backModality: Bool = false // true quando l'utente è portato alla ContentView
+    @State private var isRecording: Bool = false // true quando l'utente sta registrando
+    @State private var showPeerDisconnectedAlert: Bool = false // true se l'avversario si disconnette
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
     @State private var moveLeft: Bool = false
     @State private var moveOpponentLeft: Bool = false
-    @EnvironmentObject var speechRecognizer: SpeechRecognizer
+    @EnvironmentObject var speechRecognizer: SpeechRecognizer // riferimento allo speech recognizer
     
     var body: some View {
         ZStack {
@@ -313,25 +313,6 @@ struct OneVsOneGameView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                             .shadow(radius: 3)
                             .transition(.scale(scale: 0.5, anchor: .center)) // Scala la transizione per l'apparizione
-                        /*.onDisappear {
-                         if peerManager.isHost {                 // host
-                         if peerManager.currentPlayer == 0 { // host
-                         withAnimation(.easeInOut(duration: 0.3)) {
-                         }
-                         } else if peerManager.currentPlayer == 1 { // client
-                         withAnimation(.easeInOut(duration: 0.3)) {
-                         }
-                         }
-                         } else if peerManager.isClient {        // client
-                         if peerManager.currentPlayer == 0 { // host
-                         withAnimation(.easeInOut(duration: 0.3)) {
-                         }
-                         } else if peerManager.currentPlayer == 1 { // client
-                         withAnimation(.easeInOut(duration: 0.3)) {
-                         }
-                         }
-                         }
-                         }*/
                     }
                 }
                 .animation(.easeInOut(duration: 0.3), value: peerManager.tableCards)

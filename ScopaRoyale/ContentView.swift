@@ -8,7 +8,7 @@ struct ContentView: View {
     @State private var lobbyName: String = "" // nome della lobby
     @State private var showLobbyForm: Bool = false // true se l'utente sceglie di creare una lobby e visualizza il corrispondente overlay
     @State private var showGameRules: Bool = false // true se l'utente ha aperto le regole del gioco
-    @State private var showSettings: Bool = false // true se l'utente ha aperto le impostazioni
+    @State private var showProfileView: Bool = false // true se l'utente ha aperto le impostazioni
     @EnvironmentObject private var peerManager: MultiPeerManager // riferimento al peer manager
     private var speechRecognizer: SpeechRecognizer { // dichiarazione dello speech recognizer
         SpeechRecognizer(peerManager: peerManager)
@@ -25,7 +25,7 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 if showUsernameEntry { // se l'utente non ha ancora inserito l'username
-                    UsernameEntryView() // mostra la relativa view
+                    UsernameEntryView().environmentObject(speechRecognizer) // mostra la relativa view
                 } else { // altrimenti resta sulla ContentView
                     content
                 }
@@ -36,7 +36,7 @@ struct ContentView: View {
                 if !showUsernameEntry {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
-                            showSettings = true
+                            showProfileView = true
                         }) {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 20, weight: .regular))
@@ -54,7 +54,7 @@ struct ContentView: View {
         .preferredColorScheme(.light) // forza la light mode
         .overlay(lobbyFormOverlay) // overlay per la creazione della lobby
         .overlay(gameRulesOverlay) // overlay per la visualizzazione delle regole
-        .overlay(settingsOverlay) // overlay per le impostazioni
+        .overlay(profileOverlay) // overlay per le impostazioni
         .onTapGesture { // chiude la tastiera quando si preme sullo schermo
             hideKeyboard()
         }
@@ -186,17 +186,13 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    private var settingsOverlay: some View {
-        if showSettings {
+    private var profileOverlay: some View {
+        if showProfileView {
             ZStack {
                 Color.black.opacity(0.4)
                     .edgesIgnoringSafeArea(.all)
-                    .onTapGesture { // chiude la pagina delle impostazioni se si clicca sullo schermo
-                        showSettings = false
-                    }
                 VStack {
-                    ProfileView(username: $username)
-                        .environmentObject(peerManager)
+                    ProfileView(username: $username, showProfileView: $showProfileView)
                 }
                 .frame(width: 370)
                 .padding(.top, 20)

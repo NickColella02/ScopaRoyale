@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct UsernameEntryView: View {
-    @State private var username: String = ""
+    @State private var username: String = "" // username del giocatore
     @State private var showTitle: Bool = false
     @State private var showDescription: Bool = false
-    @State private var showUsernameField: Bool = false
+    @State private var showUsernameField: Bool = false // campo di testo per l'inserimento dell'username
+    @EnvironmentObject private var speechRecognizer: SpeechRecognizer // riferimento allo speech recognizer
     
     var body: some View {
         VStack {
@@ -43,6 +44,16 @@ struct UsernameEntryView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation(.easeInOut(duration: 1.0)) {
                     showUsernameField = true
+                }
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { //
+                speechRecognizer.speakText("Desideri abilitare la blind mode?")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    speechRecognizer.startTranscribing()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        speechRecognizer.stopTranscribing()
+                    }
                 }
             }
         }
