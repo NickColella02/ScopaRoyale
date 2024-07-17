@@ -46,11 +46,6 @@ struct ContentView: View {
                     }
                 }
             }
-            .onAppear() { // al caricamento della pagina, chiude la connessione con eventuali peer connessi
-                if peerManager.isHost {
-                    peerManager.closeConnection()
-                }
-            }
             .onReceive(NotificationCenter.default.publisher(for: .usernameEntered)) { _ in
                 self.username = UserDefaults.standard.string(forKey: "username") ?? ""
                 self.showUsernameEntry = false
@@ -111,6 +106,7 @@ struct ContentView: View {
                         if !lobbyName.isEmpty {
                             createdLobby = true
                             showLobbyForm = false
+                            peerManager.closeConnection() // chiude la connessione
                         }
                     }) {
                         Text("Crea lobby")

@@ -147,8 +147,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         DispatchQueue.main.async {
             if let receivedString = String(data: data, encoding: .utf8) {
                 if receivedString == "START_GAME" { // riceve il segnale di inizio partita
-                    self.startGame = true
-                    self.gameOver = false
+                    self.startGame = true // segnala l'inizio della partita
+                    self.gameOver = false // mette a false per non mostrare la pagina dei punteggi
+                    self.showGameOverAnimation = false // pulisce l'animazione di fine partita
                     if self.blindMode {
                         self.speakText("È il tuo turno")
                     }
@@ -349,6 +350,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.opponentHasSettebello = false
         self.playerHasPrimera = false
         self.opponentHasPrimera = false
+        self.showGameOverAnimation = false
         self.deck = []
         self.opponentHand = []
         self.playerHand = []
@@ -761,6 +763,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         self.opponentHasSettebello = false
         self.playerHasPrimera = false
         self.opponentHasPrimera = false
+        self.showGameOverAnimation = false
         self.deck = []
         self.opponentHand = []
         self.playerHand = []

@@ -36,7 +36,6 @@ struct ShowWinnerView: View {
                     Button(action: { // bottone per terminare la partita e tornare alla ContentView
                         if peerManager.isHost { // se il server clicca su termina partita
                             peerManager.sendEndGameSignal() // invia un segnale notificando al client la fine della partita
-                            peerManager.closeConnection() // chiude la connessione
                         }
                         showHomeView = true // ritorna alla ContentView
                     }) {
