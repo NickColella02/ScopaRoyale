@@ -257,7 +257,7 @@ actor SpeechRecognizer: ObservableObject {
                 }
             }
         } else {
-            if UserDefaults.standard.string(forKey: "username") == "" {
+            if UserDefaults.standard.string(forKey: "username") == nil {
                 await stopTranscribing()
                 if command == "sì" || command == "si" || command == "abilita" || command == "attiva" {
                     DispatchQueue.main.async {
