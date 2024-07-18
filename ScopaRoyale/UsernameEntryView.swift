@@ -6,6 +6,7 @@ struct UsernameEntryView: View {
     @State private var showDescription: Bool = false
     @State private var showUsernameField: Bool = false // campo di testo per l'inserimento dell'username
     @EnvironmentObject private var speechRecognizer: SpeechRecognizer // riferimento allo speech recognizer
+    @EnvironmentObject var peerManager: MultiPeerManager
     
     var body: some View {
         VStack {
@@ -18,10 +19,8 @@ struct UsernameEntryView: View {
                 .opacity(showTitle ? 1 : 0)
                 .padding(.bottom, 50)
             
-            UsernameFormView(username: $username, showUsernameField: $showUsernameField) {
-                UserDefaults.standard.set(username, forKey: "username")
-                NotificationCenter.default.post(name: .usernameEntered, object: nil)
-            }
+            UsernameFormView(username: $username, showUsernameField: $showUsernameField)
+                .environmentObject(peerManager)
             .opacity(showUsernameField ? 1 : 0)
             .padding(.bottom, showUsernameField ? 0 : -100)
             
@@ -48,16 +47,16 @@ struct UsernameEntryView: View {
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { //
-                speechRecognizer.speakText("Desideri abilitare la blind mode?")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                speechRecognizer.speakText("Desideri abilitare la modalità per non vedenti?")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
                     speechRecognizer.startTranscribing()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                         speechRecognizer.stopTranscribing()
                     }
                 }
             }
         }
-        .background(Color.white.edgesIgnoringSafeArea(.all))
+        .background(Color.white.ignoresSafeArea(.all))
         .preferredColorScheme(.light)
     }
 }
@@ -65,10 +64,10 @@ struct UsernameEntryView: View {
 struct UsernameFormView: View {
     @Binding var username: String
     @Binding var showUsernameField: Bool
-    let onContinue: () -> Void
+    @EnvironmentObject private var peerManager: MultiPeerManager
         
     var body: some View {
-        VStack {            
+        VStack {
             TextField("Inserisci il tuo username", text: $username)
                 .padding()
                 .background(Color(.systemGray6))
@@ -76,7 +75,8 @@ struct UsernameFormView: View {
                 .padding(.horizontal, 25)
                 .opacity(username.isEmpty ? 0.5 : 1.0)
             Button(action: {
-                onContinue()
+                UserDefaults.standard.set(username, forKey: "username")
+                NotificationCenter.default.post(name: .usernameEntered, object: nil)
             }) {
                 Text("Fine")
                     .font(.system(size: 20, design: .default))
@@ -89,7 +89,12 @@ struct UsernameFormView: View {
                     .opacity(username.isEmpty ? 0.5 : 1.0)
             }
             .disabled(username.isEmpty)
-            
+            .onChange(of: peerManager.blindMode) {
+                if peerManager.blindMode {
+                    UserDefaults.standard.set("BlindUser", forKey: "username")
+                    NotificationCenter.default.post(name: .usernameEntered, object: nil)
+                }
+            }
             Text("Puoi modificare il tuo username nelle impostazioni del profilo")
                 .font(.system(size: 14, design: .default))
                 .foregroundStyle(.black)

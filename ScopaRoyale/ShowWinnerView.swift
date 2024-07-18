@@ -51,7 +51,9 @@ struct ShowWinnerView: View {
                 }
                 .onAppear { // al caricamento della pagina
                     if peerManager.blindMode { // se è abilitata la blind mode
-                        speechRecognizer.speakText("Il vincitore è \(peerManager.winner)") // pronuncia il vincitore
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            speechRecognizer.speakText("Il vincitore è \(peerManager.winner)") // pronuncia il vincitore
+                        }
                     }
                 }
             }

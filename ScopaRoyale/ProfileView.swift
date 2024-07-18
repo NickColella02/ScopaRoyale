@@ -115,8 +115,8 @@ struct ProfileView: View {
     }
     
     private func toggleBlindMode() {
-            let message = peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata"
-            speakText(message)
+        let message = peerManager.blindMode ? "Blind mode abilitata" : "Blind mode disabilitata"
+        speakText(message)
     }
     
     private func speakText(_ text: String) {

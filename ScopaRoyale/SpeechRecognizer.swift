@@ -194,6 +194,8 @@ actor SpeechRecognizer: ObservableObject {
         }
         if peerManager.startGame {
             var foundVerb: String = "" // verbo trovato
+            var foundValue: String = "" // valore trovato
+            var foundSeed: String = "" // seme trovato
             for verbo in verbi { // controllo se è riconosciuto un verbo di azione
                 if command.contains(verbo) {
                     foundVerb = verbo
@@ -201,8 +203,6 @@ actor SpeechRecognizer: ObservableObject {
                 }
             }
             if !foundVerb.isEmpty { // se è riconosciuto un verbo di azione
-                var foundValue: String = "" // valore trovato
-                var foundSeed: String = "" // seme trovato
                 for valore in valori { // controllo se è riconosciuto un valore
                     if command.contains(valore) {
                         foundValue = valore
@@ -257,17 +257,28 @@ actor SpeechRecognizer: ObservableObject {
                 }
             }
         } else {
-            await stopTranscribing()
-            if command == "sì" {
-                DispatchQueue.main.async {
-                    self.peerManager.blindMode = true
+            if UserDefaults.standard.string(forKey: "username") == "" {
+                await stopTranscribing()
+                if command == "sì" || command == "si" || command == "abilita" || command == "attiva" {
+                    DispatchQueue.main.async {
+                        self.peerManager.blindMode = true
+                    }
+                    await speakText("Modalità per non vedenti abilitata")
+                } else if command == "no" || command == "disabilita" || command == "disattiva" {
+                    DispatchQueue.main.async {
+                        self.peerManager.blindMode = false
+                    }
+                    await speakText("Modalità per non vedenti disabilitata")
                 }
-                await speakText("Blind mode abilitata")
-            } else if command == "no" {
-                DispatchQueue.main.async {
-                    self.peerManager.blindMode = false
+            } else {
+                if !peerManager.joinedLobby {
+                    print("In cerca di una lobby")
+                    if command.contains("cerca") && command.contains("partita") {
+                        print("Cerca partita comando riconosciuto")
+                        await stopTranscribing()
+                        NotificationCenter.default.post(name: .joinGameCommand, object: nil)
+                    }
                 }
-                await speakText("Blind mode disabilitata")
             }
         }
     }
@@ -286,7 +297,7 @@ actor SpeechRecognizer: ObservableObject {
         utterance.rate = 0.5
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .mixWithOthers, .defaultToSpeaker])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
@@ -313,4 +324,8 @@ extension AVAudioApplication {
             }
         }
     }
+}
+
+extension Notification.Name {
+    static let joinGameCommand = Notification.Name("joinGameCommand")
 }

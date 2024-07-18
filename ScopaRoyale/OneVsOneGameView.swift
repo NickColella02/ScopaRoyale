@@ -15,13 +15,15 @@ struct OneVsOneGameView: View {
     @State private var draggedCard: Card? = nil
     @State private var cardOffset: CGSize = .zero
     @State private var moveLeft: Bool = false
+    @State private var showScopaText: Bool = false
+    @State private var showSettebelloText: Bool = false
     @State private var moveOpponentLeft: Bool = false
     @EnvironmentObject var speechRecognizer: SpeechRecognizer // riferimento allo speech recognizer
     
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
-                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea(.all)
                 .navigationBarBackButtonHidden(true)
             GeometryReader { geometry in
                 ZStack {
@@ -247,7 +249,7 @@ struct OneVsOneGameView: View {
                     return draggedCard != nil ? 143 : 150
                 }
                 
-                if peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation {
+                if showScopaText {
                     Text("Scopa!")
                         .font(.system(size: 40, weight: .bold, design: .default))
                         .foregroundStyle(peerManager.showScopaAnimation ? Color.yellow : Color.red)
@@ -259,30 +261,37 @@ struct OneVsOneGameView: View {
                         )
                         .scaleEffect(peerManager.showScopaAnimation ? 1.2 : 1.0)
                         .transition(.scale)
-                        .animation(.easeInOut(duration: 0.3), value: peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation)
+                        .animation(.easeInOut(duration: 0.3), value: showScopaText)
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 withAnimation {
                                     peerManager.showScopaAnimation = false
                                     peerManager.showOpponentScopaAnimation = false
+                                    showScopaText = false
                                 }
                             }
                         }
                 }
                 
-                if peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation {
+                if showSettebelloText {
                     Text("Settebello!")
                         .font(.system(size: 40, weight: .bold, design: .default))
                         .foregroundStyle(peerManager.showSettebelloAnimation ? Color.yellow : Color.red)
                         .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Capsule())
-                        .transition(.asymmetric(insertion: .scale, removal: .opacity))
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.7))
+                                .shadow(color: .gray, radius: 10, x: 5, y: 5)
+                        )
+                        .scaleEffect(peerManager.showSettebelloAnimation ? 1.2 : 1.0)
+                        .transition(.scale)
+                        .animation(.easeInOut(duration: 0.3), value: showSettebelloText)
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 withAnimation {
                                     peerManager.showSettebelloAnimation = false
                                     peerManager.showOpponentSettebelloAnimation = false
+                                    showSettebelloText = false
                                 }
                             }
                         }
@@ -318,8 +327,32 @@ struct OneVsOneGameView: View {
                 .animation(.easeInOut(duration: 0.3), value: peerManager.tableCards)
                 .padding(.horizontal, 40)
                 .padding(.bottom, bottomPaddingTable)
-                
-                
+                .onChange(of: peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation) {
+                    if peerManager.showScopaAnimation || peerManager.showOpponentScopaAnimation {
+                            if !peerManager.blindMode {
+                                showScopaText = true
+                            } else {
+                                if peerManager.showScopaAnimation {
+                                    peerManager.showScopaAnimation = false
+                                } else if peerManager.showOpponentScopaAnimation {
+                                    peerManager.showOpponentScopaAnimation = false
+                                }
+                            }
+                        }
+                    }
+                .onChange(of: peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation) {
+                    if peerManager.showSettebelloAnimation || peerManager.showOpponentSettebelloAnimation {
+                            if !peerManager.blindMode {
+                                showSettebelloText = true
+                            } else {
+                                if peerManager.showSettebelloAnimation {
+                                    peerManager.showSettebelloAnimation = false
+                                } else if peerManager.showOpponentSettebelloAnimation {
+                                    peerManager.showOpponentSettebelloAnimation = false
+                                }
+                            }
+                        }
+                    }
                 Spacer()
                 
                 VStack {
@@ -411,12 +444,19 @@ struct OneVsOneGameView: View {
         }
         .onChange(of: peerManager.currentPlayer) {
             if peerManager.blindMode && !peerManager.gameOver {
-                if peerManager.isHost && peerManager.currentPlayer == 0 {
-                    speechRecognizer.speakText("È il tuo turno")
+                if peerManager.isClient && peerManager.currentPlayer == 1 {
                     speechRecognizer.stopTranscribing()
-                    isRecording = false
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        speechRecognizer.speakText("È il tuo turno")
+                    }
+                    DispatchQueue.main.async {
+                        isRecording = false
+                    }
                 }
             }
+        }
+        .onAppear {
+            speechRecognizer.stopTranscribing()
         }
         .alert(isPresented: Binding(
             get: {
@@ -457,7 +497,7 @@ struct OneVsOneGameView: View {
         if peerManager.gameOver {
             ZStack {
                 Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea(.all)
                 VStack {
                     ShowWinnerView()
                 }

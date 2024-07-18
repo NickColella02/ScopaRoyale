@@ -25,7 +25,7 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 if showUsernameEntry { // se l'utente non ha ancora inserito l'username
-                    UsernameEntryView().environmentObject(speechRecognizer) // mostra la relativa view
+                    UsernameEntryView().environmentObject(peerManager).environmentObject(speechRecognizer) // mostra la relativa view
                 } else { // altrimenti resta sulla ContentView
                     content
                 }
@@ -68,6 +68,17 @@ struct ContentView: View {
                 .scaledToFit()
                 .frame(height: 180)
                 .padding(.bottom, 20)
+                .onReceive(NotificationCenter.default.publisher(for: .joinGameCommand)) { _ in
+                    if peerManager.blindMode {
+                        self.showJoinGame = true
+                    }
+                }
+                .onAppear {
+                    if peerManager.blindMode {
+                        speechRecognizer.startTranscribing()
+                        print("registro")
+                    }
+                }
                 .navigationDestination(isPresented: $showJoinGame) { // va alla JoinAGameView se l'utente entra in una lobby esistente
                     JoinAGameView(username: username).environmentObject(peerManager).environmentObject(speechRecognizer)
                 }
@@ -88,7 +99,7 @@ struct ContentView: View {
         if showLobbyForm {
             ZStack {
                 Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea(.all)
                     .onTapGesture {
                         showLobbyForm = false
                     }
@@ -135,7 +146,7 @@ struct ContentView: View {
         if showGameRules {
             ZStack {
                 Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea(.all)
                     .onTapGesture {
                         showGameRules = false
                     }
@@ -190,7 +201,7 @@ struct ContentView: View {
         if showProfileView {
             ZStack {
                 Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea(.all)
                 VStack {
                     ProfileView(username: $username, showProfileView: $showProfileView)
                 }

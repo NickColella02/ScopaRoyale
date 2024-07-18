@@ -98,7 +98,8 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var showSettebelloAnimation: Bool = false // true se il giocatore ha preso il settebello e va mostrata l'animazione
     @Published var showOpponentSettebelloAnimation: Bool = false // true se l'avversario ha preso il settebello e va mostrata l'animazione
     @Published var showGameOverAnimation: Bool = false // true se la partita è terminata
-
+    @Published var joinedLobby: Bool = false
+    
     override init() {
         self.blindMode = UserDefaults.standard.bool(forKey: "blindMode")
         super.init()
@@ -151,7 +152,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     self.gameOver = false // mette a false per non mostrare la pagina dei punteggi
                     self.showGameOverAnimation = false // pulisce l'animazione di fine partita
                     if self.blindMode {
-                        self.speakText("È il tuo turno")
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            self.speakText("È il tuo turno")
+                        }
                     }
                 } else if receivedString.starts(with: "Lobby:") { // riceve il nome della lobby
                     self.lobbyName = String(receivedString.dropFirst(6))
@@ -181,9 +184,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     let data = data.dropFirst(14)
                     let dataString = String(data: data, encoding: .utf8)
                     self.currentPlayer = Int(dataString!)!
-                    if self.blindMode {
-                        self.speakText("È il tuo turno")
-                    }
                 } else if receivedString.starts(with: "GameOver:") { // riceve il segnale di fine partita
                     self.gameOver = true
                     self.startGame = false
@@ -249,6 +249,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             let data = try JSONDecoder().decode(ScopaAnimation.self, from: jsonData)
             self.showScopaAnimation = data.showScopaAnimation
             self.showOpponentScopaAnimation = data.showOpponentScopaAnimation
+            if self.showOpponentScopaAnimation && self.blindMode {
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.speakText("L'avversario ha fatto scopa")
+                }
+            }
         } catch {
             print("Errore nella decodifica dei dati scopa animation: \(error.localizedDescription)")
         }
@@ -259,6 +264,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             let data = try JSONDecoder().decode(SettebelloAnimation.self, from: jsonData)
             self.showSettebelloAnimation = data.showSettebelloAnimation
             self.showOpponentSettebelloAnimation = data.showOpponentSettebelloAnimation
+            if self.showOpponentSettebelloAnimation && self.blindMode {
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.speakText("L'avversario ha preso il settebello")
+                }
+            }
         } catch {
             print("Errore nella decodifica dei dati settebello animation: \(error.localizedDescription)")
         }
@@ -603,6 +613,11 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
             
             if tableCards.isEmpty || shortestCombination == nil { // se il tavolo è vuoto o non c'è una combinazione valida
                 tableCards.append(card) // aggiungi la carta giocata al tavolo
+                if blindMode {
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        self.speakText("Hai giocato la carta \(card.value) di \(card.seed)")
+                    }
+                }
             } else if let validCombination = shortestCombination { // se ha trovato una combinazione di carte da prendere
                 lastPlayer = currentPlayer // aggiorno l'ultimo giocatore che ha effettuato una presa
                 cardsToTake = validCombination // salvo la combinazione
@@ -611,13 +626,17 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                         tableCards.remove(at: index)
                     }
                     if blindMode {
-                        self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            self.speakText("Hai preso la carta \(cardToTake.value) di \(cardToTake.seed)")
+                        }
                     }
                 }
                 if tableCards.isEmpty { // se il giocatore prende le ultime carte del tavolo ha fatto scopa
                     playerPoints.append(card)
                     if blindMode {
-                        self.speakText("Hai fatto scopa")
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            self.speakText("Hai fatto scopa")
+                        }
                     } else {
                         self.showScopaAnimation = true
                         sendScopaAnimation()
@@ -631,7 +650,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                 cardTakenByPlayer.append(contentsOf: cardsToTake)
                 if cardsToTake.contains(Card(value: "sette", seed: "denari")) {
                     if blindMode {
-                        self.speakText("Hai preso il settebello")
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            self.speakText("Hai preso il settebello")
+                        }
                     } else {
                         self.showSettebelloAnimation = true
                         sendSettebelloAnimation()
@@ -713,7 +734,9 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
                     sendPlayersCoins() // invia le carte oro prese dai giocatori
                     sendCardsTaken() // invia le carte prese dai giocatori
                     if blindMode {
-                        self.speakText("Partita terminata")
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            self.speakText("Partita terminata")
+                        }
                     } else {
                         self.showGameOverAnimation = true // termina la partita
                     }
@@ -735,7 +758,7 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
         utterance.rate = 0.5
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playback, mode: .default, options: [.allowBluetooth, .defaultToSpeaker, .mixWithOthers])
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .mixWithOthers, .defaultToSpeaker])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             print("Errore nella configurazione dell'AVAudioSession: \(error.localizedDescription)")
