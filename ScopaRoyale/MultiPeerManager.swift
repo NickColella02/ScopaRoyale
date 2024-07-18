@@ -98,7 +98,6 @@ class MultiPeerManager: NSObject, ObservableObject, MCSessionDelegate, MCNearbyS
     @Published var showSettebelloAnimation: Bool = false // true se il giocatore ha preso il settebello e va mostrata l'animazione
     @Published var showOpponentSettebelloAnimation: Bool = false // true se l'avversario ha preso il settebello e va mostrata l'animazione
     @Published var showGameOverAnimation: Bool = false // true se la partita è terminata
-    @Published var joinedLobby: Bool = false
     
     override init() {
         self.blindMode = UserDefaults.standard.bool(forKey: "blindMode")

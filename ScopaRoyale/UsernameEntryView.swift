@@ -46,7 +46,7 @@ struct UsernameEntryView: View {
                 }
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { //
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 speechRecognizer.speakText("Desideri abilitare la modalità per non vedenti?")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
                     speechRecognizer.startTranscribing()

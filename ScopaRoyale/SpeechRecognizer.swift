@@ -270,15 +270,6 @@ actor SpeechRecognizer: ObservableObject {
                     }
                     await speakText("Modalità per non vedenti disabilitata")
                 }
-            } else {
-                if !peerManager.joinedLobby {
-                    print("In cerca di una lobby")
-                    if command.contains("cerca") && command.contains("partita") {
-                        print("Cerca partita comando riconosciuto")
-                        await stopTranscribing()
-                        NotificationCenter.default.post(name: .joinGameCommand, object: nil)
-                    }
-                }
             }
         }
     }
@@ -324,8 +315,4 @@ extension AVAudioApplication {
             }
         }
     }
-}
-
-extension Notification.Name {
-    static let joinGameCommand = Notification.Name("joinGameCommand")
 }

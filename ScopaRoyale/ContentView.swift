@@ -68,17 +68,6 @@ struct ContentView: View {
                 .scaledToFit()
                 .frame(height: 180)
                 .padding(.bottom, 20)
-                .onReceive(NotificationCenter.default.publisher(for: .joinGameCommand)) { _ in
-                    if peerManager.blindMode {
-                        self.showJoinGame = true
-                    }
-                }
-                .onAppear {
-                    if peerManager.blindMode {
-                        speechRecognizer.startTranscribing()
-                        print("registro")
-                    }
-                }
                 .navigationDestination(isPresented: $showJoinGame) { // va alla JoinAGameView se l'utente entra in una lobby esistente
                     JoinAGameView(username: username).environmentObject(peerManager).environmentObject(speechRecognizer)
                 }
